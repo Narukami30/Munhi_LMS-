@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMHS Faculty Portal - Teacher Dashboard & ECR System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d', // DepEd Academic Green
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        gold: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-report-card, #printable-report-card * {
+                visibility: visible;
+            }
+            #printable-report-card {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
+
+    <header class="sticky top-0 z-30 border-b border-slate-200 glass-header px-4 lg:px-8 py-2.5 transition-all">
+        <div class="flex items-center justify-between gap-4">
+            <!-- Left Branding & Mobile Trigger -->
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-brand-700 hover:bg-brand-50 focus:outline-none" aria-label="Toggle Navigation">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-900 via-brand-800 to-brand-700 p-0.5 shadow-md shadow-brand-800/20 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-chalkboard-user text-xl"></i>
+                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-gold-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-heading font-extrabold text-brand-900 tracking-tight text-base sm:text-lg leading-tight">Naujan Municipal High School</h1>
+                            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200">FACULTY PORTAL</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium">DepEd Division of Oriental Mindoro • School ID: 301532</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Academic Session Indicators -->
+            <div class="hidden xl:flex items-center gap-2">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
+                    <i class="fa-regular fa-calendar-days text-brand-700"></i>
+                    <span>S.Y. 2026–2027</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                </div>
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 border border-brand-200 text-xs font-bold text-brand-800">
+                    <i class="fa-solid fa-circle-check text-brand-600"></i>
+                    <span>Three-Term Grading System</span>
+                </div>
+            </div>
+
+            <!-- Right Controls: Quick Actions, Alerts, Teacher Info -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Quick Action Buttons -->
+                <div class="hidden sm:flex items-center gap-1.5">
+                    <button onclick="switchView('ecr')" class="px-3 py-1.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-sm shadow-brand-700/20">
+                        <i class="fa-solid fa-pen-nib text-[10px]"></i>
+                        <span>Enter Grades</span>
+                    </button>
+                    <button onclick="switchView('attendance')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-brand-50 text-slate-700 hover:text-brand-800 font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-user-check text-brand-700 text-xs"></i>
+                        <span>Roll Call</span>
+                    </button>
+                </div>
+
+                <!-- Notifications -->
+                <div class="relative">
+                    <button id="notif-btn" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 hover:text-brand-700 hover:bg-slate-100 transition-colors relative" aria-label="Notifications">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+                    </button>
+                    <!-- Notification Flyout -->
+                    <div id="notif-menu" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Faculty Notifications</span>
+                            <span class="text-[11px] font-semibold text-slate-500">SERMS notices</span>
+                        </div>
+                        <div class="space-y-2 text-xs" id="teacher-notifications">
+                            <p class="rounded-xl bg-slate-50 p-3 text-slate-500">No stored school notices are available.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Profile Pill -->
+                <div class="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
+                    <div id="account-avatar" class="w-9 h-9 rounded-xl bg-brand-100 border border-brand-300 text-brand-800 font-bold flex items-center justify-center text-sm shadow-inner">
+                        MS
+                    </div>
+                    <div class="hidden md:block text-left">
+                        <p id="account-display-name" class="text-xs font-bold text-slate-900 leading-tight">Mrs. Maria Santos, LPT</p>
+                        <p class="text-[10px] text-slate-500 font-medium">Teacher</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between pt-16 lg:pt-0">
+            <div class="p-4 space-y-6 overflow-y-auto">
+                <!-- Adviser Section Tag -->
+                <div class="p-3 bg-brand-50 rounded-2xl border border-brand-100">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-extrabold uppercase text-brand-800 tracking-wider">Advisory Class</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-700 text-white">SERMS</span>
+                    </div>
+                    <p id="teacher-section-label" class="text-sm font-heading font-extrabold text-slate-800 mt-1">No saved class roster</p>
+                    <div class="flex items-center justify-between text-xs text-slate-500 mt-1">
+                        <span>Room 204 • Science Bldg</span>
+                        <span id="teacher-roster-count" class="font-semibold text-brand-700">0 Learners</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="px-3 text-[10px] font-bold tracking-wider uppercase text-slate-400">Class Management</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="switchView('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-700 text-white shadow-sm shadow-brand-700/20">
+                            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                            <span>Overview & Stats</span>
+                        </button>
+                        <button onclick="switchView('advisory')" id="nav-advisory" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800">
+                            <i class="fa-solid fa-users-rectangle w-5 text-center"></i>
+                            <span>Advisory Masterlist</span>
+                            <span class="ml-auto text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">45</span>
+                        </button>
+                        <button onclick="switchView('ecr')" id="nav-ecr" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800">
+                            <i class="fa-solid fa-calculator w-5 text-center"></i>
+                            <span>Grade Encoding (ECR)</span>
+                            <span class="ml-auto w-2 h-2 rounded-full bg-amber-500"></span>
+                        </button>
+                        <button onclick="switchView('attendance')" id="nav-attendance" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800">
+                            <i class="fa-solid fa-clipboard-user w-5 text-center"></i>
+                            <span>Daily Attendance</span>
+                        </button>
+                        <button onclick="switchView('anecdotal')" id="nav-anecdotal" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800">
+                            <i class="fa-solid fa-comment-dots w-5 text-center"></i>
+                            <span>Anecdotal Records</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div>
+                    <span class="px-3 text-[10px] font-bold tracking-wider uppercase text-slate-400">DepEd Forms & Schedules</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="openForm138Preview()" class="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-brand-50 hover:text-brand-800 transition-colors">
+                            <i class="fa-solid fa-file-lines w-5 text-center text-brand-700"></i>
+                            <span>Form 138 (SF9 Card)</span>
+                        </button>
+                        <button onclick="exportTeacherAttendance()" class="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-brand-50 hover:text-brand-800 transition-colors">
+                            <i class="fa-solid fa-file-excel w-5 text-center text-emerald-600"></i>
+                            <span>Export Attendance CSV</span>
+                        </button>
+                        <button onclick="showToast('Teaching schedules are unavailable: SERMS does not store timetable data.')" class="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-brand-50 hover:text-brand-800 transition-colors">
+                            <i class="fa-regular fa-clock w-5 text-center text-slate-500"></i>
+                            <span>Teaching Schedule</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- DepEd Quick Reference Card -->
+                <div class="p-3.5 rounded-2xl bg-gradient-to-br from-brand-900 to-brand-800 text-white text-xs shadow-md">
+                    <div class="flex items-center gap-2 mb-1 text-gold-400 font-bold">
+                        <i class="fa-solid fa-award"></i>
+                        <span>DepEd Order No. 8, s. 2015</span>
+                    </div>
+                    <p class="text-[11px] text-brand-100/90 leading-relaxed">
+                        Science Component Weights: Written Work (40%), Performance Tasks (40%), Term Exam (20%). Lowest Passing Transmuted Grade is 75.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer within sidebar -->
+            <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <span class="font-medium">NMHS SERMS Faculty v2.6</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </div>
+        </aside>
+
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-30 hidden lg:hidden"></div>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/60 relative">
+
+            <!-- ================= VIEW 1: OVERVIEW DASHBOARD ================= -->
+            <section id="view-overview" class="space-y-6">
+                <!-- Welcome & Deadline Banner -->
+                <div class="rounded-3xl bg-gradient-to-r from-brand-900 via-brand-800 to-brand-700 p-6 sm:p-7 text-white shadow-xl relative overflow-hidden">
+                    <div class="relative z-10 max-w-3xl">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 rounded-full bg-white/10 backdrop-blur border border-white/20 text-xs font-semibold text-brand-100">
+                                <i class="fa-solid fa-calendar-check mr-1 text-gold-400"></i> <span id="teacher-current-date">Today</span>
+                            </span>
+                            <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30 text-xs font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-database"></i> Live SERMS records
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-heading font-extrabold tracking-tight">Welcome, <span id="teacher-welcome-name">Teacher</span></h2>
+                        <p class="text-brand-100 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                            Review the class records, grades, and attendance saved under your teacher account.
+                        </p>
+                        
+                        <div class="mt-5 flex flex-wrap gap-2.5">
+                            <button onclick="switchView('attendance')" class="px-4 py-2 rounded-xl bg-white text-brand-900 font-bold text-xs hover:bg-brand-50 transition shadow-md active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-check text-brand-700"></i> Conduct Today's Roll Call
+                            </button>
+                            <button onclick="switchView('ecr')" class="px-4 py-2 rounded-xl bg-brand-800/80 hover:bg-brand-800 border border-brand-600 text-white font-semibold text-xs transition active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-pencil"></i> Open Electronic Class Record
+                            </button>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-graduation-cap absolute -right-6 -bottom-10 text-[180px] text-white/5 pointer-events-none"></i>
+                </div>
+
+                <!-- KPI Metric Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Stat 1: Advisory Enrollment -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Advisory Class</span>
+                            <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="teacher-student-count" class="text-3xl font-heading font-black text-slate-800">0</span>
+                            <span class="text-xs font-semibold text-slate-500">Learners</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span><i class="fa-solid fa-users text-brand-600"></i> <strong id="teacher-roster-status">No saved roster</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 2: Attendance Rate Today -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Attendance Today</span>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="teacher-attendance-rate" class="text-3xl font-heading font-black text-emerald-700">—</span>
+                            <span class="text-xs font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-full">Today</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span id="teacher-attendance-present" class="text-emerald-700 font-bold">0 Present</span>
+                            <span id="teacher-attendance-absent" class="text-rose-600 font-semibold">0 Absent</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 3: Q1 Encoding Progress -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Q1 Grades Encoded</span>
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-chart-simple"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="teacher-grades-progress" class="text-3xl font-heading font-black text-slate-800">0%</span>
+                            <span id="teacher-grades-status" class="text-xs text-slate-600 font-semibold bg-slate-50 px-2 py-0.5 rounded-full">No saved grades</span>
+                        </div>
+                        <!-- Micro Progress Bar -->
+                        <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                            <div id="teacher-grades-progress-bar" class="bg-brand-600 h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Stat 4: Remediation Alerts -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">For Remediation</span>
+                            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="teacher-remediation-count" class="text-3xl font-heading font-black text-rose-600">0</span>
+                            <span class="text-xs font-semibold text-slate-500">Learners (&lt;75 Initial)</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span>Intervention Plan</span>
+                            <button onclick="switchView('ecr')" class="text-brand-700 font-bold hover:underline">Review &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule & Performance Breakdown -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Teaching Schedule -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-heading font-bold text-slate-800 text-base">Teaching Schedule</h3>
+                                <p class="text-xs text-slate-500">Timetable data is not stored in SERMS</p>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-600">Unavailable</span>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600">
+                            SERMS does not currently store faculty schedules, room assignments, or teaching loads.
+                        </div>
+                    </div>
+
+                    <!-- Grade Distribution Chart -->
+                    <div class="lg:col-span-2 bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div>
+                                <h3 class="font-heading font-bold text-slate-800 text-base">Class Academic Performance Distribution</h3>
+                                <p class="text-xs text-slate-500">Distribution from your saved grade records</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="teacher-class-mps" class="text-xs font-semibold text-brand-800 bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200">Class MPS: —</span>
+                            </div>
+                        </div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-100 text-center text-xs">
+                            <div class="p-2 rounded-lg bg-emerald-50 text-emerald-800">
+                                <span class="block text-[10px] uppercase font-bold text-emerald-600">Outstanding (90+)</span>
+                                <span id="teacher-performance-90" class="font-black text-sm">0 Learners</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-teal-50 text-teal-800">
+                                <span class="block text-[10px] uppercase font-bold text-teal-600">Very Sat (85-89)</span>
+                                <span id="teacher-performance-85" class="font-black text-sm">0 Learners</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-blue-50 text-blue-800">
+                                <span class="block text-[10px] uppercase font-bold text-blue-600">Satisfactory (80-84)</span>
+                                <span id="teacher-performance-80" class="font-black text-sm">0 Learners</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-rose-50 text-rose-800">
+                                <span class="block text-[10px] uppercase font-bold text-rose-600">Needs Support (&lt;75)</span>
+                                <span id="teacher-performance-below-75" class="font-black text-sm">0 Learners</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 2: GRADE ENCODING & ECR TAB ================= -->
+            <section id="view-ecr" class="hidden space-y-6">
+                <!-- ECR Control Header -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-brand-100 text-brand-800 border border-brand-200">Electronic Class Record (ECR)</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200" id="ecr-status-badge">Status: Draft / In-Progress</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Teacher Grade Sheet</h2>
+                            <p class="text-xs text-slate-500">Grade entries and calculations saved to your SERMS account</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="saveEcrDraft()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-regular fa-floppy-disk text-brand-700"></i> Save Draft
+                            </button>
+                            <button onclick="submitToRegistrar()" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-brand-700/20">
+                                <i class="fa-solid fa-paper-plane"></i> Finalize & Submit to Registrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter / Term Switchers & Weights -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Class Section:</label>
+                            <select id="teacher-section-input" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="">No assigned class sections</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="teacher-learning-area" class="block font-semibold text-slate-600 mb-1">Subject / Learning Area:</label>
+                            <input id="teacher-learning-area" type="text" maxlength="120" placeholder="Enter your subject" autocomplete="off" required class="w-full px-3 py-2 rounded-xl border border-slate-200 font-medium focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Term:</label>
+                            <select id="teacher-quarter" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold text-brand-800 focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="1">Term 1</option>
+                                <option value="2">Term 2</option>
+                                <option value="3">Term 3</option>
+                            </select>
+                        </div>
+                        <!-- Subject Weights Banner -->
+                        <div class="bg-brand-50 p-2.5 rounded-xl border border-brand-200 flex flex-col justify-center">
+                            <span class="text-[10px] font-extrabold uppercase text-brand-900 tracking-wider">DepEd Weights (Science):</span>
+                            <div class="flex justify-between font-bold text-brand-800 text-[11px] mt-0.5">
+                                <span>WW: 40%</span>
+                                <span>PT: 40%</span>
+                                <span>QA: 20%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive ECR Spreadsheet Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-xs border-collapse">
+                            <thead>
+                                <!-- Top Super-Headers -->
+                                <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <th class="py-2.5 px-3 text-left w-12 border-r border-slate-200">No.</th>
+                                    <th class="py-2.5 px-3 text-left w-56 border-r border-slate-200">Learner Name (LRN)</th>
+                                    <th colspan="4" class="py-2 px-2 bg-emerald-100/70 text-emerald-900 border-r border-slate-200">Written Works (40%)</th>
+                                    <th colspan="4" class="py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-slate-200">Performance Tasks (40%)</th>
+                                    <th colspan="2" class="py-2 px-2 bg-amber-100/70 text-amber-900 border-r border-slate-200">Term Exam (20%)</th>
+                                    <th class="py-2 px-2 bg-slate-200 border-r border-slate-200">Initial</th>
+                                    <th class="py-2 px-3 bg-brand-700 text-white font-extrabold">Term Grade</th>
+                                    <th class="py-2 px-2 text-right pr-4">Remark</th>
+                                </tr>
+                                <!-- Sub-Headers with Highest Possible Scores -->
+                                <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 text-[11px]">
+                                    <th class="py-1 px-2 border-r border-slate-200">#</th>
+                                    <th class="py-1 px-3 text-left border-r border-slate-200 font-normal">Highest Possible Score (HPS):</th>
+                                    <th class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW1 (25)</th>
+                                    <th class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW2 (25)</th>
+                                    <th class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW3 (50)</th>
+                                    <th class="py-1 px-1 bg-emerald-100/80 font-bold text-emerald-900 border-r border-slate-200">WS (40%)</th>
+
+                                    <th class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT1 (30)</th>
+                                    <th class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT2 (30)</th>
+                                    <th class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT3 (40)</th>
+                                    <th class="py-1 px-1 bg-blue-100/80 font-bold text-blue-900 border-r border-slate-200">WS (40%)</th>
+
+                                    <th class="py-1 px-1 bg-amber-50 text-amber-900 font-mono">Exam (50)</th>
+                                    <th class="py-1 px-1 bg-amber-100/80 font-bold text-amber-900 border-r border-slate-200">WS (20%)</th>
+
+                                    <th class="py-1 px-1 font-mono bg-slate-100 border-r border-slate-200">100%</th>
+                                    <th class="py-1 px-2 font-bold bg-brand-800 text-white">Transmuted</th>
+                                    <th class="py-1 px-2 text-right pr-4">Pass/Fail</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200" id="ecr-table-body">
+                                <!-- Populated dynamically by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- ECR Footer notice -->
+                    <div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-500">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-brand-700"></i>
+                            <span>All cell values automatically trigger DepEd Table 1 transmutation formula on change.</span>
+                        </div>
+                        <div class="font-mono text-[11px] font-semibold">
+                            Auto-Calculation Engine: <span class="text-emerald-700">ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 3: ADVISORY CLASS MASTERLIST ================= -->
+            <section id="view-advisory" class="hidden space-y-6">
+                <!-- Search & Filters -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900">Advisory Roster: Grade 10 - Jose Rizal</h2>
+                            <p class="text-xs text-slate-500">Official DepEd School Form 1 (SF1) Class Registry • S.Y. 2026-2027</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="showToast('Exporting official SF1 Registry format...')" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-pdf text-rose-600"></i> Export SF1
+                            </button>
+                            <button onclick="openForm138Preview()" class="px-3.5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-address-card"></i> View Form 138 Cards
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Input & Quick Filter -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+                        <div class="relative sm:col-span-2">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="advisory-search" oninput="filterAdvisory()" placeholder="Search Learner Reference Number (LRN) or Student Name..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <select id="advisory-gender-filter" onchange="filterAdvisory()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All learners</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advisory Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">LRN</th>
+                                    <th class="py-3 px-4">Student Full Name</th>
+                                    <th class="py-3 px-4">Gender</th>
+                                    <th class="py-3 px-4">Barangay</th>
+                                    <th class="py-3 px-4">Saved Subject Grade</th>
+                                    <th class="py-3 px-4">Status & Alerts</th>
+                                    <th class="py-3 px-4 text-right">Portfolio Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="advisory-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 4: DAILY ATTENDANCE TRACKER ================= -->
+            <section id="view-attendance" class="hidden space-y-6">
+                <!-- Attendance Header -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-800 border border-brand-200">DepEd SF2 Module</span>
+                                <span id="teacher-attendance-date" class="text-xs font-bold text-slate-500">Today</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Daily Roll-Call & Attendance Tracker</h2>
+                            <p class="text-xs text-slate-500">Section: <span id="teacher-attendance-section">Not specified</span> • Teacher: <span data-current-account-name>Teacher</span></p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="markAllPresent()" class="px-3.5 py-2 rounded-xl bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-800 font-bold text-xs flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-check-double"></i> Mark All Present
+                            </button>
+                            <button onclick="saveDailyAttendance()" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-brand-700/20">
+                                <i class="fa-regular fa-floppy-disk"></i> Submit Roll Call
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Live Summary Counters -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+                        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+                            <span class="block text-[11px] font-bold text-emerald-700 uppercase">Present</span>
+                            <span class="text-2xl font-black text-emerald-800" id="att-count-present">0</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                            <span class="block text-[11px] font-bold text-amber-700 uppercase">Late / Tardy</span>
+                            <span class="text-2xl font-black text-amber-800" id="att-count-late">0</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-center">
+                            <span class="block text-[11px] font-bold text-rose-700 uppercase">Absent</span>
+                            <span class="text-2xl font-black text-rose-800" id="att-count-absent">0</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-center">
+                            <span class="block text-[11px] font-bold text-blue-700 uppercase">Excused</span>
+                            <span class="text-2xl font-black text-blue-800" id="att-count-excused">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Roll Call Grid -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-4 sm:p-5">
+                    <div class="space-y-3" id="attendance-roster-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 5: ANECDOTAL NOTES & BEHAVIORAL ================= -->
+            <section id="view-anecdotal" class="hidden space-y-6 max-w-4xl mx-auto">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-6">
+                    <div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200 uppercase">Guidance & Class Advising</span>
+                        <h2 class="text-2xl font-heading font-extrabold text-slate-900 mt-2">Student Anecdotal & Behavioral Observation Logs</h2>
+                        <p class="text-xs text-slate-500">Document classroom observations, remedial counseling, parent-teacher conferences, and academic interventions.</p>
+                    </div>
+
+                    <form onsubmit="handleAnecdotalSubmit(event)" class="space-y-4 pt-4 border-t border-slate-100 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Select Learner *</label>
+                                <select id="anecdotal-student" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                    <option value="">-- Choose a learner from your saved roster --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Observation Date *</label>
+                                <input type="date" id="anecdotal-date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Specific Incident / Academic Observation Details *</label>
+                            <textarea id="anecdotal-text" rows="3" placeholder="Describe the behavior, achievement, or reason for academic remediation..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Intervention / Action Taken by Teacher *</label>
+                                <input type="text" id="anecdotal-action" placeholder="e.g. Conducted peer-tutoring session, Contacted mother" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                            </div>
+                            <div class="flex items-center pt-5">
+                                <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                                    <input type="checkbox" id="anecdotal-referral" class="rounded text-brand-700 focus:ring-brand-700 w-4 h-4">
+                                    <span>Refer to NMHS Guidance Counselor Office</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-3">
+                            <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-md shadow-brand-700/20">
+                                <i class="fa-solid fa-bookmark mr-1"></i> Save Anecdotal Entry
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Recent Logs List -->
+                    <div class="pt-6 border-t border-slate-100 space-y-3">
+                        <h4 class="font-heading font-bold text-slate-800 text-sm">Recent Anecdotal Entries</h4>
+                        <div class="space-y-2.5" id="anecdotal-list-container">
+                            <p class="rounded-xl bg-slate-50 p-3 text-xs text-slate-500">No saved anecdotal records.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- SLIDE-OVER DRAWER: Student Profile & DepEd Form 138 / SF9 Preview -->
+    <div id="portfolio-drawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closePortfolioDrawer()"></div>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-2xl bg-white shadow-2xl flex flex-col justify-between">
+                <!-- Drawer Header -->
+                <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-brand-900 text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-bold text-gold-400">
+                            <i class="fa-solid fa-id-badge text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-sm">Learner Record Preview</h3>
+                            <p class="text-[11px] text-brand-200">SERMS teacher-submitted grade data only</p>
+                        </div>
+                    </div>
+                    <button onclick="closePortfolioDrawer()" class="p-2 rounded-lg text-brand-200 hover:text-white hover:bg-white/10">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Printable Report Card Container -->
+                <div class="p-6 overflow-y-auto space-y-6 text-xs flex-1" id="printable-report-card">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Drawer Actions Footer -->
+                <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2">
+                    <button onclick="closePortfolioDrawer()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100 text-xs">Close</button>
+                    <button type="button" disabled title="Official SF9 output is unavailable because complete approved subject records are not stored in SERMS." class="px-4 py-2 rounded-xl bg-slate-200 text-slate-500 font-bold cursor-not-allowed shadow-sm flex items-center gap-1.5 text-xs">
+                        <i class="fa-solid fa-ban"></i> Official SF9 unavailable
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Action Alert Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-brand-400 text-base" id="toast-icon"></i>
+        <p class="text-xs font-medium" id="toast-msg">Operation completed successfully.</p>
+    </div>
+
+    <script>
+        const advisoryStudents = [];
+        let teacherChart = null;
+        let teacherAnecdotalRecords = [];
+        let teacherSubmission = null;
+        let teacherLocked = false;
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function localDateString(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getTeacherGrade(student) {
+            const fields = ['ww1', 'ww2', 'ww3', 'pt1', 'pt2', 'pt3', 'exam'];
+            if (!fields.every(field => Number.isFinite(student[field]))) return null;
+            const initial = ((student.ww1 + student.ww2 + student.ww3) / 100) * 40
+                + ((student.pt1 + student.pt2 + student.pt3) / 100) * 40
+                + (student.exam / 50) * 20;
+            return { initial, grade: transmuteGrade(initial) };
+        }
+
+        // DepEd Official Transmutation Table snippet (DepEd Order No. 8, s. 2015)
+        function transmuteGrade(initial) {
+            if (initial >= 100) return 100;
+            if (initial >= 98.40) return 99;
+            if (initial >= 96.80) return 98;
+            if (initial >= 95.20) return 97;
+            if (initial >= 93.60) return 96;
+            if (initial >= 92.00) return 95;
+            if (initial >= 90.40) return 94;
+            if (initial >= 88.80) return 93;
+            if (initial >= 87.20) return 92;
+            if (initial >= 85.60) return 91;
+            if (initial >= 84.00) return 90;
+            if (initial >= 82.40) return 89;
+            if (initial >= 80.80) return 88;
+            if (initial >= 79.20) return 87;
+            if (initial >= 77.60) return 86;
+            if (initial >= 76.00) return 85;
+            if (initial >= 74.40) return 84;
+            if (initial >= 72.80) return 83;
+            if (initial >= 71.20) return 82;
+            if (initial >= 69.60) return 81;
+            if (initial >= 68.00) return 80;
+            if (initial >= 66.40) return 79;
+            if (initial >= 64.80) return 78;
+            if (initial >= 63.20) return 77;
+            if (initial >= 61.60) return 76;
+            if (initial >= 60.00) return 75; // Passing boundary
+            if (initial >= 56.00) return 74;
+            if (initial >= 52.00) return 73;
+            if (initial >= 48.00) return 72;
+            if (initial >= 44.00) return 71;
+            if (initial >= 40.00) return 70;
+            return 68;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            document.getElementById('teacher-current-date').textContent = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('teacher-attendance-date').textContent = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('anecdotal-date').value = localDateString(today);
+            renderEcrTable();
+            renderAdvisoryTable(advisoryStudents);
+            renderAttendanceRoster();
+            renderAnecdotalRecords();
+            initPerformanceChart();
+            setupMobileMenu();
+            setupNotificationToggle();
+        });
+
+        window.setTeacherRecords = function ({ rosters = [], submission, attendance, anecdotal }) {
+            const sectionSelect = document.getElementById('teacher-section-input');
+            const previousSection = sectionSelect.value;
+            sectionSelect.replaceChildren();
+            rosters.forEach(roster => sectionSelect.add(new Option(roster.section, roster.section)));
+            if (!rosters.length) {
+                sectionSelect.add(new Option('No assigned class sections', ''));
+                sectionSelect.disabled = true;
+            } else {
+                sectionSelect.disabled = false;
+                sectionSelect.value = rosters.some(roster => roster.section === previousSection)
+                    ? previousSection
+                    : rosters[0].section;
+            }
+            const section = sectionSelect.value;
+            const selectedRoster = rosters.find(roster => roster.section === section);
+            const roster = new Map();
+            const assignedLrns = new Set((selectedRoster?.learners || []).map(learner => String(learner.lrn)));
+            const addStudent = record => {
+                const lrn = String(record.lrn || '');
+                if (!assignedLrns.has(lrn)) return;
+                const existing = roster.get(lrn) || {};
+                const student = { ...existing, ...record, lrn, id: Number(record.id) || existing.id || roster.size + 1 };
+                ['ww1', 'ww2', 'ww3', 'pt1', 'pt2', 'pt3', 'exam'].forEach(field => {
+                    if (record[field] === undefined || record[field] === null || record[field] === '') delete student[field];
+                    else student[field] = Number(record[field]);
+                });
+                roster.set(lrn, student);
+            };
+            (selectedRoster?.learners || []).forEach(addStudent);
+            (submission?.students || []).forEach(addStudent);
+            (attendance?.entries || []).forEach(entry => addStudent({ ...entry, attendance: entry.status || 'Unmarked' }));
+            advisoryStudents.splice(0, advisoryStudents.length, ...roster.values());
+            teacherAnecdotalRecords = anecdotal || [];
+            teacherSubmission = submission || null;
+            teacherLocked = teacherSubmission?.status === 'Approved & Locked';
+            document.getElementById('teacher-section-label').textContent = section || 'No assigned class section';
+            document.getElementById('teacher-attendance-section').textContent = section || 'Not assigned';
+            const accountName = window.SERMS_ACCOUNT?.name || 'Teacher';
+            document.getElementById('teacher-welcome-name').textContent = accountName;
+            const status = submission?.status || 'No saved grade record';
+            const badge = document.getElementById('ecr-status-badge');
+            badge.textContent = `Status: ${status}`;
+            badge.className = `px-2 py-0.5 rounded text-[10px] font-bold border ${status === 'Approved & Locked' ? 'bg-slate-100 text-slate-700 border-slate-200' : status === 'Submitted' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-amber-100 text-amber-800 border-amber-200'}`;
+            document.querySelectorAll('#view-ecr button[onclick="saveEcrDraft()"], #view-ecr button[onclick="submitToRegistrar()"]').forEach(element => { element.disabled = teacherLocked || !advisoryStudents.length; });
+            document.querySelectorAll('#view-attendance button[onclick="saveDailyAttendance()"], #view-attendance button[onclick="markAllPresent()"]').forEach(element => { element.disabled = !advisoryStudents.length; });
+            renderEcrTable();
+            renderAdvisoryTable(advisoryStudents);
+            renderAttendanceRoster();
+            renderAnecdotalRecords();
+            updateTeacherOverview(submission);
+        };
+
+        // Tab Navigation
+        function switchView(viewName) {
+            const views = ['overview', 'advisory', 'ecr', 'attendance', 'anecdotal'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                const nav = document.getElementById(`nav-${v}`);
+                if (v === viewName) {
+                    el.classList.remove('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-700 text-white shadow-sm shadow-brand-700/20";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800";
+                    }
+                }
+            });
+            closeMobileSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Calculate and Render ECR Spreadsheet Table
+        function renderEcrTable() {
+            const tbody = document.getElementById('ecr-table-body');
+            tbody.replaceChildren();
+            if (!advisoryStudents.length) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 15;
+                cell.className = 'px-4 py-8 text-center text-slate-500';
+                cell.textContent = 'No learners are in your saved class records yet. A class roster must be assigned before grade entry.';
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+
+            advisoryStudents.forEach((s, idx) => {
+                const result = getTeacherGrade(s);
+                const wwWeighted = result ? (((s.ww1 + s.ww2 + s.ww3) / 100) * 40).toFixed(2) : '—';
+                const ptWeighted = result ? (((s.pt1 + s.pt2 + s.pt3) / 100) * 40).toFixed(2) : '—';
+                const qaWeighted = result ? ((s.exam / 50) * 20).toFixed(2) : '—';
+                const initialScore = result ? result.initial.toFixed(2) : '—';
+                const transmuted = result ? result.grade : '—';
+                const isPassed = result && transmuted >= 75;
+                const scoreValue = field => s[field] ?? '';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 text-slate-800 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-left font-mono font-bold text-slate-500 border-r border-slate-200">${idx + 1}</td>
+                    <td class="py-2.5 px-3 text-left border-r border-slate-200">
+                        <div class="font-bold text-slate-900">${escapeHtml(s.name)}</div>
+                        <div class="font-mono text-[10px] text-slate-400">${escapeHtml(s.lrn)}</div>
+                    </td>
+                    <!-- WW Inputs -->
+                    <td class="py-1 px-1 bg-emerald-50/40 font-mono">
+                        <input type="number" min="0" max="25" value="${scoreValue('ww1')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'ww1', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-emerald-50/40 font-mono">
+                        <input type="number" min="0" max="25" value="${scoreValue('ww2')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'ww2', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-emerald-50/40 font-mono">
+                        <input type="number" min="0" max="50" value="${scoreValue('ww3')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'ww3', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-emerald-100/50 font-bold font-mono text-emerald-900 border-r border-slate-200">${wwWeighted}%</td>
+
+                    <!-- PT Inputs -->
+                    <td class="py-1 px-1 bg-blue-50/40 font-mono">
+                        <input type="number" min="0" max="30" value="${scoreValue('pt1')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'pt1', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-blue-50/40 font-mono">
+                        <input type="number" min="0" max="30" value="${scoreValue('pt2')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'pt2', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-blue-50/40 font-mono">
+                        <input type="number" min="0" max="40" value="${scoreValue('pt3')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'pt3', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-blue-100/50 font-bold font-mono text-blue-900 border-r border-slate-200">${ptWeighted}%</td>
+
+                    <!-- Exam Input -->
+                    <td class="py-1 px-1 bg-amber-50/40 font-mono">
+                        <input type="number" min="0" max="50" value="${scoreValue('exam')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'exam', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                    </td>
+                    <td class="py-1 px-1 bg-amber-100/50 font-bold font-mono text-amber-900 border-r border-slate-200">${qaWeighted}%</td>
+
+                    <!-- Computed Results -->
+                    <td class="py-1 px-1 font-mono font-semibold bg-slate-50 border-r border-slate-200 text-slate-700">${initialScore}</td>
+                    <td class="py-1 px-2 font-black font-mono text-base ${isPassed ? 'text-brand-800 bg-brand-50' : 'text-rose-700 bg-rose-50'}">
+                        ${transmuted}
+                    </td>
+                    <td class="py-1 px-3 text-right pr-4">
+                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${!result ? 'bg-slate-100 text-slate-600' : isPassed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${result ? (isPassed ? 'PASSED' : 'REMEDIAL') : 'INCOMPLETE'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Live ECR Value update and recalculation
+        function updateEcrScore(studentId, field, newVal) {
+            const student = advisoryStudents.find(s => s.id === studentId);
+            if (student) {
+                const limits = { ww1: 25, ww2: 25, ww3: 50, pt1: 30, pt2: 30, pt3: 40, exam: 50 };
+                const score = Number(newVal);
+                if (!Number.isFinite(score) || score < 0 || score > limits[field]) {
+                    showToast(`Enter a score from 0 to ${limits[field]}.`);
+                    renderEcrTable();
+                    return;
+                }
+                student[field] = score;
+                renderEcrTable();
+                updateTeacherOverview();
+                showToast('Grade updated in this page. Save Draft to persist the changes.');
+            }
+        }
+
+        function saveEcrDraft() {
+            showToast('Unable to save grade draft. Retry after checking your connection.');
+        }
+
+        function submitToRegistrar() {
+            showToast('Unable to submit grade record. Retry after checking your connection.');
+        }
+
+        // Advisory Masterlist & Search
+        function renderAdvisoryTable(list) {
+            const tbody = document.getElementById('advisory-table-body');
+            tbody.replaceChildren();
+            if (!list.length) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 7;
+                cell.className = 'px-4 py-8 text-center text-slate-500';
+                cell.textContent = 'No learner records are attached to your saved class records.';
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+
+            list.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                const result = getTeacherGrade(s);
+                const cells = [
+                    [s.lrn, 'py-3 px-4 font-mono font-bold text-brand-900'],
+                    [s.name, 'py-3 px-4 font-bold text-slate-900'],
+                    [s.gender || '—', 'py-3 px-4 text-slate-600'],
+                    [s.brgy || '—', 'py-3 px-4 text-slate-600'],
+                    [result ? String(result.grade) : '—', 'py-3 px-4 font-mono font-bold text-slate-800'],
+                    [result ? (result.grade < 75 ? 'Remediation Needed' : 'Grade saved') : 'No complete grade', 'py-3 px-4 text-slate-600']
+                ];
+                cells.forEach(([text, className], index) => {
+                    const cell = document.createElement('td');
+                    cell.className = className;
+                    if (index === 5) {
+                        const badge = document.createElement('span');
+                        badge.className = `inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${result && result.grade < 75 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'}`;
+                        badge.textContent = text;
+                        cell.appendChild(badge);
+                    } else {
+                        cell.textContent = text || '—';
+                    }
+                    tr.appendChild(cell);
+                });
+                const actionCell = document.createElement('td');
+                actionCell.className = 'py-3 px-4 text-right';
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'px-2.5 py-1 text-slate-700 bg-slate-100 hover:bg-brand-50 hover:text-brand-800 rounded-lg text-xs font-semibold transition-colors';
+                button.textContent = 'View record';
+                button.addEventListener('click', () => viewStudentPortfolio(s.lrn));
+                actionCell.appendChild(button);
+                tr.appendChild(actionCell);
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterAdvisory() {
+            const query = document.getElementById('advisory-search').value.toLowerCase().trim();
+            const gender = document.getElementById('advisory-gender-filter').value;
+
+            const filtered = advisoryStudents.filter(s => {
+                const matchQuery = s.lrn.includes(query) || s.name.toLowerCase().includes(query);
+                return matchQuery && (gender === 'ALL' || s.gender === gender);
+            });
+
+            renderAdvisoryTable(filtered);
+        }
+
+        // Daily Attendance Roll-Call Functionality
+        function renderAttendanceRoster() {
+            const container = document.getElementById('attendance-roster-list');
+            container.replaceChildren();
+            if (!advisoryStudents.length) {
+                const empty = document.createElement('p');
+                empty.className = 'rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500';
+                empty.textContent = 'No learners are in your saved class records. Attendance cannot be taken until a class roster is assigned.';
+                container.appendChild(empty);
+                updateAttendanceCounters();
+                return;
+            }
+
+            advisoryStudents.forEach(s => {
+                const div = document.createElement('div');
+                div.className = "flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-white transition-all gap-2";
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-brand-100 text-brand-800 font-bold flex items-center justify-center text-xs">
+                            ${escapeHtml((s.name || '?')[0])}
+                        </div>
+                        <div>
+                            <span class="font-bold text-slate-900 text-xs">${escapeHtml(s.name)}</span>
+                            <span class="block font-mono text-[10px] text-slate-400">${escapeHtml(s.lrn)}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 self-end sm:self-center text-xs">
+                        <button onclick="setStudentAttendance(${s.id}, 'Present')" class="att-btn-${s.id} px-3 py-1 rounded-lg font-bold border ${s.attendance === 'Present' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200'}">Present</button>
+                        <button onclick="setStudentAttendance(${s.id}, 'Late')" class="att-btn-${s.id} px-3 py-1 rounded-lg font-bold border ${s.attendance === 'Late' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-600 border-slate-200'}">Late</button>
+                        <button onclick="setStudentAttendance(${s.id}, 'Absent')" class="att-btn-${s.id} px-3 py-1 rounded-lg font-bold border ${s.attendance === 'Absent' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-slate-600 border-slate-200'}">Absent</button>
+                        <button onclick="setStudentAttendance(${s.id}, 'Excused')" class="att-btn-${s.id} px-3 py-1 rounded-lg font-bold border ${s.attendance === 'Excused' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200'}">Excused</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            updateAttendanceCounters();
+        }
+
+        function setStudentAttendance(studentId, status) {
+            const student = advisoryStudents.find(s => s.id === studentId);
+            if (student) {
+                student.attendance = status;
+                renderAttendanceRoster();
+            }
+        }
+
+        function markAllPresent() {
+            advisoryStudents.forEach(s => s.attendance = 'Present');
+            renderAttendanceRoster();
+            if (advisoryStudents.length) showToast(`Marked ${advisoryStudents.length} learner(s) present. Submit Roll Call to save.`);
+        }
+
+        function updateAttendanceCounters() {
+            let p = 0, l = 0, a = 0, e = 0;
+            advisoryStudents.forEach(s => {
+                if (s.attendance === 'Present') p++;
+                if (s.attendance === 'Late') l++;
+                if (s.attendance === 'Absent') a++;
+                if (s.attendance === 'Excused') e++;
+            });
+            document.getElementById('att-count-present').textContent = p;
+            document.getElementById('att-count-late').textContent = l;
+            document.getElementById('att-count-absent').textContent = a;
+            document.getElementById('att-count-excused').textContent = e;
+        }
+
+        function saveDailyAttendance() {
+            showToast('Attendance was not saved. Retry after checking your connection.');
+        }
+
+        // Student Portfolio / Form 138 (SF9) Modal Generator
+        function viewStudentPortfolio(lrn) {
+            const s = advisoryStudents.find(i => i.lrn === lrn);
+            const container = document.getElementById('printable-report-card');
+            container.replaceChildren();
+            if (!s) {
+                showToast('No learner record was found in your saved class records.');
+                return;
+            }
+            const result = getTeacherGrade(s);
+            const title = document.createElement('h4');
+            title.className = 'font-heading text-lg font-bold text-slate-900';
+            title.textContent = 'SERMS Grade Record Preview';
+            const identity = document.createElement('p');
+            identity.className = 'text-sm text-slate-700';
+            identity.textContent = `${s.name} • LRN ${s.lrn}`;
+            const subject = document.createElement('p');
+            subject.className = 'text-sm text-slate-700';
+            subject.textContent = `Learning area: ${document.getElementById('teacher-learning-area').value || teacherSubmission?.grade || 'Not specified'}`;
+            const term = document.createElement('p');
+            term.className = 'text-sm text-slate-700';
+            term.textContent = `Term: ${teacherSubmission?.quarter || document.getElementById('teacher-quarter').value}`;
+            const grade = document.createElement('p');
+            grade.className = 'rounded-xl border border-brand-200 bg-brand-50 p-3 text-sm font-bold text-brand-900';
+            grade.textContent = result ? `Saved subject grade: ${result.grade}` : 'No complete saved subject grade is available.';
+            const disclaimer = document.createElement('p');
+            disclaimer.className = 'rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900';
+            disclaimer.textContent = 'This is an internal preview, not an official SF9 report card. SERMS does not store the complete approved multi-subject and promotion records required to produce an official report card.';
+            container.append(title, identity, subject, term, grade, disclaimer);
+            document.getElementById('portfolio-drawer').classList.remove('hidden');
+            return;
+
+            // Science Grade for this student
+            const wwTotal = s.ww1 + s.ww2 + s.ww3;
+            const ptTotal = s.pt1 + s.pt2 + s.pt3;
+            const initialScore = ((wwTotal / 100) * 40) + ((ptTotal / 100) * 40) + ((s.exam / 50) * 20);
+            const scienceGrade = transmuteGrade(initialScore);
+
+            const genAve = ((s.filipino + s.english + s.math + scienceGrade + s.ap + s.esp + s.mapeh + s.tle) / 8).toFixed(1);
+
+            container.innerHTML = `
+                <!-- DepEd Official Heading -->
+                <div class="text-center pb-4 border-b-2 border-brand-900">
+                    <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Republic of the Philippines • Department of Education</p>
+                    <h3 class="font-heading font-extrabold text-brand-900 text-lg">NAUJAN MUNICIPAL HIGH SCHOOL</h3>
+                    <p class="text-xs text-slate-600">Division of Oriental Mindoro • District of Naujan West</p>
+                    <p class="text-xs font-bold text-slate-800 mt-2 uppercase tracking-wider bg-brand-50 py-1 rounded-lg border border-brand-200">
+                        LEARNER'S PROGRESS REPORT CARD (SF 9 - JHS)
+                    </p>
+                </div>
+
+                <!-- Learner Bio -->
+                <div class="grid grid-cols-2 gap-2 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div><span class="text-slate-400">Name:</span> <strong class="text-slate-900">${s.name}</strong></div>
+                    <div><span class="text-slate-400">LRN:</span> <strong class="font-mono text-slate-900">${s.lrn}</strong></div>
+                    <div><span class="text-slate-400">Grade & Section:</span> <strong>Grade 10 - Jose Rizal</strong></div>
+                    <div><span class="text-slate-400">School Year:</span> <strong>2026–2027</strong></div>
+                    <div><span class="text-slate-400">Class Adviser:</span> <strong id="report-card-adviser-name">Mrs. Maria Santos, LPT</strong></div>
+                    <div><span class="text-slate-400">Curriculum:</span> <strong>K to 12 Basic Education</strong></div>
+                </div>
+
+                <!-- Academic Rating Table -->
+                <div class="space-y-2">
+                    <h4 class="font-bold uppercase tracking-wider text-slate-700 text-xs">REPORT ON LEARNING PROGRESS AND ACHIEVEMENT</h4>
+                    <table class="w-full text-left border border-slate-200">
+                        <thead class="bg-slate-100 font-bold text-[11px] text-slate-700">
+                            <tr>
+                                <th class="p-2 border-b border-r border-slate-200">Learning Areas</th>
+                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q1</th>
+                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q2</th>
+                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q3</th>
+                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q4</th>
+                                <th class="p-2 border-b border-slate-200 text-center w-16">Final</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 font-mono text-[11px]">
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Filipino</td><td class="p-2 text-center border-r border-slate-200">${s.filipino}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">English</td><td class="p-2 text-center border-r border-slate-200">${s.english}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Mathematics</td><td class="p-2 text-center border-r border-slate-200">${s.math}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr class="bg-brand-50/60 font-semibold"><td class="p-2 font-sans text-brand-900 border-r border-slate-200">Science (Your Subject)</td><td class="p-2 text-center border-r border-slate-200 text-brand-800 font-bold">${scienceGrade}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Araling Panlipunan (AP)</td><td class="p-2 text-center border-r border-slate-200">${s.ap}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Edukasyon sa Pagpapakatao (EsP)</td><td class="p-2 text-center border-r border-slate-200">${s.esp}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">MAPEH</td><td class="p-2 text-center border-r border-slate-200">${s.mapeh}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Technology & Livelihood Educ (TLE)</td><td class="p-2 text-center border-r border-slate-200">${s.tle}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
+                            <tr class="bg-slate-100 font-bold"><td class="p-2 font-sans text-slate-900 border-r border-slate-200">General Average</td><td class="p-2 text-center border-r border-slate-200 text-brand-900 font-extrabold">${genAve}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold text-brand-900">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Signatures -->
+                <div class="pt-8 grid grid-cols-2 gap-8 text-center text-xs">
+                    <div>
+                        <div id="report-card-adviser-signature" class="border-b border-slate-800 pb-1 font-bold text-slate-900">MRS. MARIA SANTOS, LPT</div>
+                        <p class="text-slate-500 text-[10px] mt-0.5">Class Adviser</p>
+                    </div>
+                    <div>
+                        <div class="border-b border-slate-800 pb-1 font-bold text-slate-900">DR. EDUARDO DELA CRUZ</div>
+                        <p class="text-slate-500 text-[10px] mt-0.5">Secondary School Principal IV</p>
+                    </div>
+                </div>
+            `;
+
+            const adviserName = window.SERMS_ACCOUNT?.name;
+            if (adviserName) {
+                document.getElementById('report-card-adviser-name').textContent = adviserName;
+                document.getElementById('report-card-adviser-signature').textContent = adviserName.toLocaleUpperCase();
+            }
+            document.getElementById('portfolio-drawer').classList.remove('hidden');
+        }
+
+        function openForm138Preview() {
+            if (!advisoryStudents.length) {
+                showToast('No saved learner records are available for a preview.');
+                return;
+            }
+            viewStudentPortfolio(advisoryStudents[0].lrn);
+        }
+
+        function closePortfolioDrawer() {
+            document.getElementById('portfolio-drawer').classList.add('hidden');
+        }
+
+        // Anecdotal Note Creation
+        function handleAnecdotalSubmit(e) {
+            e.preventDefault();
+            showToast('Anecdotal record was not saved. Retry after checking your connection.');
+        }
+
+        function renderAnecdotalRecords() {
+            const select = document.getElementById('anecdotal-student');
+            const selected = select.value;
+            select.replaceChildren(new Option('-- Choose a learner from your saved roster --', ''));
+            advisoryStudents.forEach(student => select.add(new Option(`${student.name} (LRN: ${student.lrn})`, student.lrn)));
+            if (advisoryStudents.some(student => student.lrn === selected)) select.value = selected;
+
+            const container = document.getElementById('anecdotal-list-container');
+            container.replaceChildren();
+            if (!teacherAnecdotalRecords.length) {
+                const empty = document.createElement('p');
+                empty.className = 'rounded-xl bg-slate-50 p-3 text-xs text-slate-500';
+                empty.textContent = 'No saved anecdotal records.';
+                container.appendChild(empty);
+                return;
+            }
+            teacherAnecdotalRecords.forEach(record => {
+                const item = document.createElement('article');
+                item.className = 'rounded-2xl border border-slate-200 bg-slate-50 p-3.5 text-xs';
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between gap-3 font-bold text-slate-800';
+                const student = document.createElement('span');
+                student.className = 'text-brand-900';
+                student.textContent = advisoryStudents.find(entry => entry.lrn === record.student)?.name || record.student;
+                const date = document.createElement('span');
+                date.className = 'text-slate-400 font-normal';
+                date.textContent = record.date;
+                header.append(student, date);
+                const note = document.createElement('p');
+                note.className = 'mt-1 text-slate-600';
+                note.textContent = record.narrative;
+                item.append(header, note);
+                if (record.actionTaken) {
+                    const action = document.createElement('p');
+                    action.className = 'mt-2 text-[11px] font-medium text-slate-500';
+                    action.textContent = `Action: ${record.actionTaken}`;
+                    item.appendChild(action);
+                }
+                if (record.referral) {
+                    const referral = document.createElement('span');
+                    referral.className = 'mt-2 inline-block rounded bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-700';
+                    referral.textContent = 'Referred to Guidance';
+                    item.appendChild(referral);
+                }
+                container.appendChild(item);
+            });
+        }
+
+        // Performance Distribution Chart (Chart.js)
+        function initPerformanceChart() {
+            const canvas = document.getElementById('performanceChart');
+            if (typeof Chart === 'undefined') {
+                const message = document.createElement('p');
+                message.className = 'p-4 text-center text-xs text-slate-500';
+                message.textContent = 'The performance chart is unavailable because the chart library did not load.';
+                canvas.replaceWith(message);
+                return;
+            }
+            teacherChart = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'Outstanding (90-100)',
+                        'Very Satisfactory (85-89)',
+                        'Satisfactory (80-84)',
+                        'Fairly Satisfactory (75-79)',
+                        'Did Not Meet Expectations (<75)'
+                    ],
+                    datasets: [{
+                        label: 'Students in Grade 10 - Rizal',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#15803d', // Primary Academic Green
+                            '#0d9488', // Teal
+                            '#3b82f6', // Blue
+                            '#eab308', // Gold
+                            '#ef4444'  // Rose
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 9 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTeacherOverview(submission = teacherSubmission) {
+            const grades = advisoryStudents.map(getTeacherGrade).filter(Boolean).map(result => result.grade);
+            const attendanceCounts = { Present: 0, Late: 0, Absent: 0, Excused: 0 };
+            advisoryStudents.forEach(student => {
+                if (attendanceCounts[student.attendance] !== undefined) attendanceCounts[student.attendance]++;
+            });
+            const rated = [0, 0, 0, 0, 0];
+            grades.forEach(grade => {
+                if (grade >= 90) rated[0]++;
+                else if (grade >= 85) rated[1]++;
+                else if (grade >= 80) rated[2]++;
+                else if (grade >= 75) rated[3]++;
+                else rated[4]++;
+            });
+            const total = advisoryStudents.length;
+            const completePercent = total ? Math.round((grades.length / total) * 100) : 0;
+            const attendanceMarked = Object.values(attendanceCounts).reduce((sum, count) => sum + count, 0);
+            const rate = attendanceMarked ? `${Math.round((attendanceCounts.Present / attendanceMarked) * 100)}%` : '—';
+            const mps = grades.length ? (grades.reduce((sum, grade) => sum + grade, 0) / grades.length).toFixed(1) : '—';
+            const setText = (id, text) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = String(text);
+            };
+            setText('teacher-student-count', total);
+            setText('teacher-roster-count', `${total} Learners`);
+            setText('teacher-roster-status', total ? `${total} in saved records` : 'No saved roster');
+            setText('teacher-attendance-rate', rate);
+            setText('teacher-attendance-present', `${attendanceCounts.Present} Present`);
+            setText('teacher-attendance-absent', `${attendanceCounts.Absent} Absent`);
+            setText('teacher-grades-progress', `${completePercent}%`);
+            setText('teacher-grades-status', submission?.status || 'No saved grades');
+            setText('teacher-remediation-count', grades.filter(grade => grade < 75).length);
+            setText('teacher-class-mps', `Class MPS: ${mps}${mps === '—' ? '' : '%'}`);
+            ['teacher-performance-90', 'teacher-performance-85', 'teacher-performance-80', 'teacher-performance-75', 'teacher-performance-below-75']
+                .forEach((id, index) => setText(id, `${rated[index]} Learners`));
+            const progress = document.getElementById('teacher-grades-progress-bar');
+            if (progress) progress.style.width = `${completePercent}%`;
+            if (teacherChart) {
+                teacherChart.data.datasets[0].label = `${document.getElementById('teacher-learning-area').value || 'Saved'} grade records`;
+                teacherChart.data.datasets[0].data = rated;
+                teacherChart.update();
+            }
+        }
+
+        // Navigation toggles
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                backdrop.classList.toggle('hidden');
+            });
+
+            backdrop.addEventListener('click', closeMobileSidebar);
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function setupNotificationToggle() {
+            const btn = document.getElementById('notif-btn');
+            const menu = document.getElementById('notif-menu');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Toast Feedback System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+    </script>
+    <script src="/assets/app.js"></script>
+</body>
+</html>

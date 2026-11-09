@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Recovery & Password Reset - Naujan Municipal High School SERMS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d', // Primary DepEd Green
+                            800: '#166534', // Academic Green
+                            900: '#14532d', // Executive Deep Forest
+                            950: '#052e16',
+                        },
+                        gold: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04', // DepEd Gold Accent
+                            700: '#a16207',
+                            800: '#854d0e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        formal: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .hero-pattern {
+            background-color: #052e16;
+            background-image: radial-gradient(#15803d 0.85px, transparent 0.85px), radial-gradient(#14532d 0.85px, #052e16 0.85px);
+            background-size: 34px 34px;
+            background-position: 0 0, 17px 17px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(14px);
+        }
+        .pin-input:focus {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans flex flex-col min-h-screen selection:bg-brand-100 selection:text-brand-900">
+
+
+    <!-- GOVPH Topbar -->
+    <div class="bg-slate-900 text-slate-300 text-[11px] font-medium py-1.5 px-4 lg:px-8 border-b border-slate-800 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 text-slate-200 font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-flag text-gold-400"></i> GOVPH
+                </span>
+                <span class="text-slate-600">|</span>
+                <span>Republic of the Philippines</span>
+                <span class="hidden md:inline text-slate-600">•</span>
+                <span class="hidden md:inline text-slate-400">DepEd Region IV-B MIMAROPA</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-slate-400">Philippine Standard Time:</span>
+                <span id="pst-clock" class="font-mono font-bold text-gold-300">Syncing time...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Official Portal Header -->
+    <header class="sticky top-0 z-40 border-b border-slate-200/90 bg-white/95 backdrop-blur-md transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Branding Identifier -->
+                <a href="landing_page.html" class="flex items-center gap-3 group">
+                    <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 p-0.5 shadow-md shadow-brand-900/20 flex items-center justify-center text-white ring-2 ring-gold-500/30 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-graduation-cap text-2xl text-gold-400"></i>
+                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-heading font-extrabold text-brand-950 tracking-tight text-base sm:text-lg leading-tight">Naujan Municipal High School</span>
+                            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-brand-100 text-brand-900 border border-brand-200">ID: 301648</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium leading-none mt-0.5">Student Enrollment & Records Management System (SERMS)</p>
+                    </div>
+                </a>
+
+                <!-- Header Actions -->
+                <div class="flex items-center gap-3">
+                    <a href="landing_page.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-brand-900 hover:bg-brand-50 border border-slate-200 transition-colors">
+                        <i class="fa-solid fa-arrow-left text-[11px]"></i>
+                        <span>Return to Main Portal</span>
+                    </a>
+                    <button onclick="openHelpdeskModal()" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gold-50 text-gold-900 border border-gold-300 hover:bg-gold-100 text-xs font-bold transition-colors">
+                        <i class="fa-solid fa-headset text-gold-700"></i>
+                        <span>Registrar Helpdesk</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Main Recovery Workspace -->
+    <main class="flex-1 hero-pattern relative py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center">
+        <!-- Background Ambient Glow -->
+        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="w-full max-w-2xl relative z-10 space-y-6">
+            
+            <!-- Contextual Breadcrumb & Title -->
+            <div class="text-center space-y-2 text-white">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[11px] font-semibold text-gold-300">
+                    <i class="fa-solid fa-shield-halved text-xs"></i>
+                    <span>Self-Service Credential Reset Protocol</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tight">
+                    SERMS Account Recovery
+                </h1>
+                <p class="text-xs sm:text-sm text-brand-100 max-w-lg mx-auto">
+                    Verify your identity via registered DepEd credentials, receiving a high-security One-Time Password (OTP) to restore system access.
+                </p>
+            </div>
+
+            <!-- Recovery Card Container -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-6">
+                
+                <!-- Role Selector Tabs -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                        Step 0: Select Account Classification
+                    </label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                        <button type="button" onclick="selectRole('learner')" id="btn-role-learner" class="role-pill active py-2 rounded-xl text-xs font-bold text-center transition-all bg-brand-800 text-white shadow-xs">
+                            <i class="fa-solid fa-user-graduate block sm:inline sm:mr-1 text-[11px]"></i> Learner
+                        </button>
+                        <button type="button" onclick="selectRole('faculty')" id="btn-role-faculty" class="role-pill py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 text-center transition-all">
+                            <i class="fa-solid fa-chalkboard-user block sm:inline sm:mr-1 text-[11px]"></i> Faculty
+                        </button>
+                        <button type="button" onclick="selectRole('registrar')" id="btn-role-registrar" class="role-pill py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 text-center transition-all">
+                            <i class="fa-solid fa-stamp block sm:inline sm:mr-1 text-[11px]"></i> Registrar
+                        </button>
+                        <button type="button" onclick="selectRole('principal')" id="btn-role-principal" class="role-pill py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 text-center transition-all">
+                            <i class="fa-solid fa-crown block sm:inline sm:mr-1 text-[11px]"></i> Principal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step Indicator Progress Bar -->
+                <div class="py-2 border-y border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <!-- Step 1 -->
+                        <div class="flex items-center gap-2" id="step-node-1">
+                            <span class="w-7 h-7 rounded-full bg-brand-800 text-white font-bold text-xs flex items-center justify-center shadow-xs" id="badge-1">1</span>
+                            <span class="text-xs font-bold text-brand-950 hidden sm:inline" id="text-1">Identify</span>
+                        </div>
+                        <div class="h-0.5 flex-1 mx-2 bg-slate-200" id="line-1"></div>
+
+                        <!-- Step 2 -->
+                        <div class="flex items-center gap-2" id="step-node-2">
+                            <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center" id="badge-2">2</span>
+                            <span class="text-xs font-semibold text-slate-400 hidden sm:inline" id="text-2">OTP Code</span>
+                        </div>
+                        <div class="h-0.5 flex-1 mx-2 bg-slate-200" id="line-2"></div>
+
+                        <!-- Step 3 -->
+                        <div class="flex items-center gap-2" id="step-node-3">
+                            <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center" id="badge-3">3</span>
+                            <span class="text-xs font-semibold text-slate-400 hidden sm:inline" id="text-3">New Password</span>
+                        </div>
+                        <div class="h-0.5 flex-1 mx-2 bg-slate-200" id="line-3"></div>
+
+                        <!-- Step 4 -->
+                        <div class="flex items-center gap-2" id="step-node-4">
+                            <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center" id="badge-4">4</span>
+                            <span class="text-xs font-semibold text-slate-400 hidden sm:inline" id="text-4">Complete</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- STAGE 1: IDENTIFY ACCOUNT -->
+                <div id="stage-1" class="stage-section space-y-4">
+                    <div class="space-y-1">
+                        <h3 class="font-heading font-extrabold text-base text-slate-900" id="stage-1-title">Identify Learner Account</h3>
+                        <p class="text-xs text-slate-500" id="stage-1-desc">Enter your 12-digit DepEd Learner Reference Number (LRN) as printed on your SF9 / Report Card.</p>
+                        <p class="text-[11px] text-slate-500">Student accounts must be approved by the registrar before password recovery is available. <a href="/naujan_mhs_student_registration.html" class="font-bold text-brand-800 hover:underline">Register for a student account</a>.</p>
+                    </div>
+
+                    <form onsubmit="handleIdentifySubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1" id="input-label-primary">
+                                Learner Reference Number (LRN) *
+                            </label>
+                            <div class="relative">
+                                <i class="fa-solid fa-id-card absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                                <input type="text" id="input-identifier" maxlength="12" placeholder="e.g. 109842140021" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-brand-700 focus:outline-none transition-all" required>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1" id="input-helper">Must be 12 numeric digits issued by DepEd Basic Education.</p>
+                        </div>
+
+                        <!-- Recovery Channel Radio Selector -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Dispatch Verification PIN Via: *</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:bg-brand-50/50 cursor-pointer transition-all">
+                                    <input type="radio" name="recovery-channel" value="sms" disabled class="text-brand-800 focus:ring-brand-700 w-4 h-4">
+                                    <div>
+                                        <span class="block text-xs font-bold text-slate-500"><i class="fa-solid fa-mobile-screen-button mr-1"></i> Registered Mobile SMS</span>
+                                        <span class="text-[10px] text-slate-400">Unavailable — SMS delivery is not configured</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:bg-brand-50/50 cursor-pointer transition-all">
+                                    <input type="radio" name="recovery-channel" value="email" checked class="text-brand-800 focus:ring-brand-700 w-4 h-4">
+                                    <div>
+                                        <span class="block text-xs font-bold text-slate-800"><i class="fa-solid fa-envelope text-brand-700 mr-1"></i> DepEd / Registered Email</span>
+                                        <span class="text-[10px] text-slate-500">Sent to the email address registered to your account</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Anti-Bot CAPTCHA Challenge -->
+                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-slate-700"><i class="fa-solid fa-robot text-brand-800 mr-1"></i> Human Verification Challenge</span>
+                                <button type="button" onclick="generateCaptcha()" class="text-[11px] text-brand-800 font-bold hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div id="captcha-display" class="px-4 py-2 bg-slate-800 text-gold-300 font-mono font-bold tracking-widest rounded-xl text-base select-none line-through italic">
+                                    7 K 9 M 2
+                                </div>
+                                <input type="text" id="captcha-input" placeholder="Type letters/numbers" class="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono uppercase focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                            </div>
+                        </div>
+
+                        <!-- Stage 1 Actions -->
+                        <div class="pt-2 flex items-center justify-between">
+                            <a href="landing_page.html" class="text-xs text-slate-500 hover:text-slate-800 font-semibold">
+                                Cancel & Return
+                            </a>
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-md shadow-brand-800/20 active:scale-95 transition flex items-center gap-1.5">
+                                <span>Validate & Send Code</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="pt-1 text-center text-[11px] text-slate-500">
+                        New student? <a href="/naujan_mhs_student_registration.html" class="font-bold text-brand-800 hover:underline">Register for a student account</a>.
+                        Student recovery is available after registrar approval.
+                    </p>
+                </div>
+
+
+                <!-- STAGE 2: 6-DIGIT OTP VERIFICATION -->
+                <div id="stage-2" class="stage-section hidden space-y-5">
+                    <div class="text-center space-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-800 mx-auto flex items-center justify-center text-xl font-bold border border-brand-200">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="font-heading font-extrabold text-base text-slate-900">Enter 6-Digit Verification PIN</h3>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto">
+                            If your account is eligible, a 6-digit confirmation code was sent to: <br>
+                            <strong class="text-slate-800 font-mono" id="dispatched-target">your registered email address</strong>
+                        </p>
+                    </div>
+
+                    <!-- 6-Pin Input Boxes -->
+                    <div class="flex justify-center gap-2 sm:gap-3 py-2">
+                        <input type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]" maxlength="1" class="pin-input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-black text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:bg-white focus:outline-none transition-all shadow-xs" id="pin-1" autofocus>
+                        <input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" class="pin-input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-black text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:bg-white focus:outline-none transition-all shadow-xs" id="pin-2">
+                        <input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" class="pin-input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-black text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:bg-white focus:outline-none transition-all shadow-xs" id="pin-3">
+                        <input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" class="pin-input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-black text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:bg-white focus:outline-none transition-all shadow-xs" id="pin-4">
+                        <input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" class="pin-input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-black text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:bg-white focus:outline-none transition-all shadow-xs" id="pin-5">
+                        <input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" class="pin-input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-black text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:bg-white focus:outline-none transition-all shadow-xs" id="pin-6">
+                    </div>
+
+                    <!-- Countdown & Resend Control -->
+                    <div class="flex items-center justify-between text-xs px-2">
+                        <div class="flex items-center gap-1.5 text-slate-500 font-medium">
+                            <i class="fa-regular fa-clock text-brand-700"></i>
+                            <span>Code expires in:</span>
+                            <span id="otp-timer" class="font-mono font-bold text-brand-900">10:00</span>
+                        </div>
+                        <button type="button" id="btn-resend" onclick="resendOtp()" disabled class="text-xs font-bold text-slate-400 cursor-not-allowed transition-colors">
+                            Resend Code
+                        </button>
+                    </div>
+
+                    <!-- Stage 2 Navigation -->
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <button type="button" onclick="goToStage(1)" class="text-xs font-bold text-slate-500 hover:text-slate-800">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Edit Identifier
+                        </button>
+                        <button type="button" onclick="verifyOtpCode()" class="px-6 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-md shadow-brand-800/20 active:scale-95 transition flex items-center gap-1.5">
+                            <span>Confirm Code</span>
+                            <i class="fa-solid fa-check text-gold-400"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- STAGE 3: PASSWORD RESET & STRENGTH EVALUATION -->
+                <div id="stage-3" class="stage-section hidden space-y-4">
+                    <div class="space-y-1">
+                        <h3 class="font-heading font-extrabold text-base text-slate-900">Create New Password</h3>
+                        <p class="text-xs text-slate-500">Ensure your new password satisfies the DepEd National Security Guidelines.</p>
+                    </div>
+
+                    <form onsubmit="handlePasswordReset(event)" class="space-y-4">
+                        <!-- New Password -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">New Password *</label>
+                            <div class="relative">
+                                <input type="password" id="new-password" oninput="evaluatePasswordStrength()" placeholder="Enter new password" minlength="8" maxlength="128" autocomplete="new-password" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none pr-10" required>
+                                <button type="button" onclick="togglePassVisibility('new-password', 'eye-1')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                                    <i class="fa-regular fa-eye" id="eye-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Strength Meter -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="font-medium text-slate-500">Password Strength:</span>
+                                <span id="strength-label" class="font-bold text-slate-400">Too Short</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                                <div id="strength-bar" class="h-full w-0 transition-all duration-300 bg-rose-500"></div>
+                            </div>
+                        </div>
+
+                        <!-- DepEd Password Requirements Checklist -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] space-y-1.5 text-slate-600 font-medium">
+                            <div class="flex items-center gap-1.5" id="rule-length">
+                                <i class="fa-solid fa-circle-xmark text-slate-400 text-xs"></i>
+                                <span>At least 8 characters long</span>
+                            </div>
+                            <div class="flex items-center gap-1.5" id="rule-upper-lower">
+                                <i class="fa-solid fa-circle-xmark text-slate-400 text-xs"></i>
+                                <span>Contains uppercase (A-Z) and lowercase (a-z)</span>
+                            </div>
+                            <div class="flex items-center gap-1.5" id="rule-number">
+                                <i class="fa-solid fa-circle-xmark text-slate-400 text-xs"></i>
+                                <span>Includes at least one numeric digit (0-9)</span>
+                            </div>
+                            <div class="flex items-center gap-1.5" id="rule-special">
+                                <i class="fa-solid fa-circle-xmark text-slate-400 text-xs"></i>
+                                <span>Includes special characters (!, @, #, $, %, etc.)</span>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Confirm New Password *</label>
+                            <div class="relative">
+                                <input type="password" id="confirm-password" placeholder="Confirm your new password" minlength="8" maxlength="128" autocomplete="new-password" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none pr-10" required>
+                                <button type="button" onclick="togglePassVisibility('confirm-password', 'eye-2')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                                    <i class="fa-regular fa-eye" id="eye-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stage 3 Actions -->
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <button type="button" onclick="goToStage(2)" class="text-xs font-bold text-slate-500 hover:text-slate-800">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Re-check OTP
+                            </button>
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-md shadow-brand-800/20 active:scale-95 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-key text-gold-400"></i>
+                                <span>Update Password</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+
+                <!-- STAGE 4: SUCCESS CONFIRMATION -->
+                <div id="stage-4" class="stage-section hidden text-center space-y-6 py-4">
+                    <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center text-3xl shadow-inner border-2 border-emerald-300 animate-bounce">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Authentication Updated
+                        </span>
+                        <h3 class="font-heading font-black text-2xl text-slate-900">Password Reset Successful!</h3>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto">
+                            Your password for Naujan Municipal High School SERMS has been re-keyed and secured.
+                        </p>
+                    </div>
+
+                    <!-- Recovery Confirmation -->
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-left space-y-2 max-w-md mx-auto">
+                        <div class="flex justify-between border-b border-slate-200/60 pb-1.5">
+                            <span class="text-slate-500">Account Role:</span>
+                            <span class="font-bold text-slate-900" id="audit-role">Learner / Student</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-200/60 pb-1.5">
+                            <span class="text-slate-500">Identifier Ref:</span>
+                            <span class="font-mono font-bold text-brand-900" id="audit-identifier">109842140021</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-200/60 pb-1.5">
+                            <span class="text-slate-500">Password Security:</span>
+                            <span class="text-emerald-700 font-bold">Hashed and updated</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Timestamp:</span>
+                            <span class="font-mono text-slate-700 text-[11px]" id="audit-timestamp">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <a href="landing_page.html" class="w-full sm:w-auto px-7 py-3 rounded-2xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-lg shadow-brand-800/25 active:scale-95 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrow-right-to-bracket text-gold-400"></i>
+                            <span>Proceed to Login Portal</span>
+                        </a>
+                        <button onclick="downloadConfirmationReceipt()" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-arrow-down text-brand-700"></i>
+                            <span>Download Receipt</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Alternative Help Link -->
+            <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-circle-question text-gold-400 text-lg"></i>
+                    <div>
+                        <p class="font-bold">Lost access to your registered email?</p>
+                        <p class="text-[11px] text-brand-100">Submit an emergency in-person or manual registrar recovery ticket.</p>
+                    </div>
+                </div>
+                <button onclick="openHelpdeskModal()" class="px-4 py-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-slate-950 font-bold text-xs transition shadow-xs whitespace-nowrap">
+                    Submit Helpdesk Ticket
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+
+    <!-- Quick Help & FAQs Section -->
+    <section class="py-16 bg-white border-t border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            
+            <!-- Campus Helpdesk Contacts -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div class="w-8 h-8 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm">Registrar Office</h4>
+                    <p class="text-slate-500">Admin Bldg, Window 2, Naujan MHS Campus, Poblacion, Naujan</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div class="w-8 h-8 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm">Telephone Hotline</h4>
+                    <p class="text-slate-500">(043) 288-7810 / +63 917 892 1102<br>Mon-Fri: 8:00 AM – 5:00 PM</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div class="w-8 h-8 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-envelope-circle-check"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm">Official Email</h4>
+                    <p class="text-slate-500">serms.naujanmhs.301648@deped.gov.ph<br>DepEd Helpdesk Division</p>
+                </div>
+            </div>
+
+            <!-- Recovery FAQs -->
+            <div class="space-y-4">
+                <div class="text-center space-y-1">
+                    <h3 class="font-heading font-extrabold text-xl text-slate-900">Frequently Asked Questions</h3>
+                    <p class="text-xs text-slate-500">Account management guidelines for students, faculty, and administrative staff.</p>
+                </div>
+
+                <div class="space-y-2 text-xs sm:text-sm">
+                    <details class="group bg-slate-50 p-4 rounded-2xl border border-slate-200 cursor-pointer">
+                        <summary class="font-bold text-slate-800 flex items-center justify-between">
+                            <span>Where can I find my 12-digit Learner Reference Number (LRN)?</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-400"></i>
+                        </summary>
+                        <p class="text-slate-600 mt-2.5 pt-2.5 border-t border-slate-200/60 leading-relaxed text-xs">
+                            Your LRN is permanently printed on your official DepEd Form 138 (Report Card), Certificate of Enrollment, or previous school ID. It is a 12-digit number starting with '1098' or similar DepEd Division codes.
+                        </p>
+                    </details>
+
+                    <details class="group bg-slate-50 p-4 rounded-2xl border border-slate-200 cursor-pointer">
+                        <summary class="font-bold text-slate-800 flex items-center justify-between">
+                            <span>What should teachers and staff do if their DepEd Email is inaccessible?</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-400"></i>
+                        </summary>
+                        <p class="text-slate-600 mt-2.5 pt-2.5 border-t border-slate-200/60 leading-relaxed text-xs">
+                            Enter the username associated with your SERMS account. A verification code is sent only to the email address registered to that account. If you cannot access that email, submit a helpdesk ticket or contact the Registrar Office; staff cannot bypass verification codes.
+                        </p>
+                    </details>
+
+                    <details class="group bg-slate-50 p-4 rounded-2xl border border-slate-200 cursor-pointer">
+                        <summary class="font-bold text-slate-800 flex items-center justify-between">
+                            <span>How many failed attempts before an account is locked?</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-400"></i>
+                        </summary>
+                        <p class="text-slate-600 mt-2.5 pt-2.5 border-t border-slate-200/60 leading-relaxed text-xs">
+                            A verification code expires after 10 minutes and allows up to 5 attempts. Recovery requests are rate-limited; this process does not lock your sign-in account.
+                        </p>
+                    </details>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Official DepEd Footer -->
+    <footer class="bg-brand-950 text-slate-400 text-xs border-t border-brand-900 py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <div class="w-8 h-8 rounded-xl bg-brand-800 text-gold-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-white">Naujan Municipal High School</p>
+                    <p class="text-[11px] text-slate-400">DepEd Region IV-B MIMAROPA • School ID: 301648</p>
+                </div>
+            </div>
+            <div class="text-center sm:text-right text-[11px] text-slate-500">
+                <p>© 2026 Naujan Municipal High School. All rights reserved.</p>
+                <p>SERMS Account Recovery • Contact the Registrar Office for assistance</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: Emergency Manual Registrar Reset Ticket -->
+    <div id="helpdesk-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity" onclick="closeHelpdeskModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <!-- Modal Header -->
+                <div class="p-5 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 flex items-center justify-center text-gold-400 font-bold">
+                            <i class="fa-solid fa-ticket text-base"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base">Emergency Registrar Help Ticket</h3>
+                            <p class="text-[11px] text-brand-200">For accounts without access to their registered email</p>
+                        </div>
+                    </div>
+                    <button onclick="closeHelpdeskModal()" class="text-white/80 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Form -->
+                <form onsubmit="handleHelpdeskTicket(event)" class="p-6 space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Student / Personnel Full Name *</label>
+                        <input type="text" id="ticket-name" placeholder="Last Name, First Name, Middle Initial" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">LRN or Employee ID *</label>
+                            <input type="text" id="ticket-id" placeholder="12-Digit LRN" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Grade / Department *</label>
+                            <select id="ticket-dept" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                <option>Grade 7 JHS</option>
+                                <option>Grade 8 JHS</option>
+                                <option>Grade 9 JHS</option>
+                                <option>Grade 10 JHS</option>
+                                <option>Grade 11 SHS</option>
+                                <option>Grade 12 SHS</option>
+                                <option>Faculty Member</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">New Mobile Number for Contact *</label>
+                        <input type="tel" id="ticket-contact" placeholder="0917-XXX-XXXX" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Reason for Manual Assistance *</label>
+                        <textarea id="ticket-reason" rows="3" placeholder="Explain why email verification is unavailable (e.g. inaccessible or unverified email)..." class="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required></textarea>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button type="button" onclick="closeHelpdeskModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold">Cancel</button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold flex items-center gap-1.5 shadow-md shadow-brand-800/20">
+                            <i class="fa-solid fa-paper-plane text-gold-400"></i> Dispatch Ticket
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Action Alert Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-gold-400 text-base" id="toast-icon"></i>
+        <p class="text-xs font-medium" id="toast-msg">Operation completed successfully.</p>
+    </div>
+
+
+    <script>
+        // State variables
+        let selectedRole = 'learner';
+        let activeStage = 1;
+        let countdownTimer = null;
+        let timeLeft = 600;
+        let generatedCaptchaCode = '';
+        let userIdentifier = '';
+
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePSTClock();
+            setInterval(updatePSTClock, 1000);
+            generateCaptcha();
+            setupPinInputs();
+        });
+
+        // Philippine Standard Time Clock
+        function updatePSTClock() {
+            const clockEl = document.getElementById('pst-clock');
+            if (!clockEl) return;
+            const now = new Date();
+            const options = { 
+                timeZone: 'Asia/Manila',
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            clockEl.textContent = `${new Intl.DateTimeFormat('en-US', options).format(now)} PST`;
+        }
+
+        // Role Switcher
+        function selectRole(role) {
+            selectedRole = role;
+            if (typeof window.invalidateRecoveryChallenge === 'function') window.invalidateRecoveryChallenge();
+            document.querySelectorAll('.role-pill').forEach(btn => {
+                btn.className = "role-pill py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 text-center transition-all";
+            });
+            const activeBtn = document.getElementById(`btn-role-${role}`);
+            if (activeBtn) {
+                activeBtn.className = "role-pill active py-2 rounded-xl text-xs font-bold text-center transition-all bg-brand-800 text-white shadow-xs";
+            }
+
+            // Update UI elements based on role
+            const titleEl = document.getElementById('stage-1-title');
+            const descEl = document.getElementById('stage-1-desc');
+            const labelEl = document.getElementById('input-label-primary');
+            const inputEl = document.getElementById('input-identifier');
+            const helperEl = document.getElementById('input-helper');
+
+            inputEl.value = '';
+
+            if (role === 'learner') {
+                titleEl.textContent = "Identify Learner Account";
+                descEl.textContent = "Enter your 12-digit DepEd Learner Reference Number (LRN) as printed on your SF9 / Report Card.";
+                labelEl.textContent = "Learner Reference Number (LRN) *";
+                inputEl.placeholder = "e.g. 109842140021";
+                inputEl.maxLength = 12;
+                helperEl.textContent = "Must be 12 numeric digits issued by DepEd Basic Education.";
+            } else if (role === 'faculty') {
+                titleEl.textContent = "Identify Teacher / Faculty Profile";
+                descEl.textContent = "Enter the SERMS username assigned to your teacher account.";
+                labelEl.textContent = "Teacher SERMS Username *";
+                inputEl.placeholder = "Your teacher username";
+                inputEl.removeAttribute('maxLength');
+                helperEl.textContent = "The verification code will be sent to the email registered to your account.";
+            } else if (role === 'registrar') {
+                titleEl.textContent = "Registrar Officer Verification";
+                descEl.textContent = "Enter the SERMS username assigned to your registrar account.";
+                labelEl.textContent = "Registrar SERMS Username *";
+                inputEl.placeholder = "Your registrar username";
+                inputEl.removeAttribute('maxLength');
+                helperEl.textContent = "The verification code will be sent to the email registered to your account.";
+            } else if (role === 'principal') {
+                titleEl.textContent = "Office of the Principal Executive Verification";
+                descEl.textContent = "Enter the SERMS username assigned to your principal account.";
+                labelEl.textContent = "Principal SERMS Username *";
+                inputEl.placeholder = "Your principal username";
+                inputEl.removeAttribute('maxLength');
+                helperEl.textContent = "The verification code will be sent to the email registered to your account.";
+            }
+        }
+
+        // CAPTCHA Generation
+        function generateCaptcha() {
+            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+            let result = '';
+            for (let i = 0; i < 5; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            generatedCaptchaCode = result;
+            document.getElementById('captcha-display').textContent = result.split('').join(' ');
+            document.getElementById('captcha-input').value = '';
+        }
+
+        // Stage Navigation Controller
+        function goToStage(stageNum) {
+            if (stageNum === 1 && activeStage !== 1 && typeof window.invalidateRecoveryChallenge === 'function') {
+                window.invalidateRecoveryChallenge();
+            }
+            activeStage = stageNum;
+
+            // Toggle Visibility
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`stage-${i}`);
+                if (i === stageNum) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+
+                // Update Step Nodes
+                const badge = document.getElementById(`badge-${i}`);
+                const text = document.getElementById(`text-${i}`);
+                
+                if (i < stageNum) {
+                    badge.className = "w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center";
+                    badge.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    if (text) text.className = "text-xs font-bold text-emerald-800 hidden sm:inline";
+                } else if (i === stageNum) {
+                    badge.className = "w-7 h-7 rounded-full bg-brand-800 text-white font-bold text-xs flex items-center justify-center shadow-xs";
+                    badge.innerHTML = i;
+                    if (text) text.className = "text-xs font-bold text-brand-950 hidden sm:inline";
+                } else {
+                    badge.className = "w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center";
+                    badge.innerHTML = i;
+                    if (text) text.className = "text-xs font-semibold text-slate-400 hidden sm:inline";
+                }
+
+                if (i < 4) {
+                    const line = document.getElementById(`line-${i}`);
+                    if (i < stageNum) {
+                        line.className = "h-0.5 flex-1 mx-2 bg-emerald-600";
+                    } else {
+                        line.className = "h-0.5 flex-1 mx-2 bg-slate-200";
+                    }
+                }
+            }
+
+            // Focus on first pin input if Stage 2
+            if (stageNum === 2) {
+                startOtpTimer();
+                setTimeout(() => {
+                    document.getElementById('pin-1').focus();
+                }, 100);
+            }
+        }
+
+        // Stage 1 Submission
+        function handleIdentifySubmit(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('input-identifier').value.trim();
+            const captchaVal = document.getElementById('captcha-input').value.trim().toUpperCase();
+
+            // Validate LRN length if learner
+            if (selectedRole === 'learner' && (inputVal.length !== 12 || isNaN(inputVal))) {
+                showToast('Please enter a valid 12-digit numeric DepEd LRN.');
+                return;
+            }
+
+            // Validate CAPTCHA
+            if (captchaVal !== generatedCaptchaCode) {
+                showToast('CAPTCHA code incorrect. Please try again.');
+                generateCaptcha();
+                return;
+            }
+
+            userIdentifier = inputVal;
+
+            // Target masking
+            const targetEl = document.getElementById('dispatched-target');
+            targetEl.textContent = 'your registered email address';
+
+            showToast('If the account is eligible, a verification code has been sent to its registered email.');
+            goToStage(2);
+        }
+
+        // Setup 6-Pin Input auto-advance
+        function setupPinInputs() {
+            const inputs = document.querySelectorAll('.pin-input');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '').slice(-1);
+                    if (e.target.value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', event => {
+                    event.preventDefault();
+                    const digits = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, inputs.length);
+                    digits.split('').forEach((digit, digitIndex) => {
+                        if (inputs[digitIndex]) inputs[digitIndex].value = digit;
+                    });
+                    inputs[Math.min(digits.length, inputs.length - 1)].focus();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        }
+
+        // OTP Timer
+        function startOtpTimer() {
+            clearInterval(countdownTimer);
+            timeLeft = 600;
+            const timerEl = document.getElementById('otp-timer');
+            const resendBtn = document.getElementById('btn-resend');
+            resendBtn.disabled = true;
+            resendBtn.className = "text-xs font-bold text-slate-400 cursor-not-allowed transition-colors";
+
+            countdownTimer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    timerEl.textContent = "Expired";
+                    resendBtn.disabled = false;
+                    resendBtn.className = "text-xs font-bold text-brand-800 hover:underline cursor-pointer transition-colors";
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        function resendOtp() {
+            showToast('New 6-digit confirmation PIN has been sent.');
+            startOtpTimer();
+            // Clear PIN inputs
+            document.querySelectorAll('.pin-input').forEach(i => i.value = '');
+            document.getElementById('pin-1').focus();
+        }
+
+        function verifyOtpCode() {
+            let enteredPin = '';
+            document.querySelectorAll('.pin-input').forEach(i => enteredPin += i.value);
+
+            if (enteredPin.length !== 6) {
+                showToast('Please enter all 6 digits of the confirmation code.');
+                return;
+            }
+
+            showToast('Code verified successfully! Please define your new password.');
+            goToStage(3);
+        }
+
+        // Toggle Password Visibility
+        function togglePassVisibility(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                eye.className = 'fa-regular fa-eye';
+            }
+        }
+
+        // Password Strength Evaluator
+        function evaluatePasswordStrength() {
+            const pass = document.getElementById('new-password').value;
+            let score = 0;
+
+            const hasLength = pass.length >= 8;
+            const hasUpperLower = /[a-z]/.test(pass) && /[A-Z]/.test(pass);
+            const hasNumber = /[0-9]/.test(pass);
+            const hasSpecial = /[^A-Za-z0-9]/.test(pass);
+
+            // Update Checklist UI
+            updateChecklistRule('rule-length', hasLength);
+            updateChecklistRule('rule-upper-lower', hasUpperLower);
+            updateChecklistRule('rule-number', hasNumber);
+            updateChecklistRule('rule-special', hasSpecial);
+
+            if (hasLength) score += 25;
+            if (hasUpperLower) score += 25;
+            if (hasNumber) score += 25;
+            if (hasSpecial) score += 25;
+
+            const bar = document.getElementById('strength-bar');
+            const label = document.getElementById('strength-label');
+
+            bar.style.width = `${score}%`;
+
+            if (score <= 25) {
+                bar.className = 'h-full transition-all duration-300 bg-rose-500';
+                label.textContent = 'Weak';
+                label.className = 'font-bold text-rose-600';
+            } else if (score <= 75) {
+                bar.className = 'h-full transition-all duration-300 bg-amber-500';
+                label.textContent = 'Fair';
+                label.className = 'font-bold text-amber-600';
+            } else {
+                bar.className = 'h-full transition-all duration-300 bg-emerald-600';
+                label.textContent = 'Strong (Compliant)';
+                label.className = 'font-bold text-emerald-700';
+            }
+        }
+
+        function updateChecklistRule(elementId, isMet) {
+            const el = document.getElementById(elementId);
+            const icon = el.querySelector('i');
+            if (isMet) {
+                icon.className = 'fa-solid fa-circle-check text-emerald-600 text-xs';
+                el.className = 'flex items-center gap-1.5 text-emerald-800 font-semibold';
+            } else {
+                icon.className = 'fa-solid fa-circle-xmark text-slate-400 text-xs';
+                el.className = 'flex items-center gap-1.5 text-slate-600 font-medium';
+            }
+        }
+
+        // Password Reset Final Submit
+        function handlePasswordReset(e) {
+            e.preventDefault();
+            const pass = document.getElementById('new-password').value;
+            const confirm = document.getElementById('confirm-password').value;
+
+            if (pass.length < 8) {
+                showToast('Password must be at least 8 characters long.');
+                return;
+            }
+
+            if (pass !== confirm) {
+                showToast('Passwords do not match. Please re-enter.');
+                return;
+            }
+
+            // Populate Stage 4 Audit Data
+            document.getElementById('audit-role').textContent = selectedRole.toUpperCase();
+            document.getElementById('audit-identifier').textContent = userIdentifier || "Not provided";
+            document.getElementById('audit-timestamp').textContent = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }) + " PST";
+
+            showToast('Password updated successfully!');
+            goToStage(4);
+        }
+
+        // Helpdesk Modal Controls
+        function openHelpdeskModal() {
+            document.getElementById('helpdesk-modal').classList.remove('hidden');
+        }
+
+        function closeHelpdeskModal() {
+            document.getElementById('helpdesk-modal').classList.add('hidden');
+        }
+
+        function handleHelpdeskTicket(e) {
+            e.preventDefault();
+            showToast('The helpdesk ticket could not be saved. Check your connection and try again.');
+        }
+
+        // Download a local confirmation receipt after the server confirms the reset.
+        function downloadConfirmationReceipt() {
+            const textContent = `NAUJAN MUNICIPAL HIGH SCHOOL (SERMS)
+OFFICE OF THE REGISTRAR & ICT UNIT
+--------------------------------------------------
+ACCOUNT RECOVERY CONFIRMATION RECEIPT
+Reference Identifier: ${userIdentifier || '109842140021'}
+Role: ${selectedRole.toUpperCase()}
+Status: PASSWORD RESET CONFIRMED
+Password storage: Hashed by the SERMS server
+Timestamp: ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })} PST
+DepEd School ID: 301648
+--------------------------------------------------
+This document confirms the password reset operation conducted via the NMHS SERMS Portal.`;
+
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `NMHS_Security_Audit_${new Date().toISOString().slice(0,10)}.txt`);
+            a.click();
+            showToast('Security audit receipt downloaded.');
+        }
+
+        // Dynamic Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3400);
+        }
+    </script>
+    <script src="/assets/app.js"></script>
+</body>
+</html>

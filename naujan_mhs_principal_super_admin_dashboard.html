@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office of the School Principal - Naujan Municipal High School (Super Admin Portal)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d', // DepEd Emerald Green
+                            800: '#166534', // Primary Academic Green
+                            900: '#14532d', // Executive Deep Forest
+                            950: '#052e16',
+                        },
+                        gold: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04', // Metallic Gold Accent
+                            700: '#a16207',
+                            800: '#854d0e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        formal: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .executive-glass {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(14px);
+        }
+        .gold-border-gradient {
+            border-image: linear-gradient(to right, #ca8a04, #eab308, #ca8a04) 1;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans h-screen overflow-hidden flex flex-col selection:bg-brand-100 selection:text-brand-900">
+
+    <header class="sticky top-0 z-50 shrink-0 border-b border-slate-200/90 executive-glass px-4 lg:px-8 py-3 transition-all">
+        <div class="flex items-center justify-between gap-4">
+            <!-- Left Branding: Seals & Official School Identification -->
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-brand-800 hover:bg-brand-50 focus:outline-none" aria-label="Toggle Sidebar">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 p-0.5 shadow-lg shadow-brand-900/25 flex items-center justify-center text-white ring-2 ring-gold-500/40">
+                        <i class="fa-solid fa-landmark-dome text-xl text-gold-400"></i>
+                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center" title="System Live">
+                            <i class="fa-solid fa-check text-[8px] text-white"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h1 class="font-heading font-extrabold text-brand-950 tracking-tight text-base sm:text-lg leading-tight">Naujan Municipal High School</h1>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gold-100 text-gold-800 border border-gold-300">OFFICE OF THE PRINCIPAL</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium">DepEd Region IV-B MIMAROPA • Division of Oriental Mindoro • School ID: <span class="font-mono font-bold text-slate-700">301532</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Academic Session Status (Desktop) -->
+            <div class="hidden xl:flex items-center gap-2 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200">
+                <div class="flex items-center gap-2 px-3 py-1 bg-white rounded-xl shadow-xs border border-slate-200 text-xs font-bold text-slate-700">
+                    <i class="fa-solid fa-graduation-cap text-brand-700"></i>
+                    <span>S.Y. 2026–2027</span>
+                </div>
+                <div class="flex items-center gap-1.5 px-3 py-1 bg-brand-50 rounded-xl text-xs font-extrabold text-brand-800 border border-brand-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Three-Term Grading Cycle</span>
+                </div>
+            </div>
+
+            <!-- Right Controls: Broadcast, Pending Clearances, Executive Profile -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Emergency School-Wide Broadcast Button -->
+                <button onclick="openBroadcastModal()" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition shadow-xs active:scale-95" title="Issue division or weather advisory">
+                    <i class="fa-solid fa-bullhorn text-xs animate-bounce"></i>
+                    <span>Campus Broadcast</span>
+                </button>
+
+                <!-- Notifications & Approval Center Trigger -->
+                <div class="relative">
+                    <button id="notif-btn" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 hover:text-brand-800 hover:bg-brand-50 transition relative border border-slate-200/80 bg-white" aria-label="Open Approvals Panel">
+                        <i class="fa-solid fa-bell text-base"></i>
+                        <span data-pending-approvals="count" class="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full bg-rose-600 text-white font-mono font-black text-[9px] shadow-sm animate-pulse">—</span>
+                    </button>
+                    <!-- Approval Flyout Menu -->
+                    <div id="notif-menu" class="hidden absolute right-0 mt-2 w-84 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 z-50">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <div>
+                                <span class="text-xs font-bold text-slate-900 uppercase tracking-wider">Executive Approval Queue</span>
+                                <p class="text-[10px] text-slate-400"><span data-pending-approvals="count">—</span> grade submissions awaiting review</p>
+                            </div>
+                            <span class="text-[11px] font-bold text-brand-700 cursor-pointer hover:underline" onclick="switchView('approvals')">View all</span>
+                        </div>
+                        <div class="space-y-2 text-xs">
+                            <p class="rounded-xl bg-slate-50 p-3 text-xs text-slate-500">Loading saved grade submissions…</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Principal Profile Dropdown Pill -->
+                <div class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-slate-200">
+                    <div class="relative">
+                        <div id="account-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-900 to-brand-700 border-2 border-gold-500 text-white font-formal font-bold flex items-center justify-center text-sm shadow-md">
+                            MR
+                        </div>
+                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-gold-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-slate-900 font-bold" title="Super Administrator">★</span>
+                    </div>
+                    <div class="hidden md:block text-left">
+                        <p id="account-display-name" class="text-xs font-extrabold text-slate-900 leading-tight">Dr. Maria Elena V. Ramos, EdD</p>
+                        <p class="text-[10px] text-brand-800 font-bold tracking-tight">Secondary School Principal IV • Super Admin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 min-h-0 flex overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 min-h-0 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between pt-16 lg:pt-0">
+            <div class="p-4 space-y-6 overflow-y-auto">
+                <!-- Principal Office Badge -->
+                <div class="p-3.5 rounded-2xl bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 text-white shadow-md relative overflow-hidden border border-brand-800">
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-mono font-extrabold uppercase tracking-widest text-gold-400">Institutional Governance</span>
+                        <h3 class="font-heading font-extrabold text-white text-sm mt-0.5">Office of the School Head</h3>
+                        <p class="text-[11px] text-brand-100/90 mt-1">Principal account controls are active.</p>
+                        <div class="mt-3 pt-2.5 border-t border-brand-800/80 flex items-center justify-between text-[10px]">
+                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i>LIS Sync: Online</span>
+                            <span class="font-mono bg-brand-800/80 px-2 py-0.5 rounded text-gold-300">Level 4 Clearance</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-stamp absolute -right-3 -bottom-4 text-6xl text-white/5 pointer-events-none"></i>
+                </div>
+
+                <!-- Primary Modules -->
+                <div>
+                    <span class="px-3 text-[10px] font-black tracking-wider uppercase text-slate-400">Executive Modules</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="switchView('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-800 text-white shadow-md shadow-brand-800/20">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-gold-400"></i>
+                            <span>Executive Overview</span>
+                        </button>
+                        <button onclick="switchView('public-content')" id="nav-public-content" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-globe w-5 text-center"></i>
+                            <span>Public Portal Content</span>
+                        </button>
+                        <button onclick="switchView('approvals')" id="nav-approvals" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-signature w-5 text-center"></i>
+                            <span>Grade Sign-Off & Lock</span>
+                            <span data-pending-approvals="pending" class="ml-auto text-[10px] font-extrabold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full animate-pulse">— Pending</span>
+                        </button>
+                        <button onclick="switchView('faculty')" id="nav-faculty" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-chalkboard-user w-5 text-center"></i>
+                            <span>Faculty & Staff Roster</span>
+                            <span class="ml-auto text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">68 Personnel</span>
+                        </button>
+                        <button onclick="switchView('accounts')" id="nav-accounts" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-user-plus w-5 text-center"></i>
+                            <span>Staff Accounts</span>
+                        </button>
+                        <button onclick="switchView('forms')" id="nav-forms" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-file-shield w-5 text-center"></i>
+                            <span>DepEd Forms (SF1 - SF10)</span>
+                        </button>
+                        <button onclick="switchView('audit')" id="nav-audit" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-shield-cat w-5 text-center"></i>
+                            <span>Audit Trail & Security</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Division Directives & Quick Shortcuts -->
+                <div>
+                    <span class="px-3 text-[10px] font-black tracking-wider uppercase text-slate-400">Division Operations</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="triggerLISSync()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-brand-50 hover:text-brand-900 transition">
+                            <i class="fa-solid fa-cloud-arrow-up w-5 text-center text-brand-700"></i>
+                            <span>Sync with DepEd LIS Server</span>
+                        </button>
+                        <button onclick="showToast('BEIS export is unavailable: facility and division-level statistics are not stored in SERMS yet.')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-brand-50 hover:text-brand-900 transition">
+                            <i class="fa-solid fa-file-excel w-5 text-center text-emerald-600"></i>
+                            <span>Generate BEIS Masterfile</span>
+                        </button>
+                        <button onclick="openBroadcastModal()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-700 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-bullhorn w-5 text-center text-rose-600"></i>
+                            <span>Campus Alert Broadcast</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer within sidebar -->
+            <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <span class="font-medium">SERMS SuperAdmin v3.2</span>
+                <span class="flex items-center gap-1 font-mono text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> SECURE
+                </span>
+            </div>
+        </aside>
+
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-30 hidden lg:hidden"></div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/60 relative">
+
+            <section id="view-public-content" class="hidden space-y-6">
+                <div class="rounded-3xl bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 p-6 text-white shadow-xl sm:p-8">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gold-300">
+                        <i class="fa-solid fa-globe"></i> Public portal editor
+                    </span>
+                    <h2 class="mt-3 font-heading text-2xl font-extrabold">Manage public school information</h2>
+                    <p class="mt-2 max-w-3xl text-xs leading-relaxed text-brand-100 sm:text-sm">Changes are saved to SERMS and displayed on the public portal. Verify statistics and announcements before publishing. Enrollment can be opened or closed here.</p>
+                </div>
+
+                <form id="public-portal-content-form" class="space-y-6">
+                    <section class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs sm:p-6">
+                        <div class="mb-5">
+                            <h3 class="font-heading text-base font-extrabold text-slate-900">School year & homepage</h3>
+                            <p class="mt-1 text-xs text-slate-500">Update the school year, homepage headline, introduction, and school logo.</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <label class="text-xs font-bold text-slate-700">School year
+                                <input id="portal-school-year" maxlength="20" required placeholder="2027–2028" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                            </label>
+                            <div class="text-xs font-bold text-slate-700">School logo
+                                <div class="mt-1 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 p-3">
+                                    <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-brand-700">
+                                        <img id="portal-logo-preview" alt="Selected school logo preview" class="hidden h-full w-full object-contain">
+                                        <i id="portal-logo-placeholder" class="fa-solid fa-graduation-cap text-2xl"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <input id="portal-logo-file" type="file" accept="image/png,image/jpeg,image/webp" class="block w-full text-[11px] font-normal text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-[11px] file:font-bold file:text-brand-800">
+                                        <p class="mt-1 text-[10px] font-normal text-slate-500">PNG, JPEG, or WebP; maximum 750 KB.</p>
+                                    </div>
+                                    <button id="portal-logo-remove" type="button" class="rounded-lg px-2 py-1 text-[10px] font-bold text-rose-700 hover:bg-rose-50">Remove</button>
+                                </div>
+                            </div>
+                            <label class="text-xs font-bold text-slate-700 sm:col-span-2">Homepage headline
+                                <input id="portal-hero-title" maxlength="140" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                            </label>
+                            <label class="text-xs font-bold text-slate-700 sm:col-span-2">Highlighted headline text
+                                <input id="portal-hero-accent" maxlength="80" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                            </label>
+                            <label class="text-xs font-bold text-slate-700 sm:col-span-2">Homepage introduction
+                                <textarea id="portal-hero-description" maxlength="600" rows="3" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"></textarea>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs sm:p-6">
+                        <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                            <div>
+                                <h3 class="font-heading text-base font-extrabold text-slate-900">Enrollment period</h3>
+                                <p class="mt-1 text-xs text-slate-500">Closing the period also blocks new enrollment submissions in the API.</p>
+                            </div>
+                            <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-xs font-bold text-brand-900">
+                                <input id="portal-enrollment-open" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-600">
+                                Accept enrollment applications
+                            </label>
+                        </div>
+                        <label class="block text-xs font-bold text-slate-700">Public enrollment instructions
+                            <textarea id="portal-enrollment-instructions" maxlength="600" rows="3" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"></textarea>
+                        </label>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs sm:p-6">
+                        <div class="mb-5">
+                            <h3 class="font-heading text-base font-extrabold text-slate-900">Public announcements</h3>
+                            <p class="mt-1 text-xs text-slate-500">Manage the three announcement cards shown on the school portal.</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
+                                <label class="text-xs font-bold text-slate-700">Announcement 1 category<input id="portal-announcement-0-category" maxlength="40" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700">Date or label<input id="portal-announcement-0-date" maxlength="40" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Title<input id="portal-announcement-0-title" maxlength="120" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Message<textarea id="portal-announcement-0-body" maxlength="500" rows="2" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></textarea></label>
+                            </div>
+                            <div class="grid grid-cols-1 gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
+                                <label class="text-xs font-bold text-slate-700">Announcement 2 category<input id="portal-announcement-1-category" maxlength="40" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700">Date or label<input id="portal-announcement-1-date" maxlength="40" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Title<input id="portal-announcement-1-title" maxlength="120" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Message<textarea id="portal-announcement-1-body" maxlength="500" rows="2" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></textarea></label>
+                            </div>
+                            <div class="grid grid-cols-1 gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
+                                <label class="text-xs font-bold text-slate-700">Announcement 3 category<input id="portal-announcement-2-category" maxlength="40" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700">Date or label<input id="portal-announcement-2-date" maxlength="40" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Title<input id="portal-announcement-2-title" maxlength="120" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></label>
+                                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Message<textarea id="portal-announcement-2-body" maxlength="500" rows="2" required class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 font-normal"></textarea></label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs sm:p-6">
+                        <div class="mb-5">
+                            <h3 class="font-heading text-base font-extrabold text-slate-900">Public contact & statistics</h3>
+                            <p class="mt-1 text-xs text-slate-500">Statistics are manually maintained here. Confirm the figures before publishing.</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <label class="text-xs font-bold text-slate-700 sm:col-span-2">School address<input id="portal-contact-address" maxlength="240" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                            <label class="text-xs font-bold text-slate-700">Phone number<input id="portal-contact-phone" maxlength="80" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                            <label class="text-xs font-bold text-slate-700">Contact email<input id="portal-contact-email" type="email" maxlength="254" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                            <label class="text-xs font-bold text-slate-700">Enrolled learners<input id="portal-enrolled-learners" type="number" min="0" step="1" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                            <label class="text-xs font-bold text-slate-700">Faculty & personnel<input id="portal-faculty-personnel" type="number" min="0" step="1" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                            <label class="text-xs font-bold text-slate-700">Promotion rate (%)<input id="portal-promotion-rate" type="number" min="0" max="100" step="0.01" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                            <label class="text-xs font-bold text-slate-700">Office hours<input id="portal-office-hours" maxlength="120" required class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 font-normal"></label>
+                        </div>
+                    </section>
+                    <div class="sticky bottom-0 flex flex-col justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center">
+                        <p id="portal-content-status" class="text-xs text-slate-500" role="status">Loading saved public portal content…</p>
+                        <button id="portal-content-save" type="submit" disabled class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-800 px-5 py-3 text-xs font-bold text-white shadow transition hover:bg-brand-900 disabled:cursor-not-allowed disabled:opacity-50">
+                            <i class="fa-solid fa-floppy-disk"></i> Save public portal
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="view-overview" class="space-y-6">
+                <!-- Executive Hero Banner -->
+                <div class="rounded-3xl bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-brand-900">
+                    <div class="relative z-10 max-w-3xl">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="px-3 py-1 rounded-full bg-white/10 backdrop-blur border border-white/20 text-xs font-semibold text-gold-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-crown text-gold-400 text-xs"></i> School Executive Dashboard
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-bold">
+                                DepEd Accreditation Status: Level III Compliant
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-heading font-extrabold tracking-tight">Good Day, <span data-current-account-name>Dr. Maria Elena Ramos</span></h2>
+                        <p class="text-brand-100 text-xs sm:text-sm mt-2 leading-relaxed">
+                            Welcome to the executive command center. Dashboard totals and grade-review records reflect data currently stored in SERMS.
+                        </p>
+
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <button onclick="switchView('approvals')" class="px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-slate-950 font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-file-signature"></i> Sign-Off Grade Submissions (4)
+                            </button>
+                            <button onclick="switchView('forms')" class="px-5 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-750 border border-brand-600 text-white font-semibold text-xs sm:text-sm transition active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-stamp"></i> Reports & Forms Status
+                            </button>
+                            <button onclick="triggerLISSync()" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate"></i> LIS Synchronizer
+                            </button>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-school-flag absolute -right-6 -bottom-10 text-[200px] text-white/5 pointer-events-none"></i>
+                </div>
+
+                <!-- Executive Institutional KPI Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+                    <!-- KPI 1: Enrolled Learners & Capacity -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Enrolled Learners</span>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-brand-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="overview-enrollment-count" class="text-3xl font-heading font-black text-slate-900">—</span>
+                            <span class="text-xs font-semibold text-slate-500">Officially enrolled</span>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500 font-medium">
+                            <span>From current enrollment records</span>
+                            <span id="overview-enrollment-grade-count">— grade levels</span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: Faculty Records -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Faculty Records</span>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-id-card-clip"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="overview-faculty-count" class="text-3xl font-heading font-black text-slate-900">—</span>
+                            <span class="text-xs font-semibold text-slate-500">Active records</span>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span>Teaching and administrative staff</span>
+                            <button onclick="switchView('faculty')" class="font-bold text-brand-800 hover:underline">View roster</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Staff Accounts</span>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="overview-staff-count" class="text-3xl font-heading font-black text-slate-900">—</span>
+                            <span class="text-xs font-semibold text-slate-500">Active accounts</span>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span><span id="overview-teacher-count">—</span> Teachers</span>
+                            <span><span id="overview-registrar-count">—</span> Registrars</span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Current Grade Submissions -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Grade Submissions</span>
+                            <div class="w-10 h-10 rounded-xl bg-gold-50 text-gold-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="overview-submission-count" class="text-3xl font-heading font-black text-slate-900">—</span>
+                            <span class="text-xs font-semibold text-slate-500">Total records</span>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span><span id="overview-submitted-count">—</span> Awaiting review</span>
+                            <span><span id="overview-draft-count">—</span> Drafts</span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Pending Administrative Approvals -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Action Queue</span>
+                            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="overview-pending-count" class="text-3xl font-heading font-black text-rose-700">—</span>
+                            <span class="text-xs font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">Awaiting review</span>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                            <span>Submitted by teachers</span>
+                            <span>From current grade records</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row: Live Enrollment and Submission Status -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- School Performance & MPS by Learning Area -->
+                    <div class="lg:col-span-2 bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                            <div>
+                                <h3 class="font-heading font-bold text-slate-900 text-base">Official Enrollments by Grade</h3>
+                                <p class="text-xs text-slate-500">Counts from records currently marked officially enrolled</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-brand-50 text-brand-800 rounded-lg text-xs font-bold border border-brand-200 self-start sm:self-auto">
+                                Current totals
+                            </span>
+                        </div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="schoolMpsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Grade Level Population & Strands Doughnut -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-heading font-bold text-slate-900 text-base">Grade Submission Status</h3>
+                                <i class="fa-solid fa-chart-pie text-slate-400"></i>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-3">Current counts by saved submission state</p>
+                            <div class="relative h-48 w-full flex items-center justify-center">
+                                <canvas id="cohortDoughnutChart"></canvas>
+                            </div>
+                        </div>
+                        <div id="overview-submission-legend" class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-[11px] font-semibold"></div>
+                    </div>
+                </div>
+
+                <!-- High Priority Departmental Summaries -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="font-heading font-bold text-slate-900 text-base">Grade Submission Monitor</h3>
+                            <p class="text-xs text-slate-500">Status counts from records submitted by teachers</p>
+                        </div>
+                        <button onclick="switchView('approvals')" class="text-xs font-bold text-brand-800 hover:text-brand-900 flex items-center gap-1">
+                            Go to Master Clearance Table <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60"><p class="text-xs text-slate-500">Approved and locked</p><p id="overview-approved-count" class="mt-1 text-2xl font-black text-emerald-700">—</p></div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60"><p class="text-xs text-slate-500">Returned for revision</p><p id="overview-returned-count" class="mt-1 text-2xl font-black text-amber-700">—</p></div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60"><p class="text-xs text-slate-500">Draft submissions</p><p id="overview-draft-monitor-count" class="mt-1 text-2xl font-black text-slate-700">—</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-approvals" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-gold-100 text-gold-900 border border-gold-300">Principal Review</span>
+                                <span class="text-xs font-bold text-slate-500">Q1 Official Grade Finalization</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Section Grade Submissions</h2>
+                            <p class="text-xs text-slate-500">Review saved grade submissions and record principal approval or return them for revision.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="exportPrincipalReport('grades')" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50">
+                                <i class="fa-solid fa-download mr-1"></i> Export Grades CSV
+                            </button>
+                            <button onclick="batchApproveAll()" class="px-4 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-brand-800/20 active:scale-95 transition">
+                                <i class="fa-solid fa-file-signature text-gold-400"></i> Batch Approve Submitted Grades
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters & Search -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100">
+                        <div class="relative sm:col-span-2">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="approval-search" oninput="filterApprovals()" placeholder="Search section, adviser name, or grade level..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <select id="approval-status-filter" onchange="filterApprovals()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All Submission Statuses</option>
+                                <option value="Pending Principal Sign-off">Pending Principal Sign-off</option>
+                                <option value="Approved & Locked">Approved & Locked</option>
+                                <option value="Returned for Revision">Returned for Revision</option>
+                                <option value="Draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approvals Queue Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">Section & Level</th>
+                                    <th class="py-3 px-4">Class Adviser</th>
+                                    <th class="py-3 px-4">Learners in Submission</th>
+                                    <th class="py-3 px-4">Section MPS</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4">Date Submitted</th>
+                                    <th class="py-3 px-4 text-right">Principal Clearance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="approvals-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+            <section id="view-faculty" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-800 border border-brand-200">SERMS Faculty Records</span>
+                                        <span id="faculty-active-count" class="text-xs font-bold text-slate-500">Active personnel records</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Faculty & Personnel Oversight</h2>
+                            <p class="text-xs text-slate-500">Manage faculty positions, departments, and teaching-load notes stored in SERMS. IPCRF ratings and individual service records are not stored.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openFacultyModal()" class="px-3.5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-brand-800/20 transition">
+                                <i class="fa-solid fa-user-plus"></i> Reassign / Add Personnel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Department Filters -->
+                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                        <button onclick="filterFacultyDept('ALL')" class="faculty-tab active px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-800 text-white transition">All Departments (68)</button>
+                        <button onclick="filterFacultyDept('JHS STEM')" class="faculty-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">JHS STEM (18)</button>
+                        <button onclick="filterFacultyDept('JHS Languages')" class="faculty-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">JHS Languages (16)</button>
+                        <button onclick="filterFacultyDept('SHS Academics')" class="faculty-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">SHS Academics (14)</button>
+                        <button onclick="filterFacultyDept('SHS TVL')" class="faculty-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">SHS TVL / Agri (14)</button>
+                        <button onclick="filterFacultyDept('Admin')" class="faculty-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Administrative Staff (6)</button>
+                    </div>
+                </div>
+
+                <!-- Faculty Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">Personnel Name</th>
+                                    <th class="py-3 px-4">Position / Rank</th>
+                                    <th class="py-3 px-4">Department</th>
+                                    <th class="py-3 px-4">Assigned Section / Load</th>
+                                    <th class="py-3 px-4">IPCRF Rating</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="faculty-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-accounts" class="hidden space-y-6">
+                <div class="rounded-3xl bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 p-6 sm:p-8 text-white shadow-xl border border-brand-900">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gold-500/20 border border-gold-400/40 flex items-center justify-center text-gold-400 text-xl">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-heading text-xl sm:text-2xl font-extrabold">Create Staff Accounts</h2>
+                            <p class="mt-1 text-xs sm:text-sm text-brand-100">Create sign-in accounts for teachers and registrars. Each account opens its matching staff dashboard.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="max-w-3xl bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="p-5 sm:p-6 border-b border-slate-100">
+                        <h3 class="font-heading font-bold text-slate-900">New Staff Account</h3>
+                        <p class="text-xs text-slate-500 mt-1">Student and principal accounts cannot be created from this page.</p>
+                    </div>
+                    <form id="staff-account-form" onsubmit="handleStaffAccountSubmit(event)" class="p-5 sm:p-6 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="block text-xs font-bold text-slate-700">
+                                Full name
+                                <input id="account-name" name="name" type="text" required maxlength="120" autocomplete="name" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100">
+                            </label>
+                            <label class="block text-xs font-bold text-slate-700">
+                                Account type
+                                <select id="account-role" name="role" required class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100">
+                                    <option value="teacher">Teacher — Teacher Portal</option>
+                                    <option value="registrar">Registrar — Registrar Dashboard</option>
+                                </select>
+                            </label>
+                            <label class="block text-xs font-bold text-slate-700">
+                                Username
+                                <input id="account-identifier" name="identifier" type="text" required minlength="3" maxlength="50" pattern="[A-Za-z0-9._\-]{3,50}" autocomplete="username" autocapitalize="none" spellcheck="false" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100" aria-describedby="account-identifier-help">
+                                <span id="account-identifier-help" class="mt-1 block text-[11px] font-normal text-slate-500">3–50 letters, numbers, dots, underscores, or hyphens.</span>
+                            </label>
+                            <label class="block text-xs font-bold text-slate-700">
+                                Email <span class="font-normal text-slate-400">(optional)</span>
+                                <input id="account-email" name="email" type="email" maxlength="254" autocomplete="email" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100">
+                            </label>
+                        </div>
+                        <label class="block text-xs font-bold text-slate-700">
+                            Temporary password
+                            <input id="account-password" name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100" aria-describedby="account-password-help">
+                            <span id="account-password-help" class="mt-1 block text-[11px] font-normal text-slate-500">At least 8 characters with uppercase and lowercase letters, a number, and a symbol.</span>
+                        </label>
+                        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+                            <p class="text-[11px] text-slate-500">Share the temporary password securely with the staff member.</p>
+                            <button id="create-staff-account-btn" type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-800 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-300">
+                                <i class="fa-solid fa-user-plus"></i> Create Staff Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="font-heading font-bold text-slate-900">Teacher & Registrar Accounts</h3>
+                            <p class="mt-1 text-xs text-slate-500">Deactivate access without deleting the account or its audit history.</p>
+                        </div>
+                        <div class="flex flex-col gap-2 sm:flex-row">
+                            <input id="staff-account-search" type="search" oninput="filterStaffAccounts()" placeholder="Search name or username" class="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-700">
+                            <select id="staff-account-status" onchange="filterStaffAccounts()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-700">
+                                <option value="all">All statuses</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <button type="button" onclick="loadStaffAccounts()" class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                                <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[640px] text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr><th class="px-4 py-3">Staff member</th><th class="px-4 py-3">Username</th><th class="px-4 py-3">Role</th><th class="px-4 py-3">Status</th><th class="px-4 py-3 text-right">Access</th></tr>
+                            </thead>
+                            <tbody id="staff-account-table-body" class="divide-y divide-slate-100 text-slate-700">
+                                <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">Loading staff accounts…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="p-5 sm:p-6 border-b border-slate-100">
+                        <h3 class="font-heading font-bold text-slate-900">Assign Class Rosters</h3>
+                        <p class="mt-1 text-xs text-slate-500">Teachers can access only the officially enrolled learners assigned to them here. Saving the same teacher and section updates that roster.</p>
+                    </div>
+                    <form id="teacher-roster-form" onsubmit="handleTeacherRosterSubmit(event)" class="p-5 sm:p-6 space-y-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <label class="block text-xs font-bold text-slate-700">
+                                Active teacher
+                                <select id="roster-teacher" required onchange="selectTeacherRoster()" class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100">
+                                    <option value="">Loading teacher accounts…</option>
+                                </select>
+                            </label>
+                            <label class="block text-xs font-bold text-slate-700">
+                                Class section
+                                <input id="roster-section" type="text" required maxlength="120" oninput="selectTeacherRoster()" placeholder="For example, Grade 10 - Rizal" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100">
+                            </label>
+                        </div>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">Officially enrolled learners</p>
+                                <p id="roster-learner-count" class="mt-1 text-[11px] text-slate-500">Loading eligible learners…</p>
+                            </div>
+                            <input id="roster-learner-search" type="search" oninput="filterRosterLearners()" placeholder="Search name, LRN, or grade" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs sm:max-w-xs focus:outline-none focus:ring-2 focus:ring-brand-700">
+                        </div>
+                        <div id="roster-learners-list" class="grid max-h-72 grid-cols-1 gap-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2">
+                            <p class="col-span-full py-4 text-center text-xs text-slate-500">Loading eligible learners…</p>
+                        </div>
+                        <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                            <p id="roster-assignment-status" role="status" class="text-[11px] text-slate-500">Select a teacher, section, and learners to create or update a roster.</p>
+                            <button id="save-teacher-roster-btn" type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-800 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-300">
+                                <i class="fa-solid fa-users"></i> Save Class Roster
+                            </button>
+                        </div>
+                    </form>
+                    <div class="overflow-x-auto border-t border-slate-100">
+                        <table class="w-full min-w-[560px] text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
+                                <tr><th class="px-4 py-3">Teacher</th><th class="px-4 py-3">Section</th><th class="px-4 py-3">Learners</th><th class="px-4 py-3 text-right">Status / action</th></tr>
+                            </thead>
+                            <tbody id="teacher-roster-table-body" class="divide-y divide-slate-100 text-slate-700">
+                                <tr><td colspan="4" class="px-4 py-6 text-center text-slate-500">Loading class rosters…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-forms" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-800 border border-brand-200">SERMS Data Exports</span>
+                                <span class="text-xs font-bold text-slate-500">School forms data status</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">SERMS Reports & DepEd Forms Status</h2>
+                            <p class="text-xs text-slate-500">Download CSV reports supported by stored records. These exports are not certified DepEd forms.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="triggerLISSync()" class="px-4 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-brand-800/20 transition">
+                                <i class="fa-solid fa-cloud-arrow-up text-gold-400"></i> DepEd LIS Not Configured
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forms Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- SF1 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-800 flex items-center justify-center font-bold text-base">
+                                SF1
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">Official Register</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">School Register (SF1)</h3>
+                        <p class="text-xs text-slate-500">Enrollment application fields currently stored in SERMS.</p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-slate-400">Current enrollment records</span>
+                            <button onclick="exportPrincipalReport('enrollments')" class="text-xs font-bold text-brand-800 hover:underline">
+                                Download Enrollment CSV &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SF2 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold text-base">
+                                SF2
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Saved records</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">Attendance Summary (SF2 source data)</h3>
+                        <p class="text-xs text-slate-500">Summary of teacher attendance saved in SERMS; this CSV is not an official SF2 form.</p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-emerald-700">Based on saved attendance records</span>
+                            <button onclick="exportPrincipalReport('attendance')" class="text-xs font-bold text-brand-800 hover:underline">
+                                Download Attendance CSV &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SF4 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center font-bold text-base">
+                                SF4
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Movement</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">Monthly Learner Movement (SF4)</h3>
+                        <p class="text-xs text-slate-500">Tracks transferred-in, transferred-out, and dropout rate per grade curriculum.</p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-slate-500">Movement history is not recorded</span>
+                            <button onclick="showToast('SF4 is unavailable: SERMS does not yet record learner transfer or dropout events.')" class="text-xs font-bold text-slate-500 hover:underline">
+                                Not available &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SF5 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-gold-50 text-gold-800 flex items-center justify-center font-bold text-base">
+                                SF5
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gold-100 text-gold-900 border border-gold-300">End of School Year</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">Report on Promotion (SF5)</h3>
+                        <p class="text-xs text-slate-500">Consolidated list of promoted, retained, and conditional students by section.</p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-slate-500">Promotion results are not recorded</span>
+                            <button onclick="showToast('SF5 is unavailable: promotion outcomes are not recorded in SERMS yet.')" class="text-xs font-bold text-slate-500 hover:underline">
+                                Not available &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SF10 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-800 flex items-center justify-center font-bold text-base">
+                                SF10
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800">Permanent</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">Learner Permanent Record (SF10)</h3>
+                        <p class="text-xs text-slate-500">Formerly Form 137. Official authenticated academic history and scholastic transcript.</p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-purple-700">Protected Archive</span>
+                            <button onclick="showToast('SF10 export is unavailable: historic learner transcripts are not stored in SERMS yet.')" class="text-xs font-bold text-slate-500 hover:underline">
+                                Not available &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- BEIS / Division Summary -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-800 flex items-center justify-center font-bold text-base">
+                                BEIS
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">Division</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">DepEd BEIS Statistical File</h3>
+                        <p class="text-xs text-slate-500">Government statistical report for school facilities, classroom count, and ratios.</p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-slate-500">Facility statistics are not recorded</span>
+                            <button onclick="showToast('BEIS export is unavailable: facility and division-level statistics are not stored in SERMS yet.')" class="text-xs font-bold text-slate-500 hover:underline">
+                                Not available &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-audit" class="hidden space-y-6">
+                <!-- Security Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold uppercase">
+                            <span>Role-Based Access Control</span>
+                            <i class="fa-solid fa-users-gear text-brand-700 text-sm"></i>
+                        </div>
+                        <p class="text-2xl font-black text-slate-900 mt-2">4 Supported Roles</p>
+                        <p class="text-xs text-slate-500 mt-1">Student, Teacher, Registrar, Principal</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold uppercase">
+                            <span>Password Storage</span>
+                            <i class="fa-solid fa-key text-gold-600 text-sm"></i>
+                        </div>
+                        <p class="text-2xl font-black text-slate-900 mt-2">bcrypt</p>
+                        <p class="text-xs text-emerald-700 font-bold mt-1">Passwords are hashed before storage</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold uppercase">
+                            <span>Audit Logging Level</span>
+                            <i class="fa-solid fa-file-shield text-blue-700 text-sm"></i>
+                        </div>
+                        <p class="text-2xl font-black text-slate-900 mt-2">Recorded Events</p>
+                        <p class="text-xs text-slate-500 mt-1">Audit history is stored in MongoDB; it is not an immutable ledger.</p>
+                    </div>
+                </div>
+
+                <!-- Audit Log Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-heading font-bold text-slate-900 text-base">Real-Time Administrative Audit Logs</h3>
+                            <p class="text-xs text-slate-500">Security trail recording all login, grade mutation, and record releases</p>
+                        </div>
+                        <button onclick="exportPrincipalReport('audit')" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> Download Audit File
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">Timestamp (PST)</th>
+                                    <th class="py-3 px-4">User Account & Role</th>
+                                    <th class="py-3 px-4">Action Type</th>
+                                    <th class="py-3 px-4">Target Record / Subject</th>
+                                    <th class="py-3 px-4">IP & Machine Hash</th>
+                                    <th class="py-3 px-4 text-right">Verification</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700 font-mono" id="audit-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL 1: Principal Grade Sign-Off & Official Seal Certification -->
+    <div id="sign-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeSignModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <!-- Modal Header -->
+                <div class="p-6 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 text-white flex items-center justify-between border-b border-brand-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/20 border border-gold-400/40 flex items-center justify-center text-gold-400 font-bold text-lg">
+                            <i class="fa-solid fa-signature"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-extrabold text-base">Principal Review & Approval</h3>
+                            <p class="text-[11px] text-brand-200">Naujan Municipal High School • Form 138 Approval</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSignModal()" class="text-white/70 hover:text-white text-lg p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 space-y-4 text-xs">
+                    <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Section Target:</span>
+                            <span class="font-bold text-slate-900" id="modal-target-section">—</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Class Adviser:</span>
+                            <span class="font-semibold text-slate-800" id="modal-target-adviser">—</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Mean Percentage Score (MPS):</span>
+                            <span class="font-mono font-bold text-brand-800" id="modal-target-mps">—</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Total Learners Evaluated:</span>
+                            <span class="font-semibold text-slate-800" id="modal-target-learners">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Digital Certificate Preview -->
+                    <div class="p-4 rounded-2xl border-2 border-dashed border-gold-500/50 bg-gold-50/30 text-center space-y-2">
+                        <p class="text-[11px] font-bold text-gold-800 uppercase tracking-wider">Principal Approval Record</p>
+                        <div class="font-formal font-bold text-lg text-slate-900 tracking-wide">
+                            <span data-current-account-name>Dr. Maria Elena V. Ramos, EdD</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 font-mono">Principal account • approval recorded in SERMS</p>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            <i class="fa-solid fa-stamp text-emerald-700"></i> Principal approval action
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+                        <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-700"></i> 
+                        <strong>Note:</strong> Approval records the authorized principal's review and locks this submission in SERMS. This is not a cryptographic or DepEd-certified digital signature.
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button onclick="returnSectionForRevision()" class="px-4 py-2 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold text-xs transition">
+                        Return for Revision
+                    </button>
+                    <button onclick="confirmSignAndLock()" class="px-5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-brand-800/20 active:scale-95 transition">
+                    <i class="fa-solid fa-stamp text-gold-400"></i> Approve & Lock Grades
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Campus-Wide Emergency Broadcast System -->
+    <div id="broadcast-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeBroadcastModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <div class="p-5 bg-gradient-to-r from-rose-900 to-rose-700 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white font-bold">
+                            <i class="fa-solid fa-bullhorn text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base">Campus Emergency Broadcast</h3>
+                            <p class="text-[11px] text-rose-200">Push instantaneous alerts to Teacher & Student Portals</p>
+                        </div>
+                    </div>
+                    <button onclick="closeBroadcastModal()" class="text-white/80 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleBroadcastSubmit(event)" class="p-6 space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Advisory / Announcement Type *</label>
+                        <select id="broadcast-type" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:ring-2 focus:ring-rose-600 focus:outline-none" required>
+                            <option value="Weather Suspension">Typhoon / Weather Class Suspension (MDRRMO)</option>
+                            <option value="DepEd Division Memo">Urgent DepEd Division Memorandum</option>
+                            <option value="General Faculty Assembly">Emergency Faculty & Staff Assembly</option>
+                            <option value="Campus Health Advisory">Health & Sanitation Campus Advisory</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Broadcast Message Content *</label>
+                        <textarea id="broadcast-msg" rows="4" placeholder="Enter official executive directive text to be displayed across all portal dashboards..." class="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-600 focus:outline-none" required></textarea>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="broadcast-sms" class="rounded text-rose-600 focus:ring-rose-600 w-4 h-4">
+                        <label for="broadcast-sms" class="font-semibold text-slate-700 cursor-pointer">Request SMS delivery (gateway not configured; this will only be recorded)</label>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                        <button type="button" onclick="closeBroadcastModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold">Cancel</button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-bold flex items-center gap-1.5 shadow-md shadow-rose-700/20">
+                            <i class="fa-solid fa-paper-plane"></i> Transmit Broadcast
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Faculty Reassignment / Load Allocation Modal -->
+    <div id="faculty-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeFacultyModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <div class="p-5 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 flex items-center justify-center text-gold-400 font-bold">
+                            <i class="fa-solid fa-user-pen text-base"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base">Faculty Assignment & Load Manager</h3>
+                            <p class="text-[11px] text-brand-200">Reassign advisory class or update plantilla records</p>
+                        </div>
+                    </div>
+                    <button onclick="closeFacultyModal()" class="text-white/80 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleFacultySubmit(event)" class="p-6 space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Personnel Full Name *</label>
+                        <input type="text" id="fac-name" placeholder="e.g. Ramos, Arnold D., LPT" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Position / Rank *</label>
+                            <select id="fac-rank" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                <option>Teacher I</option>
+                                <option>Teacher II</option>
+                                <option>Teacher III</option>
+                                <option>Master Teacher I</option>
+                                <option>Master Teacher II</option>
+                                <option>Head Teacher III</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Department *</label>
+                            <select id="fac-dept" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                <option value="JHS STEM">JHS STEM</option>
+                                <option value="JHS Languages">JHS Languages</option>
+                                <option value="SHS Academics">SHS Academics</option>
+                                <option value="SHS TVL">SHS TVL / Agri</option>
+                                <option value="Admin">Admin Staff</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Assigned Advisory Section & Teaching Load *</label>
+                        <input type="text" id="fac-load" placeholder="e.g. Grade 10 - Bonifacio (6 Periods / Day)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                        <button type="button" onclick="closeFacultyModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold">Cancel</button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold flex items-center gap-1.5 shadow-md shadow-brand-800/20">
+                            <i class="fa-solid fa-floppy-disk text-gold-400"></i> Save Faculty Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Action Alert Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-gold-400 text-base" id="toast-icon"></i>
+        <p class="text-xs font-medium" id="toast-msg">Executive command executed successfully.</p>
+    </div>
+
+    <script>
+        // Sample Submissions dataset for Executive Sign-off queue
+        const approvalRecords = [
+            {
+                id: 1,
+                code: "10-Rizal",
+                section: "Grade 10 - Jose Rizal",
+                level: "JHS Grade 10",
+                adviser: "Mrs. Maria Santos, LPT",
+                enrolled: 45,
+                evaluated: 45,
+                mps: "86.4%",
+                status: "Pending Principal Sign-off",
+                dateSubmitted: "Sept 30, 2026",
+                subject: "Science 10 & Core Subjects"
+            },
+            {
+                id: 2,
+                code: "12-STEM-Curie",
+                section: "Grade 12 - STEM Curie",
+                level: "SHS Grade 12",
+                adviser: "Engr. Jonathan Reyes, LPT",
+                enrolled: 42,
+                evaluated: 42,
+                mps: "89.2%",
+                status: "Pending Principal Sign-off",
+                dateSubmitted: "Sept 29, 2026",
+                subject: "General Physics 2 & Research"
+            },
+            {
+                id: 3,
+                code: "7-Mabini",
+                section: "Grade 7 - Apolinario Mabini",
+                level: "JHS Grade 7",
+                adviser: "Ms. Clara Delgado, LPT",
+                enrolled: 48,
+                evaluated: 48,
+                mps: "84.8%",
+                status: "Pending Principal Sign-off",
+                dateSubmitted: "Sept 29, 2026",
+                subject: "Mathematics 7 & Core"
+            },
+            {
+                id: 4,
+                code: "11-TVL-Edison",
+                section: "Grade 11 - TVL Edison (ICT)",
+                level: "SHS Grade 11",
+                adviser: "Mr. Arnold Ramos, LPT",
+                enrolled: 40,
+                evaluated: 40,
+                mps: "88.1%",
+                status: "Pending Principal Sign-off",
+                dateSubmitted: "Sept 28, 2026",
+                subject: "Computer Systems Servicing"
+            },
+            {
+                id: 5,
+                code: "8-Luna",
+                section: "Grade 8 - Antonio Luna",
+                level: "JHS Grade 8",
+                adviser: "Mr. Victor Mercado, LPT",
+                enrolled: 46,
+                evaluated: 46,
+                mps: "85.7%",
+                status: "Approved & Locked",
+                dateSubmitted: "Sept 27, 2026",
+                subject: "Social Studies & Filipino"
+            },
+            {
+                id: 6,
+                code: "9-Sampaguita",
+                section: "Grade 9 - Sampaguita",
+                level: "JHS Grade 9",
+                adviser: "Mrs. Teresa De Silva",
+                enrolled: 47,
+                evaluated: 43,
+                mps: "79.1%",
+                status: "Returned for Revision",
+                dateSubmitted: "Sept 26, 2026",
+                subject: "English 9"
+            }
+        ];
+
+        // Sample Faculty Dataset
+        let facultyRoster = [
+            {
+                id: 1,
+                name: "Santos, Maria C., LPT",
+                rank: "Master Teacher I",
+                dept: "JHS STEM",
+                load: "Grade 10 Rizal (Adviser) • 6 Loads",
+                ipcrf: "4.89 (Outstanding)",
+                status: "Active Duty"
+            },
+            {
+                id: 2,
+                name: "Reyes, Jonathan M., LPT",
+                rank: "Master Teacher II",
+                dept: "SHS Academics",
+                load: "Grade 12 STEM Curie • 5 Loads",
+                ipcrf: "4.92 (Outstanding)",
+                status: "Active Duty"
+            },
+            {
+                id: 3,
+                name: "Delgado, Clara T., LPT",
+                rank: "Teacher III",
+                dept: "JHS STEM",
+                load: "Grade 7 Mabini • 6 Loads",
+                ipcrf: "4.74 (Very Satisfactory)",
+                status: "Active Duty"
+            },
+            {
+                id: 4,
+                name: "Ramos, Arnold D., LPT",
+                rank: "Teacher II",
+                dept: "SHS TVL",
+                load: "Grade 11 TVL Edison • 6 Loads",
+                ipcrf: "4.68 (Very Satisfactory)",
+                status: "On Leave (Medical)"
+            },
+            {
+                id: 5,
+                name: "De Silva, Teresa G., LPT",
+                rank: "Teacher III",
+                dept: "JHS Languages",
+                load: "Grade 9 Sampaguita • 6 Loads",
+                ipcrf: "4.60 (Very Satisfactory)",
+                status: "Active Duty"
+            },
+            {
+                id: 6,
+                name: "Alano, Maria F.",
+                rank: "Administrative Officer IV",
+                dept: "Admin",
+                load: "Head Registrar & LIS Coordinator",
+                ipcrf: "4.95 (Outstanding)",
+                status: "Active Duty"
+            }
+        ];
+
+        // Audit Trail dataset
+        const auditLogs = [
+            {
+                timestamp: "2026-09-30 08:42:10",
+                user: "Dr. Maria Elena Ramos (Principal)",
+                action: "ELECTRONIC_SIGN_OFF",
+                target: "SF9 Section Grade 8-Luna (Locked)",
+                ip: "192.168.1.10 [NMHS-EXEC-01]",
+                status: "Verified RSA-4096"
+            },
+            {
+                timestamp: "2026-09-30 08:15:22",
+                user: "Maria Santos, LPT (Teacher)",
+                action: "GRADE_SUBMISSION",
+                target: "ECR Science 10 Rizal",
+                ip: "192.168.1.45 [FACULTY-RM204]",
+                status: "Hash: 8b4e21a"
+            },
+            {
+                timestamp: "2026-09-30 07:50:04",
+                user: "Maria Alano (Head Registrar)",
+                action: "RECORD_QUERY",
+                target: "LRN 109842140021 Masterfile",
+                ip: "192.168.1.15 [REGISTRAR-02]",
+                status: "Authorized"
+            },
+            {
+                timestamp: "2026-09-29 16:30:19",
+                user: "SYSTEM_LIS_GATEWAY",
+                action: "CLOUD_SYNC",
+                target: "DepEd Region IV-B MIMAROPA Server",
+                ip: "10.0.4.1 [LIS-SERVER-GW]",
+                status: "HTTP 200 Success"
+            },
+            {
+                timestamp: "2026-09-29 14:12:05",
+                user: "Dr. Maria Elena Ramos (Principal)",
+                action: "REMEDIAL_RETURN",
+                target: "Section 9-Sampaguita English",
+                ip: "192.168.1.10 [NMHS-EXEC-01]",
+                status: "Notice Dispatched"
+            }
+        ];
+
+        approvalRecords.splice(0);
+        facultyRoster.splice(0);
+        auditLogs.splice(0);
+        let activeSignCode = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApprovalsTable(approvalRecords);
+            renderFacultyTable(facultyRoster);
+            renderAuditTable(auditLogs);
+            initExecutiveCharts();
+            setupMobileMenu();
+            setupNotificationToggle();
+        });
+
+        // Tab Navigation for Principal Dashboard
+        function switchView(viewName) {
+            const views = ['overview', 'public-content', 'approvals', 'faculty', 'accounts', 'forms', 'audit'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                const nav = document.getElementById(`nav-${v}`);
+                if (v === viewName) {
+                    el.classList.remove('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-800 text-white shadow-md shadow-brand-800/20";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900";
+                    }
+                }
+            });
+            closeMobileSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render Section Grade Finalization Queue
+        function renderApprovalsTable(list) {
+            const tbody = document.getElementById('approvals-table-body');
+            tbody.innerHTML = '';
+
+            if (!list.length) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7" class="px-4 py-8 text-center text-slate-500">No grade submissions are currently stored in SERMS.</td>';
+                tbody.appendChild(row);
+                return;
+            }
+
+            list.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+
+                let statusBadge = "bg-amber-50 text-amber-800 border-amber-200";
+                if (item.status === 'Approved & Locked') statusBadge = "bg-emerald-50 text-emerald-800 border-emerald-200";
+                if (item.status === 'Returned for Revision') statusBadge = "bg-rose-50 text-rose-800 border-rose-200";
+                if (item.status === 'Draft') statusBadge = "bg-slate-50 text-slate-700 border-slate-200";
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-900">${item.section}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">${item.level}</div>
+                    </td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${item.adviser}</td>
+                    <td class="py-3 px-4">
+                        <span class="font-mono font-bold text-slate-700">${item.evaluated} learners</span>
+                        <span class="text-[10px] text-slate-400 block">Saved in this submission</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="font-mono font-black text-brand-900 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">${item.mps}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${statusBadge}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-500 font-mono text-[11px]">${item.dateSubmitted}</td>
+                    <td class="py-3 px-4 text-right">
+                        ${item.status === 'Approved & Locked' ? `
+                            <span class="inline-flex items-center gap-1 text-emerald-700 font-bold text-xs bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                                <i class="fa-solid fa-lock text-[10px]"></i> Approved & Locked
+                            </span>
+                        ` : ['Pending Principal Sign-off', 'Returned for Revision'].includes(item.status) ? `
+                            <button onclick="openSignModal('${item.code}')" class="px-3 py-1 bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-1.5 ml-auto">
+                                <i class="fa-solid fa-check text-gold-400 text-[10px]"></i> Review
+                            </button>
+                        ` : '<span class="text-slate-400">Awaiting teacher submission</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterApprovals() {
+            const query = document.getElementById('approval-search').value.toLowerCase().trim();
+            const status = document.getElementById('approval-status-filter').value;
+
+            const filtered = approvalRecords.filter(item => {
+                const matchQuery = item.section.toLowerCase().includes(query) || item.adviser.toLowerCase().includes(query);
+                const matchStatus = (status === 'ALL') || item.status === status;
+                return matchQuery && matchStatus;
+            });
+
+            renderApprovalsTable(filtered);
+        }
+
+        // Open Principal Signature Modal
+        function openSignModal(sectionCode) {
+            activeSignCode = sectionCode;
+            const record = approvalRecords.find(r => r.code === sectionCode);
+            if (record) {
+                document.getElementById('modal-target-section').textContent = record.section;
+                document.getElementById('modal-target-adviser').textContent = record.adviser;
+                document.getElementById('modal-target-mps').textContent = record.mps;
+                document.getElementById('modal-target-learners').textContent = `${record.evaluated} learners in submission`;
+            }
+            document.getElementById('sign-modal').classList.remove('hidden');
+        }
+
+        function closeSignModal() {
+            document.getElementById('sign-modal').classList.add('hidden');
+        }
+
+        function confirmSignAndLock() {
+            if (!activeSignCode) return;
+            showToast('Connect to SERMS to record principal approval.');
+            closeSignModal();
+        }
+
+        function returnSectionForRevision() {
+            if (!activeSignCode) return;
+            showToast('Connect to SERMS to return a grade submission for revision.');
+            closeSignModal();
+        }
+
+        function batchApproveAll() {
+            showToast('Connect to SERMS to approve submitted grade records.');
+        }
+
+        // Faculty Management Roster
+        function renderFacultyTable(list) {
+            const tbody = document.getElementById('faculty-table-body');
+            tbody.innerHTML = '';
+
+            if (!list.length) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7" class="px-4 py-8 text-center text-slate-500">No faculty records are currently stored in SERMS.</td>';
+                tbody.appendChild(row);
+                return;
+            }
+
+            list.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-900">${f.name}</div>
+                        <div class="text-[10px] text-slate-400">Faculty record in SERMS</div>
+                    </td>
+                    <td class="py-3 px-4 font-bold text-brand-900">${f.rank}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-md bg-slate-100 font-semibold text-[11px] text-slate-700">${f.dept}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-600">${f.load}</td>
+                    <td class="py-3 px-4">
+                        <span class="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">${f.ipcrf}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${f.status === 'Active Duty' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${f.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="showToast('Individual service records are not stored in SERMS.')" class="px-2.5 py-1 text-slate-700 bg-slate-100 hover:bg-brand-50 hover:text-brand-900 rounded-lg text-xs font-semibold">
+                            Service record unavailable
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterFacultyDept(dept) {
+            document.querySelectorAll('.faculty-tab').forEach(t => {
+                t.className = "faculty-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+            });
+            event.target.className = "faculty-tab active px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-800 text-white transition";
+
+            if (dept === 'ALL') {
+                renderFacultyTable(facultyRoster);
+            } else {
+                const filtered = facultyRoster.filter(f => f.dept === dept);
+                renderFacultyTable(filtered);
+            }
+        }
+
+        function openFacultyModal() {
+            document.getElementById('faculty-modal').classList.remove('hidden');
+        }
+
+        function closeFacultyModal() {
+            document.getElementById('faculty-modal').classList.add('hidden');
+        }
+
+        function handleFacultySubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('fac-name').value;
+            const rank = document.getElementById('fac-rank').value;
+            const dept = document.getElementById('fac-dept').value;
+            const load = document.getElementById('fac-load').value;
+
+            facultyRoster.unshift({
+                id: facultyRoster.length + 1,
+                name: name,
+                rank: rank,
+                dept: dept,
+                load: load,
+                ipcrf: "4.80 (Very Satisfactory)",
+                status: "Active Duty"
+            });
+
+            renderFacultyTable(facultyRoster);
+            closeFacultyModal();
+            showToast(`Faculty record saved for ${name}.`);
+            e.target.reset();
+        }
+
+        function handleStaffAccountSubmit(e) {
+            e.preventDefault();
+            const form = document.getElementById('staff-account-form');
+            const role = document.getElementById('account-role').value;
+            form.reset();
+            showToast(`${role === 'teacher' ? 'Teacher' : 'Registrar'} account created successfully.`);
+        }
+
+        function handleTeacherRosterSubmit(e) {
+            e.preventDefault();
+            showToast('Class roster was not saved. Retry after checking your connection.');
+        }
+
+        // Audit Trail Renderer
+        function renderAuditTable(list) {
+            const tbody = document.getElementById('audit-table-body');
+            tbody.innerHTML = '';
+
+            if (!list.length) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="6" class="px-4 py-8 text-center text-slate-500">No audit events are currently stored in SERMS.</td>';
+                tbody.appendChild(row);
+                return;
+            }
+
+            list.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 text-[11px]";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-4 text-slate-500">${a.timestamp}</td>
+                    <td class="py-2.5 px-4 font-bold text-slate-900">${a.user}</td>
+                    <td class="py-2.5 px-4 text-brand-800 font-bold">${a.action}</td>
+                    <td class="py-2.5 px-4 text-slate-600">${a.target}</td>
+                    <td class="py-2.5 px-4 text-slate-400">${a.ip}</td>
+                    <td class="py-2.5 px-4 text-right">
+                        <span class="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold">${a.status}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Campus Broadcast Handlers
+        function openBroadcastModal() {
+            document.getElementById('broadcast-modal').classList.remove('hidden');
+        }
+
+        function closeBroadcastModal() {
+            document.getElementById('broadcast-modal').classList.add('hidden');
+        }
+
+        function handleBroadcastSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('broadcast-type').value;
+            closeBroadcastModal();
+            showToast(`Broadcast "${type}" recorded in SERMS. No portal delivery or SMS gateway is configured.`);
+            e.target.reset();
+        }
+
+        function triggerLISSync() {
+            showToast('DepEd LIS sync is unavailable: no approved endpoint or credentials are configured. No records were synchronized.');
+        }
+
+        let principalEnrollmentChart;
+        let principalSubmissionChart;
+
+        function initExecutiveCharts() {
+            principalEnrollmentChart = new Chart(document.getElementById('schoolMpsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Loading…'],
+                    datasets: [{ label: 'Officially enrolled learners', data: [0], backgroundColor: '#15803d', borderRadius: 8 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            principalSubmissionChart = new Chart(document.getElementById('cohortDoughnutChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Submitted', 'Draft', 'Approved & Locked', 'Returned for Revision'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#15803d', '#64748b', '#0d9488', '#ca8a04'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+            window.updatePrincipalCharts = updatePrincipalCharts;
+        }
+
+        function updatePrincipalCharts(overview) {
+            if (!principalEnrollmentChart || !principalSubmissionChart) return;
+            const grades = [...(overview.enrollmentsByGrade || [])]
+                .sort((left, right) => String(left._id).localeCompare(String(right._id), undefined, { numeric: true, sensitivity: 'base' }));
+            principalEnrollmentChart.data.labels = grades.length ? grades.map(item => item._id) : ['No enrollment records'];
+            principalEnrollmentChart.data.datasets[0].data = grades.length ? grades.map(item => item.count) : [0];
+            principalEnrollmentChart.update();
+
+            const statuses = [
+                ['Submitted', overview.submissions.Submitted],
+                ['Draft', overview.submissions.Draft],
+                ['Approved & Locked', overview.submissions['Approved & Locked']],
+                ['Returned for Revision', overview.submissions['Returned for Revision']]
+            ];
+            principalSubmissionChart.data.datasets[0].data = statuses.map(([, count]) => count);
+            principalSubmissionChart.update();
+            const legend = document.getElementById('overview-submission-legend');
+            legend.replaceChildren();
+            statuses.forEach(([label, count], index) => {
+                const item = document.createElement('span');
+                item.className = 'flex items-center gap-1.5 text-slate-600';
+                const swatch = document.createElement('span');
+                swatch.className = 'h-2.5 w-2.5 rounded-full';
+                swatch.style.backgroundColor = ['#15803d', '#64748b', '#0d9488', '#ca8a04'][index];
+                const text = document.createElement('span');
+                text.textContent = `${label}: ${count}`;
+                item.append(swatch, text);
+                legend.appendChild(item);
+            });
+        }
+
+        // Navigation toggles
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                backdrop.classList.toggle('hidden');
+            });
+
+            backdrop.addEventListener('click', closeMobileSidebar);
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function setupNotificationToggle() {
+            const btn = document.getElementById('notif-btn');
+            const menu = document.getElementById('notif-menu');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Toast Feedback System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3400);
+        }
+    </script>
+    <script src="/assets/app.js"></script>
+</body>
+</html>
