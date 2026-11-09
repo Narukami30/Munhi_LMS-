@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naujan Municipal High School - Student Enrollment & Records Management System (SERMS)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d', // DepEd Emerald Green
+                            800: '#166534', // Primary Academic Green
+                            900: '#14532d', // Executive Deep Forest
+                            950: '#052e16',
+                        },
+                        gold: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04', // DepEd Official Gold Accent
+                            700: '#a16207',
+                            800: '#854d0e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        formal: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .hero-pattern {
+            background-color: #052e16;
+            background-image: radial-gradient(#15803d 0.85px, transparent 0.85px), radial-gradient(#14532d 0.85px, #052e16 0.85px);
+            background-size: 34px 34px;
+            background-position: 0 0, 17px 17px;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+        }
+        .card-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(20, 83, 45, 0.12), 0 8px 10px -6px rgba(20, 83, 45, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans flex flex-col min-h-screen selection:bg-brand-100 selection:text-brand-900">
+
+    <div class="bg-slate-900 text-slate-300 text-[11px] font-medium py-1.5 px-4 lg:px-8 border-b border-slate-800 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 text-slate-200 font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-flag text-gold-400"></i> GOVPH
+                </span>
+                <span class="text-slate-600">|</span>
+                <span>Republic of the Philippines</span>
+                <span class="hidden md:inline text-slate-600">•</span>
+                <span class="hidden md:inline text-slate-400">Department of Education Region IV-B MIMAROPA</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-slate-400">Philippine Standard Time:</span>
+                <span id="pst-clock" class="font-mono font-bold text-gold-300">Wednesday, Sept 30, 2026, 4:44 AM PST</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 border-b border-slate-200/90 glass-nav transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Identifier -->
+                <a href="#home" class="flex items-center gap-3 group">
+                    <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 p-0.5 shadow-md shadow-brand-900/20 flex items-center justify-center text-white ring-2 ring-gold-500/30 group-hover:scale-105 transition-transform">
+                        <i data-school-logo-fallback class="fa-solid fa-graduation-cap text-2xl text-gold-400"></i>
+                        <img data-school-logo alt="School logo" class="hidden h-full w-full rounded-xl object-contain bg-white p-1">
+                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-heading font-extrabold text-brand-950 tracking-tight text-base sm:text-lg leading-tight">Naujan Municipal High School</span>
+                            <span class="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-brand-100 text-brand-900 border border-brand-200">DEPED ID: 301648</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium leading-none mt-0.5">Student Enrollment & Records Management System (SERMS)</p>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Menu -->
+                <nav class="hidden lg:flex items-center gap-1 xl:gap-2">
+                    <a href="#home" class="px-3.5 py-2 rounded-xl text-xs font-bold text-brand-900 hover:bg-brand-50 transition-colors">Home</a>
+                    <a href="#portals" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 hover:bg-brand-50 transition-colors">Portals</a>
+                    <a href="#offerings" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 hover:bg-brand-50 transition-colors">Curriculum & Strands</a>
+                    <a href="#tracker" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 hover:bg-brand-50 transition-colors">Application Tracker</a>
+                    <a href="#announcements" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 hover:bg-brand-50 transition-colors">Announcements</a>
+                    <a href="#faqs" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-brand-900 hover:bg-brand-50 transition-colors">Help & FAQ</a>
+                </nav>
+
+                <!-- Action Button & Login Trigger -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <a href="#tracker" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-900 transition-colors shadow-xs">
+                        <i class="fa-solid fa-magnifying-glass text-brand-700"></i>
+                        <span>Check Status</span>
+                    </a>
+                    <button id="public-sign-in-button" onclick="openLoginModal()" class="px-4 sm:px-5 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-800/25 active:scale-95 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-gold-400 text-xs"></i>
+                        <span>Portal Sign In</span>
+                    </button>
+                    <!-- Mobile Hamburger -->
+                    <button id="mobile-toggle" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-brand-900 hover:bg-brand-50" aria-label="Toggle navigation">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Container -->
+        <div id="mobile-nav" class="hidden lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-5 space-y-2">
+            <a href="#home" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-sm font-bold text-brand-900 bg-brand-50">Home</a>
+            <a href="#portals" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">Access Portals</a>
+            <a href="#offerings" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">Curriculum & Strands</a>
+            <a href="#tracker" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">Application Tracker</a>
+            <a href="#announcements" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">School Bulletins</a>
+            <a href="#faqs" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">FAQs & Helpdesk</a>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <section id="home" class="relative hero-pattern text-white pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden">
+            <!-- Decorative Glow Elements -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-10 right-10 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Left Hero Content -->
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <!-- Enrollment Status Badge -->
+                        <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-brand-100 shadow-inner">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-gold-300 font-bold">Online School Portal</span>
+                            <span class="text-white/40">•</span>
+                            <span id="public-school-year">School Year 2026–2027</span>
+                        </div>
+
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black tracking-tight leading-[1.15]">
+                            <span data-public-content="heroTitle">Empowering Mindoro’s Youth with</span> <span data-public-content="heroAccent" class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-brand-200 to-gold-400">Quality Basic Education</span>
+                        </h1>
+
+                        <p data-public-content="heroDescription" class="text-brand-100 text-sm sm:text-base md:text-lg max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed text-slate-300">
+                            The online portal for <strong class="text-white font-semibold">Naujan Municipal High School</strong>. Submit an enrollment application and track its status using the tracking code provided after submission.
+                        </p>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5">
+                            <button data-enrollment-action onclick="openEnrollmentModal()" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-slate-950 font-heading font-black text-sm shadow-xl shadow-gold-500/25 active:scale-95 transition-all flex items-center justify-center gap-2.5">
+                                <i class="fa-solid fa-pen-to-square text-base"></i>
+                                <span data-enrollment-cta>Enroll Online for S.Y. 2026–2027</span>
+                            </button>
+                            <a href="#tracker" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-heading font-bold text-sm backdrop-blur-md active:scale-95 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-magnifying-glass text-gold-400"></i>
+                                <span>Track Application Status</span>
+                            </a>
+                        </div>
+
+                        <!-- Division Certification Footer Tags -->
+                        <div class="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-brand-200/80">
+                            <div class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                                <span>Online enrollment application</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-shield-halved text-gold-400"></i>
+                                <span>Use the tracking code to check status</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Visual / Quick Card -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="relative bg-white/95 text-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 backdrop-blur-xl space-y-6">
+                            <!-- Quick Card Header -->
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-school text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-heading font-extrabold text-sm sm:text-base text-slate-900">NMHS SERMS Gateway</h3>
+                                        <p class="text-[11px] text-slate-500 font-medium">Division of Oriental Mindoro</p>
+                                    </div>
+                                </div>
+                                <span id="public-enrollment-period-status" class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        Checking enrollment status
+                                </span>
+                            </div>
+
+                            <!-- Live Quick Counts -->
+                            <div class="grid grid-cols-2 gap-3 text-xs">
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                                    <span class="text-slate-400 block text-[11px] font-semibold">Learners (school-reported)</span>
+                                    <span id="public-enrollment-count-hero" class="text-2xl font-black text-brand-950 font-heading">Loading</span>
+                                    <span class="text-[10px] text-slate-500 font-bold block mt-0.5">Manually reported figure</span>
+                                </div>
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                                    <span class="text-slate-400 block text-[11px] font-semibold">Faculty & personnel</span>
+                                    <span id="public-faculty-count-hero" class="text-2xl font-black text-brand-950 font-heading">Not provided</span>
+                                    <span class="text-[10px] text-brand-700 font-bold block mt-0.5">School-reported figure</span>
+                                </div>
+                            </div>
+
+                            <!-- Schedule Alert -->
+                            <div class="p-3.5 rounded-2xl bg-brand-50 border border-brand-200 text-xs space-y-1">
+                                <div class="flex items-center justify-between font-bold text-brand-900">
+                                    <span><i class="fa-solid fa-circle-info mr-1.5 text-brand-700"></i> Application status</span>
+                                    <span class="text-[10px] bg-brand-700 text-white px-2 py-0.2 rounded-full">SERMS</span>
+                                </div>
+                                <p id="public-enrollment-instructions" data-public-content="enrollmentInstructions" class="text-[11px] text-brand-800/90 leading-relaxed">
+                                    SERMS accepts enrollment applications for registrar review. It does not perform PSA verification or synchronize with DepEd LIS.
+                                </p>
+                            </div>
+
+                            <!-- Primary CTA inside card -->
+                            <button id="public-hero-sign-in-button" onclick="openLoginModal()" class="w-full py-3 rounded-xl bg-brand-900 hover:bg-brand-950 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                                <span>Sign In to School Account</span>
+                                <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="relative -mt-10 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 bg-white p-5 sm:p-7 rounded-3xl shadow-xl border border-slate-200/80">
+                <div class="text-center p-2 border-r border-slate-100 last:border-none">
+                    <span class="text-2xl sm:text-3xl font-heading font-black text-brand-900 block">301648</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">DepEd School ID</span>
+                </div>
+                <div class="text-center p-2 border-r border-slate-100 last:border-none">
+                    <span id="public-enrollment-count" class="text-2xl sm:text-3xl font-heading font-black text-brand-900 block">Not provided</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Learners (school-reported)</span>
+                </div>
+                <div class="text-center p-2 border-r border-slate-100 last:border-none">
+                    <span id="public-faculty-count" class="text-2xl sm:text-3xl font-heading font-black text-brand-900 block">Not provided</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Faculty & Personnel</span>
+                </div>
+                <div class="text-center p-2">
+                    <span id="public-promotion-rate" class="text-2xl sm:text-3xl font-heading font-black text-brand-900 block">Not provided</span>
+                    <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Promotion statistics</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="portals" class="py-20 lg:py-28 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto space-y-3 mb-14">
+                    <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">
+                        Unified School Gateways
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black text-slate-900">
+                        Choose Your Official SERMS Portal
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                        Dedicated role-based portals designed for learners, teachers, registrar officers, and school executives of Naujan Municipal High School.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Portal 1: Student & Parent Online Enrollment -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm card-hover flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-200 text-brand-800 flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-brand-700 bg-brand-50 px-2 py-0.5 rounded">Learners & Parents</span>
+                                <h3 class="font-heading font-extrabold text-lg text-slate-900 mt-1">Student Enrollment Portal</h3>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                    Submit enrollment information for registrar review and track the application using its tracking code.
+                                </p>
+                            </div>
+                            <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-600 text-[10px]"></i> Enrollment application form</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-600 text-[10px]"></i> Registrar status review</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-600 text-[10px]"></i> Tracking code provided on submission</li>
+                            </ul>
+                        </div>
+                        <div class="pt-6">
+                            <button data-enrollment-action onclick="openEnrollmentModal()" class="w-full py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+                                <span>Start Enrollment</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Portal 2: Teacher Portal & ECR System -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm card-hover flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Faculty & Advisers</span>
+                                <h3 class="font-heading font-extrabold text-lg text-slate-900 mt-1">Faculty & ECR Portal</h3>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                    Assigned class rosters, saved grade submissions, attendance, and anecdotal records.
+                                </p>
+                            </div>
+                            <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600 text-[10px]"></i> Principal-assigned class rosters</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600 text-[10px]"></i> Grade drafts and submissions</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600 text-[10px]"></i> Saved attendance records</li>
+                            </ul>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="openLoginModal('teacher')" class="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+                                <span>Faculty Login</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Portal 3: Registrar Records Management Desk -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm card-hover flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-folder-open"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded">Records Office</span>
+                                <h3 class="font-heading font-extrabold text-lg text-slate-900 mt-1">Registrar Division Desk</h3>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                    Review submitted enrollment records, document requests, and registrar helpdesk tickets.
+                                </p>
+                            </div>
+                            <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-600 text-[10px]"></i> Enrollment status review</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-600 text-[10px]"></i> Document request management</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-600 text-[10px]"></i> Registrar helpdesk queue</li>
+                            </ul>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="openLoginModal('registrar')" class="w-full py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+                                <span>Registrar Login</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Portal 4: Office of the School Principal -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm card-hover flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="w-14 h-14 rounded-2xl bg-gold-50 border border-gold-300 text-gold-800 flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-stamp"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-gold-800 bg-gold-100 px-2 py-0.5 rounded">Super Administrator</span>
+                                <h3 class="font-heading font-extrabold text-lg text-slate-900 mt-1">Office of the Principal</h3>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                    Term grade sign-off, DepEd RSA digital locking, faculty plantilla loads, and campus emergency broadcasts.
+                                </p>
+                            </div>
+                            <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-gold-600 text-[10px]"></i> Section Grade Locking Authority</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-gold-600 text-[10px]"></i> Institutional MPS Analytics</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-gold-600 text-[10px]"></i> BEIS & DepEd Division Sync</li>
+                            </ul>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="openLoginModal('principal')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-950 text-gold-400 font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+                                <span>Principal Executive</span>
+                                <i class="fa-solid fa-shield text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="offerings" class="py-20 bg-white border-y border-slate-200/70">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto space-y-3 mb-12">
+                    <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">
+                        DepEd K to 12 Basic Education
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black text-slate-900">
+                        Academic Programs & Senior High Strands
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                        Offering comprehensive curriculum pathways from Junior High School to specialized Senior High School Academic and Technical-Vocational Livelihood tracks.
+                    </p>
+                </div>
+
+                <!-- Tabs Selector -->
+                <div class="flex flex-wrap justify-center gap-2 mb-8" id="offering-tabs">
+                    <button onclick="switchStrandTab('jhs')" id="tab-jhs" class="strand-btn active px-4 py-2 rounded-xl text-xs font-bold bg-brand-800 text-white transition-all shadow-xs">
+                        Junior High (Grades 7–10)
+                    </button>
+                    <button onclick="switchStrandTab('stem')" id="tab-stem" class="strand-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                        STEM
+                    </button>
+                    <button onclick="switchStrandTab('abm')" id="tab-abm" class="strand-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                        ABM
+                    </button>
+                    <button onclick="switchStrandTab('humss')" id="tab-humss" class="strand-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                        HUMSS
+                    </button>
+                    <button onclick="switchStrandTab('tvl-agri')" id="tab-tvl-agri" class="strand-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                        TVL: Agri-Fishery Arts
+                    </button>
+                    <button onclick="switchStrandTab('tvl-ict')" id="tab-tvl-ict" class="strand-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                        TVL: ICT Servicing
+                    </button>
+                </div>
+
+                <!-- Tab Content Card -->
+                <div class="bg-slate-50 rounded-3xl p-6 sm:p-8 border border-slate-200 max-w-4xl mx-auto" id="strand-content-card">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="tracker" class="py-20 bg-slate-50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl space-y-6">
+                    <div class="text-center space-y-2">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">
+                            Public Verification Service
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-heading font-black text-slate-900">
+                            Live LRN & Application Status Tracker
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500">
+                            Enter the tracking code provided after submitting an application or document request. For privacy, LRN searches are not supported.
+                        </p>
+                    </div>
+
+                    <form onsubmit="handleSearchTracker(event)" class="space-y-4">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                                <input type="text" id="tracker-input" placeholder="e.g. ENR-2026-..." autocomplete="off" class="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-xs sm:text-sm font-mono focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                            </div>
+                            <button type="submit" class="px-7 py-3 rounded-2xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-800/20 active:scale-95 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-search text-gold-400"></i>
+                                <span>Check Status</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Tracker Result Container -->
+                    <div id="tracker-result" class="hidden pt-6 border-t border-slate-100 space-y-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-white border-y border-slate-200/70">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto space-y-3 mb-14">
+                    <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">
+                        Enrollment Procedure
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-heading font-black text-slate-900">
+                        How to Enroll at Naujan Municipal High School
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500">
+                        Submit an online application and use its tracking code to follow registrar review.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+                    <!-- Step 1 -->
+                    <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 relative space-y-3">
+                        <span class="w-10 h-10 rounded-2xl bg-brand-800 text-white font-black text-sm flex items-center justify-center shadow-md">1</span>
+                        <h3 class="font-heading font-extrabold text-base text-slate-900">Fill-out BEEF Online</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">Enter the learner and parent or guardian details requested in the online application form.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 relative space-y-3">
+                        <span class="w-10 h-10 rounded-2xl bg-brand-800 text-white font-black text-sm flex items-center justify-center shadow-md">2</span>
+                        <h3 class="font-heading font-extrabold text-base text-slate-900">Document Review</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">The registrar reviews submitted application information and updates its status in SERMS.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 relative space-y-3">
+                        <span class="w-10 h-10 rounded-2xl bg-brand-800 text-white font-black text-sm flex items-center justify-center shadow-md">3</span>
+                        <h3 class="font-heading font-extrabold text-base text-slate-900">Section Assignment</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">Any section assignment or external record verification is handled separately by the school.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 relative space-y-3">
+                        <span class="w-10 h-10 rounded-2xl bg-gold-600 text-slate-950 font-black text-sm flex items-center justify-center shadow-md">4</span>
+                        <h3 class="font-heading font-extrabold text-base text-slate-900">Official Certification</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">Contact the school registrar for the next steps after your application status is updated.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="announcements" class="py-20 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+                    <div>
+                        <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">
+                            Public Portal Information
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-heading font-black text-slate-900 mt-2">
+                            Using the Public Portal
+                        </h2>
+                    </div>
+                    <a href="#tracker" class="text-xs font-bold text-brand-800 hover:underline">
+                        Track an application &rarr;
+                    </a>
+                </div>
+
+                <div id="public-announcement-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <section id="faqs" class="py-20 bg-white border-t border-slate-200/70">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="text-center space-y-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">
+                        Help & Citizen's Charter
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-heading font-black text-slate-900">
+                        Frequently Asked Questions
+                    </h2>
+                </div>
+
+                <div class="space-y-3 text-xs sm:text-sm">
+                    <details class="group bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer">
+                        <summary class="font-heading font-bold text-slate-800 flex items-center justify-between">
+                            <span>What information does the online application request?</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-400"></i>
+                        </summary>
+                        <p class="text-slate-600 mt-3 pt-3 border-t border-slate-200/60 leading-relaxed">
+                            The form requests the learner's LRN, name, grade, and contact details. Supporting-document uploads and external record verification are not available in this portal.
+                        </p>
+                    </details>
+
+                    <details class="group bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer">
+                        <summary class="font-heading font-bold text-slate-800 flex items-center justify-between">
+                            <span>How do I check my application status?</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-400"></i>
+                        </summary>
+                        <p class="text-slate-600 mt-3 pt-3 border-t border-slate-200/60 leading-relaxed">
+                            Enter the tracking code shown after submitting your application. Status changes when the registrar updates the application in SERMS.
+                        </p>
+                    </details>
+
+                    <details class="group bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer">
+                        <summary class="font-heading font-bold text-slate-800 flex items-center justify-between">
+                            <span>Does submitting an application mean I am enrolled?</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-400"></i>
+                        </summary>
+                        <p class="text-slate-600 mt-3 pt-3 border-t border-slate-200/60 leading-relaxed">
+                            No. A new application starts as Pending Review. The registrar must review and update its status before it is considered officially enrolled in SERMS.
+                        </p>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-brand-950 text-slate-400 text-xs border-t border-brand-900 pt-16 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Col 1: School Identity -->
+                <div class="space-y-3 md:col-span-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 text-white flex items-center justify-center font-bold text-lg ring-1 ring-gold-500/30">
+                            <i data-school-logo-fallback class="fa-solid fa-graduation-cap text-gold-400"></i>
+                            <img data-school-logo alt="School logo" class="hidden h-full w-full rounded-lg object-contain bg-white p-1">
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-black text-white text-base">Naujan Municipal High School</h3>
+                            <p class="text-[11px] text-slate-400">DepEd Region IV-B MIMAROPA • School ID: 301648</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-xs max-w-md leading-relaxed">
+                        Dedicated to providing quality, equitable, culture-based, and complete basic education to the youth of Naujan and Oriental Mindoro.
+                    </p>
+                    <p class="text-[11px] text-slate-500 font-mono">
+                        <span data-public-content="contactAddress">Poblacion, Naujan, Oriental Mindoro, 5204 Philippines</span>
+                    </p>
+                </div>
+
+                <!-- Col 2: Quick Links -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Portals & Systems</span>
+                    <ul class="space-y-1.5 text-slate-400">
+                        <li><a href="javascript:void(0)" data-enrollment-action onclick="openEnrollmentModal()" class="hover:text-white transition">Online Enrollment</a></li>
+                        <li><a href="javascript:void(0)" onclick="openLoginModal('teacher')" class="hover:text-white transition">Teacher ECR System</a></li>
+                        <li><a href="javascript:void(0)" onclick="openLoginModal('registrar')" class="hover:text-white transition">Registrar Vault & SF10</a></li>
+                        <li><a href="javascript:void(0)" onclick="openLoginModal('principal')" class="hover:text-white transition">Principal Executive Suite</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Government Hotlines -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-200">DepEd Contact & Helpdesk</span>
+                    <ul class="space-y-1.5 text-slate-400 text-[11px]">
+                        <li><i class="fa-solid fa-phone text-brand-500 mr-1.5"></i> <span data-public-content="contactPhone">(043) 288-7810</span></li>
+                        <li><i class="fa-solid fa-envelope text-brand-500 mr-1.5"></i> <span data-public-content="contactEmail">naujanmhs.301648@deped.gov.ph</span></li>
+                        <li><i class="fa-solid fa-globe text-brand-500 mr-1.5"></i> depedormindoro.gov.ph</li>
+                        <li><i class="fa-solid fa-clock text-brand-500 mr-1.5"></i> <span data-public-content="officeHours">Mon - Fri: 8:00 AM - 5:00 PM</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Subfooter -->
+            <div class="pt-8 border-t border-brand-900/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+                <p>© 2026 Naujan Municipal High School. All rights reserved. DepEd Region IV-B.</p>
+                <div class="flex items-center gap-4">
+                    <a href="javascript:void(0)" onclick="showToast('Data Privacy Notice: Republic Act No. 10173 compliant.')" class="hover:text-slate-200">Data Privacy</a>
+                    <span>•</span>
+                    <a href="javascript:void(0)" onclick="showToast('Citizen\'s Charter DepEd Service Commitments active.')" class="hover:text-slate-200">Citizen's Charter</a>
+                    <span>•</span>
+                    <a href="javascript:void(0)" onclick="showToast('NMHS SERMS Server Version: 3.2.0-LATEST')" class="hover:text-slate-200">System Info</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="login-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/65 backdrop-blur-xs transition-opacity" onclick="closeLoginModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <div class="p-6 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 flex items-center justify-center text-gold-400 font-bold">
+                            <i class="fa-solid fa-id-badge text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-extrabold text-base">SERMS Unified Sign In</h3>
+                            <p class="text-[11px] text-brand-200">Sign in with the account credentials issued to you</p>
+                        </div>
+                    </div>
+                    <button onclick="closeLoginModal()" class="text-white/80 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4 text-xs">
+                    <!-- Role Switcher Tabs -->
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1.5">Select Your Portal Role</label>
+                        <div class="grid grid-cols-4 gap-1 p-1 bg-slate-100 rounded-xl">
+                            <button type="button" onclick="setLoginRole('student')" id="role-student" class="login-role-btn py-1.5 rounded-lg font-bold text-[10px] bg-white text-brand-950 shadow-xs">Student</button>
+                            <button type="button" onclick="setLoginRole('teacher')" id="role-teacher" class="login-role-btn py-1.5 rounded-lg font-semibold text-[10px] text-slate-600">Faculty</button>
+                            <button type="button" onclick="setLoginRole('registrar')" id="role-registrar" class="login-role-btn py-1.5 rounded-lg font-semibold text-[10px] text-slate-600">Registrar</button>
+                            <button type="button" onclick="setLoginRole('principal')" id="role-principal" class="login-role-btn py-1.5 rounded-lg font-semibold text-[10px] text-slate-600">Principal</button>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1" id="login-id-label">Learner Reference Number (LRN) / Student ID</label>
+                            <input type="text" id="login-identifier" placeholder="Enter your account identifier" autocomplete="username" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Account password</label>
+                            <input type="password" id="login-password" placeholder="••••••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-500">Use your issued credentials.</span>
+                            <a href="/naujan_mhs_account_recovery_portal.html" class="text-brand-800 font-bold hover:underline">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="w-full py-3 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-md shadow-brand-800/20 active:scale-95 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-arrow-right-to-bracket text-gold-400"></i>
+                            <span id="login-btn-text">Authenticate Student</span>
+                        </button>
+                        <p class="text-center text-[11px] text-slate-500">
+                            New student? <a href="/naujan_mhs_student_registration.html" class="font-bold text-brand-800 hover:underline">Create an account</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Action Alert Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-gold-400 text-base" id="toast-icon"></i>
+        <p class="text-xs font-medium" id="toast-msg">Operation completed successfully.</p>
+    </div>
+
+    <script>
+        // Philippine Standard Time Clock
+        function updatePSTClock() {
+            const clockEl = document.getElementById('pst-clock');
+            if (!clockEl) return;
+            const now = new Date();
+            const options = { 
+                timeZone: 'Asia/Manila',
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            clockEl.textContent = `${new Intl.DateTimeFormat('en-US', options).format(now)} PST`;
+        }
+        setInterval(updatePSTClock, 1000);
+
+        // Academic Offerings Content Dataset
+        const strandData = {
+            'jhs': {
+                title: 'Junior High School Program (Grades 7 to 10)',
+                desc: 'DepEd standard curriculum preparing learners for advanced tracks with foundational competencies in Science, Mathematics, English, Filipino, Araling Panlipunan, EsP, MAPEH, and TLE.',
+                highlights: ['Special Science Curriculum (SSC) Cohort', 'Technology & Livelihood Exploratory Modules', 'Comprehensive Diagnostic & Remedial Reading Program'],
+                badge: 'General Academic Intake'
+            },
+            'stem': {
+                title: 'Science, Technology, Engineering, and Mathematics (STEM)',
+                desc: 'Specialized Senior High Academic track designed for future engineers, researchers, computer scientists, medical doctors, and agricultural technologists.',
+                highlights: ['Advanced General Chemistry & University Physics', 'Pre-Calculus & Differential Calculus', 'Independent Science Investigatory Project (SIP)'],
+                badge: 'Academic Track'
+            },
+            'abm': {
+                title: 'Accountancy, Business, and Management (ABM)',
+                desc: 'Equips students with fundamental corporate acumen, accounting standards, financial management, and cooperative entrepreneurship.',
+                highlights: ['Fundamentals of Accountancy & Business Math', 'Corporate Principles & Marketing Strategies', 'Actual Business Simulation & Enterprise Immersion'],
+                badge: 'Academic Track'
+            },
+            'humss': {
+                title: 'Humanities and Social Sciences (HUMSS)',
+                desc: 'Focuses on critical thinking, literature, legal studies, community development, political governance, and behavioral sciences.',
+                highlights: ['Philippine Politics, Governance & Constitution', 'Creative Writing & Social Science Inquiry', 'Community Engagement & Local Cultural Archiving'],
+                badge: 'Academic Track'
+            },
+            'tvl-agri': {
+                title: 'TVL: Agricultural Arts & Crop Production',
+                desc: 'Tailored for the agricultural heritage of Naujan, Oriental Mindoro. Imparts skills in crop science, organic farming, and food processing with TESDA National Certificate (NC II) pathways.',
+                highlights: ['Agricultural Crop Production NC II Assessment', 'Organic Agriculture & Farm Management', 'Direct Dual-Training with Naujan Agri-Cooperatives'],
+                badge: 'Technical-Vocational Track'
+            },
+            'tvl-ict': {
+                title: 'TVL: Information and Communications Technology (ICT)',
+                desc: 'Hands-on training in computer systems servicing, hardware diagnostics, basic programming, and network administration.',
+                highlights: ['Computer Systems Servicing (CSS) NC II Certification', 'Local Area Network (LAN) Configuration', 'DepEd Digital Equipment Maintenance Apprenticeship'],
+                badge: 'Technical-Vocational Track'
+            }
+        };
+
+        // Tab Switching for Strands
+        function switchStrandTab(strandKey) {
+            document.querySelectorAll('.strand-btn').forEach(b => {
+                b.className = "strand-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all";
+            });
+            const activeBtn = document.getElementById(`tab-${strandKey}`);
+            if (activeBtn) {
+                activeBtn.className = "strand-btn active px-4 py-2 rounded-xl text-xs font-bold bg-brand-800 text-white transition-all shadow-xs";
+            }
+
+            const data = strandData[strandKey];
+            const enrollmentOpen = Boolean(window.SERMS_PUBLIC_CONTENT?.loaded && window.SERMS_PUBLIC_CONTENT.enrollmentOpen);
+            const card = document.getElementById('strand-content-card');
+            card.innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4 mb-4">
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-wider text-brand-800 bg-brand-100 px-2 py-0.5 rounded border border-brand-200">${data.badge}</span>
+                        <h3 class="font-heading font-extrabold text-xl text-slate-900 mt-1">${data.title}</h3>
+                    </div>
+                    <button data-enrollment-action data-strand-application ${enrollmentOpen ? '' : 'disabled'} onclick="openEnrollmentModal('${strandKey.toUpperCase()}')" class="px-4 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 self-start sm:self-auto shadow-xs ${enrollmentOpen ? '' : 'opacity-50 cursor-not-allowed'}">
+                        <span>${enrollmentOpen ? 'Apply for This Strand' : 'Enrollment Closed'}</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">${data.desc}</p>
+                <div class="space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Curriculum Highlights:</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        ${data.highlights.map(h => `
+                            <div class="p-3 bg-white rounded-2xl border border-slate-200 text-xs font-medium text-slate-800 flex items-start gap-2 shadow-2xs">
+                                <i class="fa-solid fa-circle-check text-brand-700 mt-0.5"></i>
+                                <span>${h}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleSearchTracker(e) {
+            e.preventDefault();
+            const resultBox = document.getElementById('tracker-result');
+            resultBox.classList.remove('hidden');
+            resultBox.textContent = 'Application tracking requires a tracking code and an active connection to SERMS.';
+            showToast('Application status is unavailable. Please try again later.');
+        }
+
+        // Mobile Nav Toggle
+        function toggleMobileNav() {
+            const menu = document.getElementById('mobile-nav');
+            menu.classList.toggle('hidden');
+        }
+        document.getElementById('mobile-toggle').addEventListener('click', toggleMobileNav);
+
+        // Unified Login Modal Role Switcher
+        let currentRole = 'student';
+        function setLoginRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.login-role-btn').forEach(b => {
+                b.className = "login-role-btn py-1.5 rounded-lg font-semibold text-[10px] text-slate-600";
+            });
+            document.getElementById(`role-${role}`).className = "login-role-btn py-1.5 rounded-lg font-bold text-[10px] bg-white text-brand-950 shadow-xs";
+
+            const idLabel = document.getElementById('login-id-label');
+            const btnText = document.getElementById('login-btn-text');
+
+            if (role === 'student') {
+                idLabel.textContent = "Learner Reference Number (LRN) / Student ID";
+                btnText.textContent = "Authenticate Student";
+            } else if (role === 'teacher') {
+                idLabel.textContent = "Teacher account username / staff ID";
+                btnText.textContent = "Sign In as Teacher";
+            } else if (role === 'registrar') {
+                idLabel.textContent = "Registrar account username";
+                btnText.textContent = "Access Registrar Desk";
+            } else if (role === 'principal') {
+                idLabel.textContent = "Principal account username";
+                btnText.textContent = "Enter Principal Suite";
+            }
+        }
+
+        function openLoginModal(preselectRole = 'student') {
+            setLoginRole(preselectRole);
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('login-identifier').value.trim();
+            closeLoginModal();
+            showToast(`Authenticated successfully as ${currentRole.toUpperCase()}: ${id}`);
+        }
+
+        function openEnrollmentModal(strand = '') {
+            showToast(`Opening BEEF Enrollment Wizard ${strand ? 'for ' + strand : ''}...`);
+        }
+
+        // Toast Feedback System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+
+        // Initialize Default View
+        document.addEventListener('DOMContentLoaded', () => {
+            switchStrandTab('jhs');
+            updatePSTClock();
+        });
+    </script>
+    <script src="/assets/app.js"></script>
+</body>
+</html>

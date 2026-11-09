@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office of the School Registrar - Naujan Municipal High School (SERMS)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d', // Primary DepEd Green
+                            800: '#166534',
+                            900: '#14532d', // Executive Deep Forest
+                            950: '#052e16',
+                        },
+                        gold: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            500: '#eab308',
+                            600: '#ca8a04', // DepEd Gold
+                            700: '#a16207',
+                            800: '#854d0e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        official: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .registrar-glass {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            #printable-sf10 { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
+
+    <header class="sticky top-0 z-40 border-b border-slate-200 registrar-glass px-4 lg:px-8 py-2.5 transition-all">
+        <div class="flex items-center justify-between gap-4">
+            <!-- Left Branding & Mobile Trigger -->
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-brand-800 hover:bg-brand-50" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 p-0.5 shadow-md shadow-brand-900/20 flex items-center justify-center text-white ring-2 ring-gold-500/30">
+                        <i class="fa-solid fa-stamp text-xl text-gold-400"></i>
+                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-heading font-extrabold text-brand-950 tracking-tight text-base sm:text-lg leading-tight">Naujan Municipal High School</h1>
+                            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-brand-100 text-brand-900 border border-brand-200">REGISTRAR DIVISION</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium">DepEd Region IV-B MIMAROPA • Division of Oriental Mindoro • School ID: <span class="font-mono font-bold text-slate-700">301648</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Academic Session & DepEd LIS Sync Status -->
+            <div class="hidden xl:flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200">
+                <div class="flex items-center gap-2 px-3 py-1 bg-white rounded-xl shadow-xs border border-slate-200 text-xs font-bold text-slate-700">
+                    <i class="fa-regular fa-calendar-check text-brand-700"></i>
+                    <span>S.Y. 2026–2027</span>
+                    <span class="text-slate-400">•</span>
+                    <span class="text-brand-800 font-extrabold">1st Semester (Q1)</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800 border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>DepEd LIS integration not configured</span>
+                </div>
+            </div>
+
+            <!-- Right Controls: Quick Search, Action Buttons, and Officer Profile -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="openRequestModal()" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs shadow-sm shadow-brand-800/20 active:scale-95 transition">
+                    <i class="fa-solid fa-file-circle-plus text-gold-400"></i>
+                    <span>File Doc Request</span>
+                </button>
+                <button onclick="triggerLISSync()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-xs active:scale-95 transition" title="DepEd LIS is not configured">
+                    <i class="fa-solid fa-arrows-rotate text-brand-700"></i>
+                    <span>LIS Sync</span>
+                </button>
+
+                <!-- Alerts & Notifications -->
+                <div class="relative">
+                    <button id="notif-btn" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 hover:text-brand-800 hover:bg-brand-50 transition border border-slate-200/80 bg-white" aria-label="Notifications">
+                        <i class="fa-regular fa-bell text-base"></i>
+                        <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+                    </button>
+                    <!-- Notification Flyout -->
+                    <div id="notif-menu" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Registrar Alerts</span>
+                            <span class="text-[11px] font-semibold text-slate-500">Live queue status</span>
+                        </div>
+                        <div id="registrar-alerts" class="space-y-2 text-xs">
+                            <p class="rounded-xl bg-slate-50 p-3 text-slate-500">Loading current queue status…</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Head Registrar Profile -->
+                <div class="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
+                    <div id="account-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-900 to-brand-700 border-2 border-brand-300 text-white font-bold flex items-center justify-center text-sm shadow-inner">
+                        CM
+                    </div>
+                    <div class="hidden xl:block text-left">
+                        <p id="account-display-name" class="text-xs font-extrabold text-slate-900 leading-tight">Mrs. Clarissa V. Mendoza, LPT</p>
+                        <p class="text-[10px] text-brand-800 font-bold">Head Registrar • Officer-in-Charge</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between pt-16 lg:pt-0">
+            <div class="p-4 space-y-6 overflow-y-auto">
+                <!-- Registrar Office Identity -->
+                <div class="p-3.5 rounded-2xl bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 text-white shadow-md border border-brand-800 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-mono font-extrabold uppercase tracking-widest text-gold-400">Records & Archives</span>
+                        <h3 class="font-heading font-extrabold text-white text-sm mt-0.5">Official Registry Desk</h3>
+                        <p class="text-[11px] text-brand-100/90 mt-1">Workspace for enrollment records and document requests stored in SERMS.</p>
+                        <div class="mt-3 pt-2.5 border-t border-brand-800/80 flex items-center justify-between text-[10px]">
+                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-database mr-1"></i>SERMS database</span>
+                            <span class="font-mono bg-brand-800/80 px-2 py-0.5 rounded text-gold-300">Station No. 01</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div>
+                    <span class="px-3 text-[10px] font-black tracking-wider uppercase text-slate-400">Registrar Modules</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="switchView('tracking')" id="nav-tracking" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-800 text-white shadow-md shadow-brand-800/20">
+                            <i class="fa-solid fa-file-signature w-5 text-center text-gold-400"></i>
+                            <span>Document Issuance Hub</span>
+                            <span class="ml-auto text-[10px] font-extrabold bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full" id="sidebar-doc-count">—</span>
+                        </button>
+                        <button onclick="switchView('verification')" id="nav-verification" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-id-card-clip w-5 text-center"></i>
+                            <span>Enrollment Review</span>
+                            <span id="sidebar-enrollment-count" class="ml-auto text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full">—</span>
+                        </button>
+                        <button onclick="switchView('student-accounts')" id="nav-student-accounts" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-user-check w-5 text-center"></i>
+                            <span>Student Account Approvals</span>
+                            <span id="sidebar-student-account-count" class="ml-auto text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">—</span>
+                        </button>
+                        <button onclick="switchView('transferees')" id="nav-transferees" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-arrow-right-arrow-left w-5 text-center"></i>
+                            <span>Transferees & Balik-Aral</span>
+                        </button>
+                        <button onclick="switchView('forms')" id="nav-forms" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-folder-tree w-5 text-center"></i>
+                            <span>DepEd Masterlist & SF1–10</span>
+                        </button>
+                        <button onclick="switchView('archive')" id="nav-archive" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-box-archive w-5 text-center"></i>
+                            <span>Permanent Student Vault</span>
+                        </button>
+                        <button onclick="switchView('helpdesk')" id="nav-helpdesk" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900">
+                            <i class="fa-solid fa-life-ring w-5 text-center"></i>
+                            <span>Account Recovery Helpdesk</span>
+                            <span id="sidebar-helpdesk-count" class="ml-auto text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">—</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Quick Services -->
+                <div>
+                    <span class="px-3 text-[10px] font-black tracking-wider uppercase text-slate-400">Expedited Action</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="openRequestModal()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-900 transition">
+                            <i class="fa-solid fa-receipt w-5 text-center text-brand-700"></i>
+                            <span>New Document Request</span>
+                        </button>
+                        <button onclick="showToast('Batch transcript generation is unavailable: SERMS does not store historical learner grades.')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-900 transition">
+                            <i class="fa-solid fa-print w-5 text-center text-emerald-700"></i>
+                            <span>Batch SF10 Card Print</span>
+                        </button>
+                        <button onclick="showToast('CAV processing is unavailable: SERMS does not store certification records or connect to the Division.')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-900 transition">
+                            <i class="fa-solid fa-passport w-5 text-center text-gold-600"></i>
+                            <span>CAV for DFA / Apostille</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer within sidebar -->
+            <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <span class="font-medium">NMHS Registrar v3.2</span>
+                <span class="font-mono text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                    SERMS ONLINE
+                </span>
+            </div>
+        </aside>
+
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-30 hidden lg:hidden"></div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/60 relative">
+
+            <!-- Top Registrar KPI Metrics Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- Metric 1: Total Official Enrollees -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Enrollees</span>
+                        <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-800 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline gap-2">
+                        <span id="registrar-enrollment-total" class="text-3xl font-heading font-black text-slate-900">—</span>
+                        <span class="text-xs font-semibold text-slate-500">Officially enrolled in SERMS</span>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500 font-medium">
+                        <span>JHS: <strong id="registrar-jhs-total" class="text-slate-800 font-bold">—</strong></span>
+                        <span>SHS: <strong id="registrar-shs-total" class="text-slate-800 font-bold">—</strong></span>
+                    </div>
+                </div>
+
+                <!-- Metric 2: Pending Document Requests -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Doc Requests</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline gap-2">
+                        <span id="registrar-pending-doc-count" class="text-3xl font-heading font-black text-amber-700">—</span>
+                        <span class="text-xs font-semibold text-slate-500">Awaiting processing</span>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500 font-medium">
+                        <span>Processing: <strong id="registrar-processing-count">—</strong></span>
+                        <span>Ready: <strong id="registrar-ready-count">—</strong></span>
+                    </div>
+                </div>
+
+                <!-- Metric 3: Credential Discrepancies -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Enrollment Review</span>
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline gap-2">
+                        <span id="registrar-enrollment-review-count" class="text-3xl font-heading font-black text-rose-700">—</span>
+                        <span class="text-xs font-semibold text-slate-500">Pending review</span>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500 font-medium">
+                        <span>Returned: <strong id="registrar-enrollment-returned-count">—</strong></span>
+                        <button onclick="switchView('verification')" class="font-bold text-brand-800 hover:underline">Review records</button>
+                    </div>
+                </div>
+
+                <!-- Metric 4: Transferees & Balik-Aral -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Documents Released</span>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline gap-2">
+                        <span id="registrar-released-doc-count" class="text-3xl font-heading font-black text-slate-900">—</span>
+                        <span class="text-xs font-semibold text-slate-500">Marked dispatched</span>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500 font-medium">
+                        <span>Total requests: <strong id="registrar-total-doc-count">—</strong></span>
+                        <span>Returns: <strong id="registrar-doc-returned-count">—</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW A: DOCUMENT TRACKING & ISSUANCE HUB ================= -->
+            <section id="view-tracking" class="space-y-6">
+                <!-- Search & Filters Container -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">Official Issuance Queue</span>
+                                <span class="text-xs font-bold text-slate-500">Current requests stored in SERMS</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Learner Document Requests & Issuance Desk</h2>
+                            <p class="text-xs text-slate-500">Track processing status for requests entered in SERMS. Changing a status does not create or certify the requested document.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openRequestModal()" class="px-4 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-brand-800/20 active:scale-95 transition">
+                                <i class="fa-solid fa-plus text-gold-400"></i> New Document Request
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+                        <div class="relative sm:col-span-2">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="doc-search" oninput="filterDocRequests()" placeholder="Search Tracking No, LRN, Student Name..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <select id="doc-type-filter" onchange="filterDocRequests()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All Document Categories</option>
+                                <option value="SF10 / Form 137">SF10 / Form 137 (Transcript)</option>
+                                <option value="Certificate of Good Moral">Certificate of Good Moral</option>
+                                <option value="Certificate of Enrollment">Certificate of Enrollment</option>
+                                <option value="CAV (DepEd / DFA)">CAV (DepEd / DFA Apostille)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="doc-status-filter" onchange="filterDocRequests()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All Processing Statuses</option>
+                                <option value="Pending Processing">Pending Processing</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Ready for Claim">Ready for Claim</option>
+                                <option value="Dispatched">Dispatched</option>
+                                <option value="Returned for Revision">Returned for Revision</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Requests Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">Tracking Code</th>
+                                    <th class="py-3 px-4">Learner Name & LRN</th>
+                                    <th class="py-3 px-4">Requested Document</th>
+                                    <th class="py-3 px-4">Purpose / Destination</th>
+                                    <th class="py-3 px-4">Date Filed</th>
+                                    <th class="py-3 px-4">Contact</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="doc-requests-tbody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Processing Velocity & Turnaround Chart -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="font-heading font-bold text-slate-900 text-base">Document Requests by Status</h3>
+                                <p class="text-xs text-slate-500">Current saved requests by processing status</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-brand-50 text-brand-800 rounded-lg text-xs font-bold border border-brand-200">Live database totals</span>
+                        </div>
+                        <div class="relative h-60 w-full">
+                            <canvas id="docTurnaroundChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Document Request Distribution Doughnut -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-heading font-bold text-slate-900 text-base mb-1">Most Requested Credentials</h3>
+                            <p class="text-xs text-slate-500 mb-3">Current saved requests by document type</p>
+                            <div class="relative h-44 w-full flex items-center justify-center">
+                                <canvas id="docDistributionChart"></canvas>
+                            </div>
+                        </div>
+                        <div id="registrar-doc-type-legend" class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-[11px] font-semibold"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-student-accounts" class="hidden space-y-6">
+                <div class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs sm:p-6">
+                    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                        <div>
+                            <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-extrabold uppercase text-amber-900">Registrar controlled</span>
+                            <h2 class="mt-2 font-heading text-xl font-extrabold text-slate-900">Student Account Approvals</h2>
+                            <p class="mt-1 max-w-3xl text-xs leading-relaxed text-slate-500">Review student self-registration requests. Only approved accounts can sign in or use student account recovery. Rejecting a request requires a note for the student.</p>
+                        </div>
+                        <button type="button" onclick="loadRegistrarData()" class="shrink-0 rounded-xl bg-brand-800 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-brand-900">
+                            <i class="fa-solid fa-rotate mr-1"></i> Refresh registrations
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[900px] text-left text-xs">
+                            <thead class="border-b border-slate-200 bg-slate-50 font-semibold uppercase tracking-wider text-slate-500">
+                                <tr>
+                                    <th class="px-4 py-3">Registered</th>
+                                    <th class="px-4 py-3">Student</th>
+                                    <th class="px-4 py-3">LRN</th>
+                                    <th class="px-4 py-3">Recovery email</th>
+                                    <th class="px-4 py-3">Status / review note</th>
+                                    <th class="px-4 py-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-registrations-table-body" class="divide-y divide-slate-100 font-medium text-slate-700">
+                                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">Loading student registrations…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW B: CREDENTIAL & PSA VERIFICATION DESK ================= -->
+            <section id="view-verification" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">Enrollment Applications</span>
+                                <span class="text-xs font-bold text-slate-500">Review stored submissions</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Enrollment Review Desk</h2>
+                            <p class="text-xs text-slate-500">Review submitted learner details and update their SERMS enrollment status. PSA and DepEd LIS validation are not connected.</p>
+                        </div>
+                        <button onclick="loadRegistrarData()" class="px-3.5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-rotate"></i> Refresh records
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enrollment Review Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="verification-cards-container">
+                    <p class="rounded-2xl bg-white p-5 text-xs text-slate-500">Loading enrollment records…</p>
+                </div>
+            </section>
+
+            <!-- ================= VIEW C: TRANSFEREE & BALIK-ARAL RECORDS HUB ================= -->
+            <section id="view-transferees" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-blue-100 text-blue-800 border border-blue-200">Not yet available</span>
+                                <span class="text-xs font-bold text-slate-500">Movement records are not stored</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Transferees & Balik-Aral Management</h2>
+                            <p class="text-xs text-slate-500">SERMS does not yet store transfer-in, transfer-out, or Balik-Aral events, so this section cannot show movement history.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-500">No transfer actions available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transferee Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">LRN</th>
+                                    <th class="py-3 px-4">Learner Name</th>
+                                    <th class="py-3 px-4">Direction</th>
+                                    <th class="py-3 px-4">Partner School / Division</th>
+                                    <th class="py-3 px-4">Grade / Strand</th>
+                                    <th class="py-3 px-4">Enrollment Status</th>
+                                    <th class="py-3 px-4">Submitted</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="transferee-table-body">
+                                <tr><td colspan="8" class="px-4 py-8 text-center text-slate-500">Transfer events are not stored in SERMS.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW D: DEPED FORMS & MASTERLIST GENERATOR ================= -->
+            <section id="view-forms" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">SERMS exports</span>
+                                <span class="text-xs font-bold text-slate-500">Data currently stored</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Enrollment & Document Reports</h2>
+                            <p class="text-xs text-slate-500">Download CSVs from stored SERMS records. These exports are not certified DepEd forms.</p>
+                        </div>
+                        <button onclick="triggerLISSync()" class="px-4 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-down text-gold-400"></i> DepEd LIS not configured
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- SF1 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center font-extrabold text-sm">SF1</div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-50 text-brand-800 border border-brand-200">Master Registry</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">School Register (SF1)</h3>
+                        <p class="text-xs text-slate-500">CSV of learner enrollment applications and their current SERMS status.</p>
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-700">Current saved enrollments</span>
+                            <button onclick="exportRegistrarReport('enrollments')" class="text-xs font-bold text-brand-800 hover:underline">Download CSV &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- SF4 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center font-extrabold text-sm">SF4</div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">Monthly Movement</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">Learner Movement & Dropout (SF4)</h3>
+                        <p class="text-xs text-slate-500">Movement and dropout events are not currently stored in SERMS.</p>
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-500">Unavailable</span>
+                            <button onclick="showToast('SF4 export is unavailable: SERMS does not store learner transfer or dropout events.')" class="text-xs font-bold text-slate-500 hover:underline">Not available &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- SF10 Batch -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-brand-500 transition space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center font-extrabold text-sm">SF10</div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-800 border border-purple-200">Permanent Card</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-900 text-sm">Learner Permanent Record (SF10)</h3>
+                        <p class="text-xs text-slate-500">Historical learner grade records and certified transcripts are not stored in SERMS.</p>
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-500">Unavailable</span>
+                            <button onclick="showToast('SF10 is unavailable: SERMS does not store historical learner grades or transcript records.')" class="text-xs font-bold text-slate-500 hover:underline">Not available &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW E: PERMANENT STUDENT VAULT ================= -->
+            <section id="view-archive" class="hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-brand-100 text-brand-900 border border-brand-200">Enrollment records</span>
+                                <span class="text-xs font-bold text-slate-500">Current database</span>
+                            </div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900 mt-1">Learner Enrollment Register</h2>
+                            <p class="text-xs text-slate-500">Search stored enrollment records. Historical transcripts and scanned PSA records are not available in SERMS.</p>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="vault-search" oninput="filterVault()" placeholder="Search LRN, Student Name, Year..." class="pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none w-64">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vault Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">LRN</th>
+                                    <th class="py-3 px-4">Student Name</th>
+                                    <th class="py-3 px-4">Grade / Strand</th>
+                                    <th class="py-3 px-4">Barangay</th>
+                                    <th class="py-3 px-4">Enrollment Status</th>
+                                    <th class="py-3 px-4">Submitted</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="vault-table-body">
+                                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">Loading enrollment records…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-helpdesk" class="hidden space-y-6">
+                <div class="rounded-3xl bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 p-6 sm:p-8 text-white shadow-xl border border-brand-900">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gold-500/20 border border-gold-400/40 flex items-center justify-center text-gold-400 text-xl">
+                            <i class="fa-solid fa-life-ring"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-heading text-xl sm:text-2xl font-extrabold">Account Recovery Helpdesk</h2>
+                            <p class="mt-1 text-xs sm:text-sm text-brand-100">Review saved recovery assistance requests and update their handling status.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="font-heading font-bold text-slate-900">Recovery Assistance Requests</h3>
+                            <p class="mt-1 text-xs text-slate-500">Contact information is provided by the requester for follow-up.</p>
+                        </div>
+                        <button type="button" onclick="loadRegistrarData()" class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                            <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[900px] text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-3">Received</th>
+                                    <th class="px-4 py-3">Requester</th>
+                                    <th class="px-4 py-3">Identifier / department</th>
+                                    <th class="px-4 py-3">Contact</th>
+                                    <th class="px-4 py-3">Reason</th>
+                                    <th class="px-4 py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="helpdesk-table-body" class="divide-y divide-slate-100 text-slate-700">
+                                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">Loading recovery requests…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL 1: New Document Request Filing Modal -->
+    <div id="request-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeRequestModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <div class="p-5 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-800 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 flex items-center justify-center text-gold-400 font-bold">
+                            <i class="fa-solid fa-file-circle-plus text-base"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base">File Document Issuance Request</h3>
+                            <p class="text-[11px] text-brand-200">Stores a document request and generates its SERMS tracking code</p>
+                        </div>
+                    </div>
+                    <button onclick="closeRequestModal()" class="text-white/80 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleRequestSubmit(event)" class="p-6 space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Learner Reference Number (LRN) *</label>
+                        <input type="text" id="req-lrn" maxlength="12" placeholder="12-digit DepEd LRN (e.g., 109842140021)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Student Full Name *</label>
+                        <input type="text" id="req-name" placeholder="Last Name, First Name, Middle Name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Document Category *</label>
+                            <select id="req-doc-type" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                <option value="SF10 / Form 137">SF10 / Form 137 (Transcript)</option>
+                                <option value="Certificate of Good Moral">Certificate of Good Moral</option>
+                                <option value="Certificate of Enrollment">Certificate of Enrollment</option>
+                                <option value="CAV (DepEd / DFA)">CAV (DepEd / DFA Apostille)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Target Purpose *</label>
+                            <select id="req-purpose" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                <option value="College / University Admission">College Admission</option>
+                                <option value="Scholarship (CHED / LGU)">LGU / CHED Scholarship</option>
+                                <option value="School Transfer">School Transfer</option>
+                                <option value="Employment Requirement">Employment Requirement</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Contact Number (for registrar follow-up) *</label>
+                        <input type="tel" id="req-contact" placeholder="0917-XXX-XXXX" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                        <button type="button" onclick="closeRequestModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold">Cancel</button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold flex items-center gap-1.5 shadow-md shadow-brand-800/20">
+                            <i class="fa-solid fa-receipt text-gold-400"></i> Save Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Enrollment Status Review -->
+    <div id="verify-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeVerifyModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden z-10 flex flex-col">
+                <div class="p-5 bg-gradient-to-r from-brand-950 to-brand-800 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 flex items-center justify-center text-gold-400 font-bold">
+                            <i class="fa-solid fa-id-card-clip text-base"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base">Review Enrollment Status</h3>
+                            <p class="text-[11px] text-brand-200">Update this learner's SERMS enrollment record</p>
+                        </div>
+                    </div>
+                    <button onclick="closeVerifyModal()" class="text-white/80 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4 text-xs">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Student Name:</span>
+                            <span class="font-bold text-slate-900" id="verify-modal-name">Mendoza, John Paul C.</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Learner Reference Number:</span>
+                            <span class="font-mono font-bold text-slate-800" id="verify-modal-lrn">109842140045</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Current Status:</span>
+                            <span class="font-bold text-brand-800" id="verify-modal-status">Pending Review</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1 text-amber-700"></i>
+                        Changing the status records a registrar review only. It does not verify a birth certificate with the PSA or synchronize records with DepEd LIS.
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button onclick="flagDiscrepancy()" class="px-4 py-2 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold transition">
+                        Return for Revision
+                    </button>
+                    <button onclick="confirmCredentialValid()" class="px-5 py-2 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold flex items-center gap-1.5 shadow-md shadow-brand-800/20 transition">
+                        <i class="fa-solid fa-check text-gold-400"></i> Mark Officially Enrolled
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAWER: Printable SF10 / Form 137 Transcript Drawer -->
+    <div id="sf10-drawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeSF10Drawer()"></div>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-3xl bg-white shadow-2xl flex flex-col justify-between">
+                <!-- Drawer Header -->
+                <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-brand-950 text-white no-print">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-800 flex items-center justify-center font-bold text-gold-400">
+                            <i class="fa-solid fa-stamp text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-sm">Historical SF10 Transcript Unavailable</h3>
+                            <p class="text-[11px] text-brand-200">Historical grades and transcript records are not stored in SERMS.</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSF10Drawer()" class="p-2 rounded-lg text-brand-200 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Printable SF10 Document Body -->
+                <div class="p-8 overflow-y-auto space-y-6 text-xs flex-1 bg-white" id="printable-sf10">
+                    <!-- DepEd Header Seal -->
+                    <div class="text-center pb-4 border-b-2 border-slate-900 space-y-1">
+                        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Republic of the Philippines • Department of Education</p>
+                        <h2 class="font-official font-black text-brand-950 text-xl tracking-tight">NAUJAN MUNICIPAL HIGH SCHOOL</h2>
+                        <p class="text-xs text-slate-600 font-semibold">Division of Oriental Mindoro • District of Naujan West • School ID: 301648</p>
+                        <div class="mt-2 inline-block px-4 py-1 bg-slate-100 border border-slate-300 rounded font-bold uppercase tracking-wider text-slate-800 text-xs">
+                            Learner Permanent Record (SF10 - JHS)
+                        </div>
+                    </div>
+
+                    <!-- Learner Profile Details -->
+                    <div class="grid grid-cols-2 gap-2 text-slate-800 bg-slate-50/60 p-3.5 rounded-xl border border-slate-200">
+                        <div><span class="text-slate-500">Learner Reference Number (LRN):</span> <strong class="font-mono text-slate-900" id="sf10-lrn">109842140021</strong></div>
+                        <div><span class="text-slate-500">PSA Birth Cert No.:</span> <strong class="font-mono text-slate-900">2010-0428-11092</strong></div>
+                        <div><span class="text-slate-500">Learner Name:</span> <strong class="text-slate-900" id="sf10-name">Alvarez, Bea Nicole M.</strong></div>
+                        <div><span class="text-slate-500">Date of Birth:</span> <strong>March 14, 2010</strong></div>
+                        <div><span class="text-slate-500">Barangay Residence:</span> <strong>Barcenaga, Naujan, Oriental Mindoro</strong></div>
+                        <div><span class="text-slate-500">Curriculum:</span> <strong>K to 12 Basic Education Program</strong></div>
+                    </div>
+
+                    <!-- Scholastic Record Table -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold uppercase tracking-wider text-slate-800 text-xs">Scholastic Record • Grade 10 Performance</span>
+                            <span class="text-slate-500 text-[11px]">School Year: 2026–2027</span>
+                        </div>
+                        <table class="w-full text-left border border-slate-300">
+                            <thead class="bg-slate-100 font-bold text-[11px] text-slate-800">
+                                <tr>
+                                    <th class="p-2 border border-slate-300">Learning Areas</th>
+                                    <th class="p-2 border border-slate-300 text-center w-14">Q1</th>
+                                    <th class="p-2 border border-slate-300 text-center w-14">Q2</th>
+                                    <th class="p-2 border border-slate-300 text-center w-14">Q3</th>
+                                    <th class="p-2 border border-slate-300 text-center w-14">Q4</th>
+                                    <th class="p-2 border border-slate-300 text-center w-16">Final</th>
+                                    <th class="p-2 border border-slate-300 text-center w-20">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-300 font-mono text-[11px]">
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">Filipino</td><td class="p-2 text-center border border-slate-300">91</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">English</td><td class="p-2 text-center border border-slate-300">93</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">Mathematics</td><td class="p-2 text-center border border-slate-300">90</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">Science</td><td class="p-2 text-center border border-slate-300">92</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">Araling Panlipunan (AP)</td><td class="p-2 text-center border border-slate-300">92</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">Edukasyon sa Pagpapakatao (EsP)</td><td class="p-2 text-center border border-slate-300">95</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">MAPEH</td><td class="p-2 text-center border border-slate-300">94</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr><td class="p-2 font-sans font-medium border border-slate-300">Technology & Livelihood Educ (TLE)</td><td class="p-2 text-center border border-slate-300">93</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                                <tr class="bg-slate-50 font-bold"><td class="p-2 font-sans text-slate-900 border border-slate-300">General Average (Q1)</td><td class="p-2 text-center border border-slate-300 text-brand-900 font-extrabold">92.50</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300">-</td><td class="p-2 text-center border border-slate-300 font-bold">-</td><td class="p-2 text-center border border-slate-300 text-emerald-700">Passed</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Certification & Seal Stamp -->
+                    <div class="pt-8 grid grid-cols-2 gap-8 text-center text-xs relative">
+                        <!-- Simulated Registrar Dry Seal -->
+                        <div class="absolute inset-x-0 bottom-4 flex justify-center pointer-events-none opacity-15">
+                            <div class="w-32 h-32 rounded-full border-4 border-dashed border-brand-900 flex items-center justify-center font-bold text-[9px] uppercase tracking-widest text-brand-900 rotate-12">
+                                Official Seal • NMHS Registrar
+                            </div>
+                        </div>
+                        <div>
+                            <div data-current-account-name class="border-b border-slate-800 pb-1 font-bold text-slate-900">MRS. CLARISSA V. MENDOZA, LPT</div>
+                            <p class="text-slate-500 text-[10px] mt-0.5">Head Registrar, Naujan MHS</p>
+                        </div>
+                        <div>
+                            <div class="border-b border-slate-800 pb-1 font-bold text-slate-900">DR. MARIA ELENA V. RAMOS, EdD</div>
+                            <p class="text-slate-500 text-[10px] mt-0.5">Secondary School Principal IV</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer Footer -->
+                <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2 no-print">
+                    <button onclick="closeSF10Drawer()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100 text-xs">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Action Alert Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-gold-400 text-base" id="toast-icon"></i>
+        <p class="text-xs font-medium" id="toast-msg">Operation completed successfully.</p>
+    </div>
+
+    <script>
+        // Sample Document Requests Dataset
+        let docRequests = [
+            {
+                tracking: "DOC-2026-0891",
+                lrn: "109842140021",
+                name: "Alvarez, Bea Nicole M.",
+                docType: "SF10 / Form 137",
+                purpose: "College / University Admission",
+                dateFiled: "2026-09-28",
+                dueDate: "2026-10-01",
+                status: "Ready for Release"
+            },
+            {
+                tracking: "DOC-2026-0892",
+                lrn: "109842140045",
+                name: "Mendoza, John Paul C.",
+                docType: "Certificate of Good Moral",
+                purpose: "Scholarship (CHED / LGU)",
+                dateFiled: "2026-09-29",
+                dueDate: "2026-10-02",
+                status: "Pending Processing"
+            },
+            {
+                tracking: "DOC-2026-0893",
+                lrn: "109842140089",
+                name: "Reyes, Samantha Joy D.",
+                docType: "CAV (DepEd / DFA)",
+                purpose: "Scholarship (CHED / LGU)",
+                dateFiled: "2026-09-29",
+                dueDate: "2026-10-03",
+                status: "Pending Processing"
+            },
+            {
+                tracking: "DOC-2026-0894",
+                lrn: "109842140102",
+                name: "Castillo, Mark Kevin L.",
+                docType: "SF10 / Form 137",
+                purpose: "School Transfer",
+                dateFiled: "2026-09-27",
+                dueDate: "2026-09-30",
+                status: "Ready for Release"
+            },
+            {
+                tracking: "DOC-2026-0895",
+                lrn: "109842140134",
+                name: "Villanueva, Angelica P.",
+                docType: "Certificate of Enrollment",
+                purpose: "Employment Requirement",
+                dateFiled: "2026-09-26",
+                dueDate: "2026-09-29",
+                status: "Dispatched / Released"
+            },
+            {
+                tracking: "DOC-2026-0896",
+                lrn: "109842140199",
+                name: "Tolentino, Kyle Joshua V.",
+                docType: "SF10 / Form 137",
+                purpose: "College / University Admission",
+                dateFiled: "2026-09-29",
+                dueDate: "2026-10-02",
+                status: "Pending Processing"
+            }
+        ];
+
+        // Sample PSA Verification Queue
+        const verificationList = [
+            {
+                lrn: "109842140045",
+                name: "Mendoza, John Paul C.",
+                dob: "2010-04-28",
+                psaNo: "2010-0428-99120",
+                feederSchool: "Naujan Central School",
+                issue: "Middle initial mismatch (C vs Cruz)",
+                status: "Flagged Discrepancy"
+            },
+            {
+                lrn: "109842140102",
+                name: "Castillo, Mark Kevin L.",
+                dob: "2009-11-12",
+                psaNo: "2009-1112-44189",
+                feederSchool: "Bancuro Elementary School",
+                issue: "Missing Original Form 137-E",
+                status: "Deficient Feeder Record"
+            },
+            {
+                lrn: "109842140212",
+                name: "Evangelista, Carlito B.",
+                dob: "2010-02-15",
+                psaNo: "2010-0215-77621",
+                feederSchool: "Inarawan National High School",
+                issue: "Pending LIS Unlinking from previous Division",
+                status: "LIS Tagging Pending"
+            },
+            {
+                lrn: "109842140245",
+                name: "Giron, Princess Lovely S.",
+                dob: "2010-08-20",
+                psaNo: "2010-0820-33412",
+                feederSchool: "Victoria Central School",
+                issue: "PSA Birth Cert Not Yet Submitted",
+                status: "Pending PSA Document"
+            }
+        ];
+
+        // Sample Transferees Dataset
+        const transferees = [
+            {
+                lrn: "109842140301",
+                name: "Navarro, Christian Rey D.",
+                direction: "Inbound",
+                partnerSchool: "Oriental Mindoro National High School (OMNHS)",
+                curriculum: "Grade 11 - STEM",
+                f137Status: "Requested (Awaiting Reply)",
+                movementCode: "T-IN-OMNHS-09"
+            },
+            {
+                lrn: "109842140302",
+                name: "Macatangay, Alyssa Marie B.",
+                direction: "Inbound",
+                partnerSchool: "Calapan City National High School",
+                curriculum: "Grade 9 - JHS",
+                f137Status: "Received & Filed",
+                movementCode: "T-IN-CCNHS-12"
+            },
+            {
+                lrn: "109842140303",
+                name: "Dimailig, Kenneth P.",
+                direction: "Outbound",
+                partnerSchool: "Mindoro State University Laboratory HS",
+                curriculum: "Grade 10 - JHS",
+                f137Status: "SF10 Released",
+                movementCode: "T-OUT-MinSU-04"
+            },
+            {
+                lrn: "109842140304",
+                name: "Bautista, Janine V.",
+                direction: "Inbound",
+                partnerSchool: "San Agustin National High School",
+                curriculum: "Grade 11 - TVL Agri",
+                f137Status: "Received & Filed",
+                movementCode: "T-IN-SANHS-02"
+            }
+        ];
+
+        // Sample Vault Dataset
+        const vaultRecords = [
+            {
+                lrn: "109842140021",
+                name: "Alvarez, Bea Nicole M.",
+                track: "Grade 11 STEM",
+                brgy: "Barcenaga",
+                gwa: "92.40",
+                status: "Active Learner"
+            },
+            {
+                lrn: "109842140045",
+                name: "Mendoza, John Paul C.",
+                track: "Grade 7 Regular JHS",
+                brgy: "Poblacion 1",
+                gwa: "88.75",
+                status: "Active Learner"
+            },
+            {
+                lrn: "109842140089",
+                name: "Reyes, Samantha Joy D.",
+                track: "Grade 12 HUMSS",
+                brgy: "Inarawan",
+                gwa: "91.10",
+                status: "Active Learner"
+            },
+            {
+                lrn: "109842140102",
+                name: "Castillo, Mark Kevin L.",
+                track: "Grade 11 TVL ICT",
+                brgy: "Bancuro",
+                gwa: "84.30",
+                status: "Transferee Incomplete"
+            },
+            {
+                lrn: "109842140134",
+                name: "Villanueva, Angelica P.",
+                track: "Grade 8 Regular JHS",
+                brgy: "Malinao",
+                gwa: "89.20",
+                status: "Active Learner"
+            },
+            {
+                lrn: "109842140199",
+                name: "Tolentino, Kyle Joshua V.",
+                track: "Grade 11 ABM",
+                brgy: "San Agustin",
+                gwa: "87.65",
+                status: "Active Learner"
+            }
+        ];
+
+        let enrollmentRecords = [];
+        let registrarCharts = {};
+        let recoveryTickets = [];
+        let studentRegistrations = [];
+        docRequests.splice(0);
+        verificationList.splice(0);
+        transferees.splice(0);
+        vaultRecords.splice(0);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDocRequests(docRequests);
+            renderVerificationCards();
+            renderTransferees();
+            renderVaultTable(vaultRecords);
+            initRegistrarCharts();
+            setupMobileMenu();
+            setupNotificationToggle();
+        });
+
+        window.setRegistrarRecords = function ({ enrollments, requests, tickets = [], studentRegistrations: registrations = [], overview }) {
+            enrollmentRecords = enrollments;
+            recoveryTickets = tickets;
+            studentRegistrations = registrations;
+            docRequests.splice(0, docRequests.length, ...requests);
+            vaultRecords.splice(0, vaultRecords.length, ...enrollments);
+            renderDocRequests(docRequests);
+            renderHelpdeskTickets(recoveryTickets);
+            renderStudentRegistrations(studentRegistrations);
+            renderVerificationCards();
+            renderVaultTable(vaultRecords);
+            updateRegistrarOverview(overview);
+        };
+
+        function renderStudentRegistrations(registrations) {
+            const tbody = document.getElementById('student-registrations-table-body');
+            if (!tbody) return;
+            tbody.replaceChildren();
+            const pendingCount = registrations.filter(registration => registration.registrationStatus === 'Pending Approval').length;
+            const countBadge = document.getElementById('sidebar-student-account-count');
+            if (countBadge) countBadge.textContent = String(pendingCount);
+            if (!registrations.length) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 6;
+                cell.className = 'px-4 py-8 text-center text-slate-500';
+                cell.textContent = 'No student self-registration requests have been received.';
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+            registrations.forEach(registration => {
+                const row = document.createElement('tr');
+                row.className = 'align-top hover:bg-slate-50';
+                const date = document.createElement('td');
+                date.className = 'whitespace-nowrap px-4 py-3 text-slate-500';
+                const submitted = new Date(registration.createdAt);
+                date.textContent = Number.isNaN(submitted.getTime()) ? '' : submitted.toLocaleString();
+                const name = document.createElement('td');
+                name.className = 'px-4 py-3 font-semibold text-slate-900';
+                name.textContent = registration.name;
+                const identifier = document.createElement('td');
+                identifier.className = 'px-4 py-3 font-mono';
+                identifier.textContent = registration.identifier;
+                const email = document.createElement('td');
+                email.className = 'px-4 py-3';
+                email.textContent = registration.email || 'Not provided';
+                const review = document.createElement('td');
+                review.className = 'px-4 py-3';
+                const status = document.createElement('span');
+                status.className = registration.registrationStatus === 'Approved'
+                    ? 'rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-800'
+                    : registration.registrationStatus === 'Rejected'
+                        ? 'rounded-full bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-800'
+                        : 'rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-800';
+                status.textContent = registration.registrationStatus;
+                review.appendChild(status);
+                if (registration.registrationReviewNote) {
+                    const note = document.createElement('p');
+                    note.className = 'mt-2 max-w-xs whitespace-pre-wrap text-[11px] text-slate-500';
+                    note.textContent = registration.registrationReviewNote;
+                    review.appendChild(note);
+                }
+                const actions = document.createElement('td');
+                actions.className = 'px-4 py-3 text-right';
+                if (registration.registrationStatus === 'Pending Approval') {
+                    const approve = document.createElement('button');
+                    approve.type = 'button';
+                    approve.className = 'mr-2 rounded-lg bg-emerald-700 px-3 py-2 text-[11px] font-bold text-white hover:bg-emerald-800';
+                    approve.textContent = 'Approve';
+                    approve.addEventListener('click', () => window.reviewStudentRegistration(registration.id, 'Approved'));
+                    const reject = document.createElement('button');
+                    reject.type = 'button';
+                    reject.className = 'rounded-lg border border-rose-200 bg-white px-3 py-2 text-[11px] font-bold text-rose-700 hover:bg-rose-50';
+                    reject.textContent = 'Reject';
+                    reject.addEventListener('click', () => window.reviewStudentRegistration(registration.id, 'Rejected'));
+                    actions.append(approve, reject);
+                } else {
+                    actions.textContent = 'Reviewed';
+                }
+                row.append(date, name, identifier, email, review, actions);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Tab Switching Engine
+        function switchView(viewName) {
+            const views = ['tracking', 'verification', 'student-accounts', 'transferees', 'forms', 'archive', 'helpdesk'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                const nav = document.getElementById(`nav-${v}`);
+                if (v === viewName) {
+                    el.classList.remove('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-800 text-white shadow-md shadow-brand-800/20";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-900";
+                    }
+                }
+            });
+            closeMobileSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderHelpdeskTickets(tickets) {
+            const tbody = document.getElementById('helpdesk-table-body');
+            if (!tbody) return;
+            tbody.replaceChildren();
+            const openCount = tickets.filter(ticket => ticket.status !== 'Resolved').length;
+            const badge = document.getElementById('sidebar-helpdesk-count');
+            if (badge) badge.textContent = String(openCount);
+            if (!tickets.length) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 6;
+                cell.className = 'px-4 py-8 text-center text-slate-500';
+                cell.textContent = 'No recovery assistance requests have been submitted.';
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+            tickets.forEach(ticket => {
+                const row = document.createElement('tr');
+                row.className = 'align-top hover:bg-slate-50';
+                const received = document.createElement('td');
+                received.className = 'px-4 py-3 whitespace-nowrap text-slate-500';
+                const createdAt = new Date(ticket.createdAt);
+                received.textContent = Number.isNaN(createdAt.getTime()) ? '' : createdAt.toLocaleString();
+                const name = document.createElement('td');
+                name.className = 'px-4 py-3 font-semibold';
+                name.textContent = ticket.name;
+                const identifier = document.createElement('td');
+                identifier.className = 'px-4 py-3';
+                identifier.textContent = [ticket.identifier, ticket.department].filter(Boolean).join(' · ');
+                const contact = document.createElement('td');
+                contact.className = 'px-4 py-3 whitespace-nowrap';
+                contact.textContent = ticket.contact || 'Not provided';
+                const reason = document.createElement('td');
+                reason.className = 'max-w-sm whitespace-pre-wrap break-words px-4 py-3 text-slate-600';
+                reason.textContent = ticket.reason;
+                const status = document.createElement('td');
+                status.className = 'px-4 py-3';
+                const select = document.createElement('select');
+                select.className = 'rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-700';
+                ['Open', 'In Progress', 'Resolved'].forEach(value => select.add(new Option(value, value)));
+                select.value = ticket.status;
+                select.addEventListener('change', () => {
+                    select.disabled = true;
+                    window.updateHelpdeskTicketStatus(ticket.id, select.value).finally(() => { select.disabled = false; });
+                });
+                status.appendChild(select);
+                row.append(received, name, identifier, contact, reason, status);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Render Document Issuance Table
+        function renderDocRequests(list) {
+            const tbody = document.getElementById('doc-requests-tbody');
+            tbody.replaceChildren();
+            if (!list.length) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 8;
+                cell.className = 'px-4 py-8 text-center text-slate-500';
+                cell.textContent = docRequests.length ? 'No document requests match these filters.' : 'No document requests are currently stored in SERMS.';
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+
+            list.forEach(req => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+
+                const addCell = (text, className) => {
+                    const cell = document.createElement('td');
+                    cell.className = className;
+                    cell.textContent = text || '—';
+                    tr.appendChild(cell);
+                    return cell;
+                };
+                addCell(req.tracking, 'py-3 px-4 font-mono font-bold text-brand-900');
+                const learnerCell = document.createElement('td');
+                learnerCell.className = 'py-3 px-4';
+                const learnerName = document.createElement('div');
+                learnerName.className = 'font-bold text-slate-900';
+                learnerName.textContent = req.name;
+                const learnerLrn = document.createElement('div');
+                learnerLrn.className = 'text-[10px] text-slate-400 font-mono';
+                learnerLrn.textContent = `LRN: ${req.lrn}`;
+                learnerCell.append(learnerName, learnerLrn);
+                tr.appendChild(learnerCell);
+                addCell(req.docType, 'py-3 px-4 font-bold text-slate-800');
+                addCell(req.purpose, 'py-3 px-4 text-slate-600');
+                addCell(req.dateFiled, 'py-3 px-4 text-slate-500 font-mono text-[11px]');
+                addCell(req.contact, 'py-3 px-4 text-slate-600 font-mono text-[11px]');
+                const statusCell = document.createElement('td');
+                statusCell.className = 'py-3 px-4';
+                const badge = document.createElement('span');
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border border-slate-200';
+                badge.classList.add(req.status === 'Dispatched' ? 'bg-slate-100' : req.status === 'Ready for Claim' ? 'bg-emerald-50' : req.status === 'Returned for Revision' ? 'bg-rose-50' : 'bg-amber-50');
+                badge.classList.add(req.status === 'Dispatched' ? 'text-slate-700' : req.status === 'Ready for Claim' ? 'text-emerald-800' : req.status === 'Returned for Revision' ? 'text-rose-800' : 'text-amber-800');
+                badge.textContent = req.status;
+                statusCell.appendChild(badge);
+                tr.appendChild(statusCell);
+                const actionCell = document.createElement('td');
+                actionCell.className = 'py-3 px-4 text-right';
+                const nextStep = {
+                    'Pending Processing': ['Processing', 'Start Processing'],
+                    Processing: ['Ready for Claim', 'Mark Ready'],
+                    'Ready for Claim': ['Dispatched', 'Mark Dispatched'],
+                    'Returned for Revision': ['Processing', 'Resume Processing']
+                }[req.status];
+                if (nextStep) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'rounded-lg bg-brand-800 px-2.5 py-1 text-xs font-semibold text-white hover:bg-brand-900';
+                    button.textContent = nextStep[1];
+                    button.addEventListener('click', () => markDispatched(req.tracking, nextStep[0]));
+                    actionCell.appendChild(button);
+                } else {
+                    actionCell.textContent = 'Complete';
+                }
+                tr.appendChild(actionCell);
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterDocRequests() {
+            const q = document.getElementById('doc-search').value.toLowerCase().trim();
+            const typeFilter = document.getElementById('doc-type-filter').value;
+            const statusFilter = document.getElementById('doc-status-filter').value;
+
+            const filtered = docRequests.filter(item => {
+                const matchQ = item.tracking.toLowerCase().includes(q) || item.lrn.includes(q) || item.name.toLowerCase().includes(q);
+                const matchType = (typeFilter === 'ALL') || item.docType === typeFilter;
+                const matchStatus = (statusFilter === 'ALL') || item.status === statusFilter;
+                return matchQ && matchType && matchStatus;
+            });
+
+            renderDocRequests(filtered);
+        }
+
+        function markDispatched(trackingCode, status) {
+            const item = docRequests.find(r => r.tracking === trackingCode);
+            if (item) {
+                if (status === 'Dispatched' && !window.confirm(`Confirm that document request ${trackingCode} has actually been handed to the learner?`)) return;
+                window.updateRegistrarDocumentStatus(trackingCode, status);
+            }
+        }
+
+        // Credential Verification Cards
+        function renderVerificationCards() {
+            const container = document.getElementById('verification-cards-container');
+            container.replaceChildren();
+            if (!enrollmentRecords.length) {
+                const empty = document.createElement('p');
+                empty.className = 'rounded-2xl border border-slate-200 bg-white p-5 text-xs text-slate-500 md:col-span-2';
+                empty.textContent = 'No enrollment applications are currently stored in SERMS.';
+                container.appendChild(empty);
+                return;
+            }
+            enrollmentRecords.forEach(record => {
+                const card = document.createElement('div');
+                card.className = "p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-3";
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between gap-3';
+                const identity = document.createElement('div');
+                const lrn = document.createElement('span');
+                lrn.className = 'font-mono text-xs font-bold text-brand-900';
+                lrn.textContent = `LRN: ${record.lrn}`;
+                const name = document.createElement('h4');
+                name.className = 'mt-0.5 font-heading text-sm font-bold text-slate-900';
+                name.textContent = record.name;
+                identity.append(lrn, name);
+                const badge = document.createElement('span');
+                badge.className = 'rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold text-slate-700';
+                badge.textContent = record.status;
+                header.append(identity, badge);
+                const details = document.createElement('div');
+                details.className = 'space-y-1.5 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600';
+                const grade = document.createElement('p');
+                grade.textContent = `Grade: ${record.grade || 'Not provided'}${record.strand ? ` · ${record.strand}` : ''}`;
+                const filed = document.createElement('p');
+                filed.textContent = `Submitted: ${record.dateFiled}`;
+                details.append(grade, filed);
+                card.append(header, details);
+                if (record.status !== 'Officially Enrolled') {
+                    const actions = document.createElement('div');
+                    actions.className = 'flex justify-end gap-2 pt-1';
+                    const review = document.createElement('button');
+                    review.type = 'button';
+                    review.className = 'rounded-xl bg-brand-800 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-brand-900';
+                    review.textContent = 'Review status';
+                    review.addEventListener('click', () => openVerifyModal(record.lrn, record.name));
+                    actions.appendChild(review);
+                    card.appendChild(actions);
+                }
+                container.appendChild(card);
+            });
+        }
+
+        function openVerifyModal(lrn, name) {
+            const record = enrollmentRecords.find(item => item.lrn === lrn);
+            document.getElementById('verify-modal-name').textContent = name;
+            document.getElementById('verify-modal-lrn').textContent = lrn;
+            document.getElementById('verify-modal-status').textContent = record ? record.status : 'Unknown';
+            document.getElementById('verify-modal').classList.remove('hidden');
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').classList.add('hidden');
+        }
+
+        function confirmCredentialValid() {
+            const lrn = document.getElementById('verify-modal-lrn').textContent.trim();
+            closeVerifyModal();
+            window.updateRegistrarEnrollmentStatus(lrn, 'Officially Enrolled');
+        }
+
+        function flagDiscrepancy() {
+            const lrn = document.getElementById('verify-modal-lrn').textContent.trim();
+            closeVerifyModal();
+            window.updateRegistrarEnrollmentStatus(lrn, 'Returned for Revision');
+        }
+
+        // Transferees Table
+        function renderTransferees() {
+            const tbody = document.getElementById('transferee-table-body');
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-slate-500">Transfer events are not stored in SERMS.</td></tr>';
+        }
+
+        // Vault Table & Search
+        function renderVaultTable(list) {
+            const tbody = document.getElementById('vault-table-body');
+            tbody.replaceChildren();
+            if (!list.length) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7" class="px-4 py-8 text-center text-slate-500">No enrollment records are currently stored in SERMS.</td>';
+                tbody.appendChild(row);
+                return;
+            }
+
+            list.forEach(v => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                const addCell = (text, className) => {
+                    const cell = document.createElement('td');
+                    cell.className = className;
+                    cell.textContent = text || '—';
+                    tr.appendChild(cell);
+                };
+                addCell(v.lrn, 'py-3 px-4 font-mono font-bold text-brand-900');
+                addCell(v.name, 'py-3 px-4 font-bold text-slate-900');
+                addCell(`${v.grade || '—'}${v.strand ? ` · ${v.strand}` : ''}`, 'py-3 px-4');
+                addCell(v.brgy, 'py-3 px-4 text-slate-600');
+                addCell(v.status, 'py-3 px-4 font-semibold text-slate-800');
+                addCell(v.dateFiled, 'py-3 px-4 font-mono text-[11px] text-slate-500');
+                const actionCell = document.createElement('td');
+                actionCell.className = 'py-3 px-4 text-right';
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'rounded-lg bg-brand-800 px-3 py-1 text-xs font-bold text-white hover:bg-brand-900';
+                button.textContent = 'Review status';
+                button.addEventListener('click', () => openVerifyModal(v.lrn, v.name));
+                actionCell.appendChild(button);
+                tr.appendChild(actionCell);
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterVault() {
+            const q = document.getElementById('vault-search').value.toLowerCase().trim();
+            const filtered = vaultRecords.filter(r => {
+                return r.lrn.includes(q) || r.name.toLowerCase().includes(q) || (r.grade || '').toLowerCase().includes(q) || (r.strand || '').toLowerCase().includes(q);
+            });
+            renderVaultTable(filtered);
+        }
+
+        // Modals & Drawers
+        function openRequestModal() {
+            document.getElementById('request-modal').classList.remove('hidden');
+        }
+
+        function closeRequestModal() {
+            document.getElementById('request-modal').classList.add('hidden');
+        }
+
+        function handleRequestSubmit(e) {
+            e.preventDefault();
+            showToast('The request could not be saved. Reload the page and try again.');
+        }
+
+        function openSF10Drawer(lrn) {
+            showToast('SF10 is unavailable: SERMS does not store historical learner grades or transcript records.');
+        }
+
+        function closeSF10Drawer() {
+            document.getElementById('sf10-drawer').classList.add('hidden');
+        }
+
+        function triggerLISSync() {
+            showToast('DepEd LIS is not configured. SERMS does not synchronize learner records with LIS.');
+        }
+
+        // Initialize Registrar Performance Charts
+        function initRegistrarCharts() {
+            if (typeof Chart === 'undefined') {
+                document.querySelectorAll('#docTurnaroundChart, #docDistributionChart').forEach(canvas => {
+                    const message = document.createElement('p');
+                    message.className = 'p-4 text-center text-xs text-slate-500';
+                    message.textContent = 'Charts are unavailable because the chart library did not load.';
+                    canvas.replaceWith(message);
+                });
+                return;
+            }
+            registrarCharts.status = new Chart(document.getElementById('docTurnaroundChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{ label: 'Requests', data: [], backgroundColor: '#15803d', borderRadius: 6 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+                    }
+                }
+            });
+
+            registrarCharts.types = new Chart(document.getElementById('docDistributionChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#166534', '#15803d', '#ca8a04', '#2563eb', '#7c3aed', '#0891b2'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateRegistrarOverview(overview) {
+            const enrollments = overview.enrollmentStatuses || {};
+            const documents = overview.documentStatuses || {};
+            const grades = overview.enrollmentsByGrade || [];
+            const pendingDocs = (documents['Pending Processing'] || 0) + (documents.Processing || 0);
+            const gradeCount = (min, max) => grades
+                .filter(item => {
+                    const number = Number(String(item._id || '').match(/\d+/)?.[0]);
+                    return number >= min && number <= max;
+                })
+                .reduce((sum, item) => sum + item.count, 0);
+            const values = {
+                'registrar-enrollment-total': overview.enrollmentCount || 0,
+                'registrar-jhs-total': gradeCount(7, 10),
+                'registrar-shs-total': gradeCount(11, 12),
+                'registrar-pending-doc-count': pendingDocs,
+                'registrar-processing-count': documents.Processing || 0,
+                'registrar-ready-count': documents['Ready for Claim'] || 0,
+                'registrar-enrollment-review-count': enrollments['Pending Review'] || 0,
+                'registrar-enrollment-returned-count': enrollments['Returned for Revision'] || 0,
+                'registrar-released-doc-count': documents.Dispatched || 0,
+                'registrar-total-doc-count': overview.documentRequestCount || 0,
+                'registrar-doc-returned-count': documents['Returned for Revision'] || 0,
+                'sidebar-doc-count': pendingDocs + (documents['Ready for Claim'] || 0),
+                'sidebar-enrollment-count': enrollments['Pending Review'] || 0
+            };
+            Object.entries(values).forEach(([id, count]) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = String(count);
+            });
+
+            const typeCounts = overview.documentsByType || [];
+            const typeSelect = document.getElementById('doc-type-filter');
+            const selectedType = typeSelect.value;
+            typeSelect.replaceChildren(new Option('All Document Categories', 'ALL'));
+            typeCounts.forEach(item => typeSelect.add(new Option(item._id, item._id)));
+            if (Array.from(typeSelect.options).some(option => option.value === selectedType)) typeSelect.value = selectedType;
+            const legend = document.getElementById('registrar-doc-type-legend');
+            legend.replaceChildren();
+            typeCounts.forEach((item, index) => {
+                const entry = document.createElement('span');
+                entry.className = 'flex items-center gap-1.5 text-slate-600';
+                const swatch = document.createElement('i');
+                swatch.className = 'h-2 w-2 rounded-full';
+                swatch.style.backgroundColor = ['#166534', '#15803d', '#ca8a04', '#2563eb', '#7c3aed', '#0891b2'][index % 6];
+                const label = document.createElement('span');
+                label.textContent = `${item._id}: ${item.count}`;
+                entry.append(swatch, label);
+                legend.appendChild(entry);
+            });
+
+            if (registrarCharts.status && registrarCharts.types) {
+                const statuses = Object.entries(documents).filter(([, count]) => count > 0);
+                registrarCharts.status.data.labels = statuses.length ? statuses.map(([status]) => status) : ['No requests'];
+                registrarCharts.status.data.datasets[0].data = statuses.length ? statuses.map(([, count]) => count) : [0];
+                registrarCharts.status.update();
+                registrarCharts.types.data.labels = typeCounts.length ? typeCounts.map(item => item._id) : ['No requests'];
+                registrarCharts.types.data.datasets[0].data = typeCounts.length ? typeCounts.map(item => item.count) : [0];
+                registrarCharts.types.update();
+            }
+
+            const alerts = document.getElementById('registrar-alerts');
+            alerts.replaceChildren();
+            const alertItems = [
+                [pendingDocs, 'document requests need processing.'],
+                [enrollments['Pending Review'] || 0, 'enrollment applications need review.'],
+                [documents['Ready for Claim'] || 0, 'document requests are ready for claim.']
+            ].filter(([count]) => count > 0);
+            if (!alertItems.length) {
+                const message = document.createElement('p');
+                message.className = 'rounded-xl bg-slate-50 p-3 text-slate-500';
+                message.textContent = 'No pending registrar actions.';
+                alerts.appendChild(message);
+            } else {
+                alertItems.forEach(([count, text]) => {
+                    const message = document.createElement('p');
+                    message.className = 'rounded-xl bg-amber-50 p-3 text-amber-900';
+                    message.textContent = `${count} ${text}`;
+                    alerts.appendChild(message);
+                });
+            }
+            filterDocRequests();
+            filterVault();
+        }
+
+        // Navigation toggles
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                backdrop.classList.toggle('hidden');
+            });
+
+            backdrop.addEventListener('click', closeMobileSidebar);
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function setupNotificationToggle() {
+            const btn = document.getElementById('notif-btn');
+            const menu = document.getElementById('notif-menu');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Toast Feedback System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+    </script>
+    <script src="/assets/app.js"></script>
+</body>
+</html>

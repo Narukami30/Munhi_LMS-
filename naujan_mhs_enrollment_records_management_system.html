@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naujan Municipal High School - Enrollment & Records Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d', // Primary Academic Green
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        accent: {
+                            gold: '#eab308',
+                            emerald: '#10b981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar and sleek interactions */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
+
+    <header class="sticky top-0 z-30 border-b border-slate-200 glass-header px-4 lg:px-8 py-3 transition-all duration-200">
+        <div class="flex items-center justify-between gap-4">
+            <!-- Left Branding & Mobile Toggle -->
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-brand-700 hover:bg-brand-50 focus:outline-none" aria-label="Toggle Navigation">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-800 to-brand-600 p-0.5 shadow-md shadow-brand-700/20 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-400 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-heading font-extrabold text-brand-900 tracking-tight text-base sm:text-lg leading-tight">Naujan Municipal High School</h1>
+                            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-800 border border-brand-200">DepEd Region IV-B</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium">Student Enrollment & Records Management System (SERMS)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Controls: Academic Year, Search, Notifications, Profile -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
+                    <i class="fa-regular fa-calendar-check text-brand-700"></i>
+                    <span>S.Y. 2026–2027</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+
+                <!-- Notifications Dropdown Trigger -->
+                <div class="relative">
+                    <button id="notif-btn" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 hover:text-brand-700 hover:bg-slate-100 transition-colors relative" aria-label="View notifications">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+                    </button>
+                    <!-- Notification flyout -->
+                    <div id="notif-menu" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">System Alerts</span>
+                            <span class="text-[11px] font-semibold text-brand-700 cursor-pointer hover:underline">Mark read</span>
+                        </div>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 rounded-xl bg-brand-50 border border-brand-100 text-brand-900">
+                                <p class="font-semibold">5 New Online Applications</p>
+                                <p class="text-slate-500 text-[11px] mt-0.5">Grade 11 TVL & STEM applicants awaiting review.</p>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-slate-700">
+                                <p class="font-semibold">DepEd LIS Export Ready</p>
+                                <p class="text-slate-500 text-[11px] mt-0.5">Q1 Preliminary Masterlist compiled successfully.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-slate-200">
+                    <div class="w-9 h-9 rounded-xl bg-brand-100 border border-brand-300 text-brand-800 font-bold flex items-center justify-center text-sm shadow-inner">
+                        MA
+                    </div>
+                    <div class="hidden xl:block text-left">
+                        <p class="text-xs font-bold text-slate-800 leading-tight">Maria Alano</p>
+                        <p class="text-[11px] text-slate-500 font-medium">Head Registrar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between pt-16 lg:pt-0">
+            <div class="p-4 space-y-6 overflow-y-auto">
+                <div>
+                    <span class="px-3 text-[10px] font-bold tracking-wider uppercase text-slate-400">Main Modules</span>
+                    <nav class="mt-2 space-y-1">
+                        <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-700 text-white shadow-sm shadow-brand-700/20">
+                            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                            <span>Dashboard</span>
+                        </button>
+                        <button onclick="switchView('enrollment')" id="nav-enrollment" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800">
+                            <i class="fa-solid fa-user-plus w-5 text-center"></i>
+                            <span>New Enrollment</span>
+                            <span class="ml-auto text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">New</span>
+                        </button>
+                        <button onclick="switchView('records')" id="nav-records" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800">
+                            <i class="fa-solid fa-address-book w-5 text-center"></i>
+                            <span>Student Masterlist</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div>
+                    <span class="px-3 text-[10px] font-bold tracking-wider uppercase text-slate-400">Academic & Reports</span>
+                    <nav class="mt-2 space-y-1">
+                        <a href="javascript:void(0)" onclick="showToast('Sectioning module is synchronized with DepEd Division memo.')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-800 transition-colors">
+                            <i class="fa-solid fa-layer-group w-5 text-center"></i>
+                            <span>Sections & Rosters</span>
+                        </a>
+                        <a href="javascript:void(0)" onclick="showToast('Form 137 / SF10 Generator template active.')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-800 transition-colors">
+                            <i class="fa-solid fa-file-invoice w-5 text-center"></i>
+                            <span>SF10 / Form 137</span>
+                        </a>
+                        <a href="javascript:void(0)" onclick="showToast('Generating official LIS summary export...')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-800 transition-colors">
+                            <i class="fa-solid fa-file-arrow-down w-5 text-center"></i>
+                            <span>LIS Data Exports</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- School Info Card -->
+                <div class="p-3.5 rounded-2xl bg-gradient-to-br from-brand-900 to-brand-800 text-white text-xs shadow-md">
+                    <div class="flex items-center gap-2 mb-2 font-semibold text-brand-100">
+                        <i class="fa-solid fa-school-circle-check"></i>
+                        <span>Naujan MHS Portal</span>
+                    </div>
+                    <p class="text-brand-100/80 leading-relaxed text-[11px]">School ID: <span class="font-bold text-white">301532</span></p>
+                    <p class="text-brand-100/80 leading-relaxed text-[11px]">Division of Oriental Mindoro</p>
+                    <div class="mt-3 pt-2 border-t border-brand-700/50 flex justify-between items-center text-[11px]">
+                        <span class="text-emerald-300 font-medium">Server Online</span>
+                        <span class="px-1.5 py-0.5 bg-brand-700/80 rounded font-mono text-[10px]">v2.6</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer within sidebar -->
+            <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <span>© 2026 NMHS SERMS</span>
+                <button onclick="showToast('Settings saved.')" class="hover:text-slate-600"><i class="fa-solid fa-gear"></i></button>
+            </div>
+        </aside>
+
+        <!-- Backdrop overlay for mobile navigation -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-30 hidden lg:hidden"></div>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/60 relative">
+
+            <!-- ================= VIEW 1: DASHBOARD OVERVIEW ================= -->
+            <section id="view-dashboard" class="space-y-6">
+                <!-- Welcome Banner -->
+                <div class="rounded-3xl bg-gradient-to-r from-brand-900 via-brand-800 to-brand-700 p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                    <div class="relative z-10 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur border border-white/20 text-xs font-semibold text-emerald-200 mb-3">
+                            <i class="fa-solid fa-circle-dot animate-ping text-[8px] text-emerald-400"></i>
+                            Official Enrollment Ongoing
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-heading font-extrabold tracking-tight">Naujan Municipal High School Portal</h2>
+                        <p class="text-brand-100 text-sm sm:text-base mt-2 leading-relaxed">
+                            Welcome, Registrar. Track real-time student registration, verify documentary requirements, and organize junior and senior high school sections for the current academic session.
+                        </p>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <button onclick="switchView('enrollment')" class="px-5 py-2.5 rounded-xl bg-white text-brand-900 font-bold text-xs sm:text-sm hover:bg-emerald-50 transition-all shadow-md active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-plus-circle text-brand-700"></i> Enroll New Student
+                            </button>
+                            <button onclick="switchView('records')" class="px-5 py-2.5 rounded-xl bg-brand-800/80 hover:bg-brand-800 border border-brand-600 text-white font-semibold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check"></i> Manage Records
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Decorative Background Icon -->
+                    <i class="fa-solid fa-school absolute -right-6 -bottom-10 text-[200px] text-white/5 pointer-events-none"></i>
+                </div>
+
+                <!-- Key Metrics Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                    <!-- Total Enrolled -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Enrolled</span>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-brand-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-baseline gap-2">
+                            <span class="text-3xl font-heading font-black text-slate-800">2,480</span>
+                            <span class="text-xs font-bold text-emerald-600 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-0.5"></i> +8.4%</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">vs. previous school year</p>
+                    </div>
+
+                    <!-- Pending Verification -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Needs Verification</span>
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-clipboard-question"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-baseline gap-2">
+                            <span class="text-3xl font-heading font-black text-slate-800">42</span>
+                            <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">PSA/SF9 Missing</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Action needed by registrar</p>
+                    </div>
+
+                    <!-- Junior High School Total -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">JHS Learners</span>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-book-open-reader"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-baseline gap-2">
+                            <span class="text-3xl font-heading font-black text-slate-800">1,560</span>
+                            <span class="text-xs text-slate-500 font-medium">Grades 7 to 10</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">36 Regular & Special Sections</p>
+                    </div>
+
+                    <!-- Senior High School Strands -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">SHS Learners</span>
+                            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-baseline gap-2">
+                            <span class="text-3xl font-heading font-black text-slate-800">920</span>
+                            <span class="text-xs text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded-full">STEM • ABM • HUMSS • TVL</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Grades 11 & 12</p>
+                    </div>
+                </div>
+
+                <!-- Charts & Breakdown Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Enrollment Timeline Chart -->
+                    <div class="lg:col-span-2 bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="font-heading font-bold text-slate-800 text-base">Enrollment Registrations Velocity</h3>
+                                <p class="text-xs text-slate-500">Weekly recorded registrations (June - September 2026)</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-brand-50 text-brand-800 rounded-lg text-xs font-bold border border-brand-200">Live Data</span>
+                        </div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="enrollmentTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- SHS Strand Distribution Doughnut -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-heading font-bold text-slate-800 text-base">Senior High Strands</h3>
+                                <i class="fa-solid fa-chart-pie text-slate-400"></i>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Enrollee ratio per SHS Academic & TVL track</p>
+                            <div class="relative h-48 w-full flex items-center justify-center">
+                                <canvas id="strandDoughnutChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-[11px] font-semibold">
+                            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-700"></span> STEM (34%)</div>
+                            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> HUMSS (28%)</div>
+                            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> ABM (21%)</div>
+                            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> TVL / ICT (17%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Applications Table with Quick Action -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-heading font-bold text-slate-800 text-base">Recent Enrollment Applications</h3>
+                            <p class="text-xs text-slate-500">Latest online and walk-in submissions ready for registrar evaluation</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="switchView('records')" class="text-xs font-bold text-brand-700 hover:text-brand-900 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors">
+                                View Full Directory <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">LRN</th>
+                                    <th class="py-3 px-4">Student Name</th>
+                                    <th class="py-3 px-4">Level & Track</th>
+                                    <th class="py-3 px-4">Barangay (Naujan)</th>
+                                    <th class="py-3 px-4">Date Applied</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="recent-enrollment-tbody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 2: NEW ENROLLMENT MULTI-STEP FORM ================= -->
+            <section id="view-enrollment" class="hidden space-y-6 max-w-4xl mx-auto">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm">
+                    <!-- Form Title & Badge -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">DepEd Basic Education Enrollment Form (BEEF)</span>
+                            <h2 class="text-2xl font-heading font-extrabold text-slate-900 mt-2">New Student Enrollment Portal</h2>
+                            <p class="text-xs text-slate-500">Official digital intake for Junior (G7-10) and Senior High School (G11-12)</p>
+                        </div>
+                        <div class="text-right text-xs">
+                            <span class="text-slate-400">Form Version:</span>
+                            <span class="font-bold text-slate-700 ml-1">2026-NMHS-A1</span>
+                        </div>
+                    </div>
+
+                    <!-- Step Progress Bar -->
+                    <div class="my-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="step-indicator active flex items-center gap-2" id="step-ind-1">
+                                <span class="w-7 h-7 rounded-full bg-brand-700 text-white font-bold text-xs flex items-center justify-center shadow-sm">1</span>
+                                <span class="text-xs font-bold text-brand-900 hidden sm:inline">Learner Profile</span>
+                            </div>
+                            <div class="h-0.5 flex-1 mx-2 bg-slate-200" id="bar-1"></div>
+                            <div class="step-indicator flex items-center gap-2" id="step-ind-2">
+                                <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">2</span>
+                                <span class="text-xs font-semibold text-slate-500 hidden sm:inline">Academic Level</span>
+                            </div>
+                            <div class="h-0.5 flex-1 mx-2 bg-slate-200" id="bar-2"></div>
+                            <div class="step-indicator flex items-center gap-2" id="step-ind-3">
+                                <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">3</span>
+                                <span class="text-xs font-semibold text-slate-500 hidden sm:inline">Parent & Docs</span>
+                            </div>
+                            <div class="h-0.5 flex-1 mx-2 bg-slate-200" id="bar-3"></div>
+                            <div class="step-indicator flex items-center gap-2" id="step-ind-4">
+                                <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">4</span>
+                                <span class="text-xs font-semibold text-slate-500 hidden sm:inline">Summary & Submit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Content Steps Container -->
+                    <form id="enrollment-wizard-form" onsubmit="handleEnrollmentSubmit(event)">
+                        <!-- STEP 1: Basic Learner Information -->
+                        <div id="step-1" class="form-step space-y-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Step 1: Student Identity & Demographic Info</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Learner Reference Number (LRN) *</label>
+                                    <input type="text" id="form-lrn" maxlength="12" placeholder="12-digit DepEd LRN (e.g., 109842140029)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none transition-all font-mono" required>
+                                    <p class="text-[10px] text-slate-400 mt-1">Must be 12 numeric characters issued by DepEd</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">PSA Birth Certificate Registry No.</label>
+                                    <input type="text" id="form-psa" placeholder="B-Cert Registry No." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
+                                    <input type="text" id="form-lname" placeholder="e.g. Delos Santos" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
+                                    <input type="text" id="form-fname" placeholder="e.g. Joshua Christian" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Middle Name / Suffix</label>
+                                    <input type="text" id="form-mname" placeholder="e.g. Ramos Jr." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Birthdate *</label>
+                                    <input type="date" id="form-dob" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Sex Assigned at Birth *</label>
+                                    <select id="form-sex" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                        <option value="">Select Sex</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Naujan Barangay Residence *</label>
+                                    <select id="form-brgy" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                        <option value="">Select Barangay</option>
+                                        <option value="Poblacion 1">Poblacion 1</option>
+                                        <option value="Poblacion 2">Poblacion 2</option>
+                                        <option value="Poblacion 3">Poblacion 3</option>
+                                        <option value="Barcenaga">Barcenaga</option>
+                                        <option value="Inarawan">Inarawan</option>
+                                        <option value="Bancuro">Bancuro</option>
+                                        <option value="Malinao">Malinao</option>
+                                        <option value="San Agustin">San Agustin</option>
+                                        <option value="Other / Outside Naujan">Other / Outside Naujan</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: Grade Level and Senior High Track / Strand -->
+                        <div id="step-2" class="form-step hidden space-y-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Step 2: Educational Level & Program Selection</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Grade Level To Enroll *</label>
+                                    <select id="form-grade" onchange="toggleStrandOption()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                        <option value="">Choose Grade Level</option>
+                                        <option value="Grade 7">Grade 7 (JHS)</option>
+                                        <option value="Grade 8">Grade 8 (JHS)</option>
+                                        <option value="Grade 9">Grade 9 (JHS)</option>
+                                        <option value="Grade 10">Grade 10 (JHS)</option>
+                                        <option value="Grade 11">Grade 11 (SHS)</option>
+                                        <option value="Grade 12">Grade 12 (SHS)</option>
+                                    </select>
+                                </div>
+                                <div id="strand-wrapper" class="opacity-40 pointer-events-none transition-all">
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">SHS Track & Strand</label>
+                                    <select id="form-strand" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                        <option value="N/A">Not Applicable (JHS)</option>
+                                        <option value="STEM">Academic: STEM (Science, Tech, Eng, Math)</option>
+                                        <option value="ABM">Academic: ABM (Accountancy & Business)</option>
+                                        <option value="HUMSS">Academic: HUMSS (Humanities & Social Sci)</option>
+                                        <option value="TVL - ICT">TVL: Computer Systems Servicing (ICT)</option>
+                                        <option value="TVL - Agri">TVL: Agricultural Arts & Crop Production</option>
+                                    </select>
+                                    <p class="text-[10px] text-brand-700 mt-1">Available for Grades 11 and 12 applicants</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Last School Attended *</label>
+                                    <input type="text" id="form-last-school" placeholder="e.g. Naujan Central School or Naujan MHS" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">General Average (Last S.Y.) *</label>
+                                    <input type="number" step="0.01" min="70" max="100" id="form-gen-ave" placeholder="e.g. 89.5" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: Guardian Details & Document Checklist -->
+                        <div id="step-3" class="form-step hidden space-y-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Step 3: Parent / Guardian & Credential Checklist</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Parent / Legal Guardian Full Name *</label>
+                                    <input type="text" id="form-guardian" placeholder="e.g. Elena Delos Santos" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Primary Contact Number *</label>
+                                    <input type="tel" id="form-contact" placeholder="0917-XXX-XXXX" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none" required>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 mt-3">
+                                <label class="block text-xs font-bold text-slate-800 mb-2">Hardcopy & Document Submission Checklist</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 bg-white rounded-xl border border-slate-200/80 hover:bg-brand-50/50">
+                                        <input type="checkbox" id="doc-psa" class="rounded text-brand-700 focus:ring-brand-700 w-4 h-4">
+                                        <span>PSA Birth Certificate (Original/Photocopy)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 bg-white rounded-xl border border-slate-200/80 hover:bg-brand-50/50">
+                                        <input type="checkbox" id="doc-sf9" class="rounded text-brand-700 focus:ring-brand-700 w-4 h-4" checked>
+                                        <span>Form 138 (SF9 - Report Card)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 bg-white rounded-xl border border-slate-200/80 hover:bg-brand-50/50">
+                                        <input type="checkbox" id="doc-gm" class="rounded text-brand-700 focus:ring-brand-700 w-4 h-4">
+                                        <span>Certificate of Good Moral Character</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 bg-white rounded-xl border border-slate-200/80 hover:bg-brand-50/50">
+                                        <input type="checkbox" id="doc-pic" class="rounded text-brand-700 focus:ring-brand-700 w-4 h-4" checked>
+                                        <span>2x2 Recent ID Photos (2 Copies)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: Review & Final Submission -->
+                        <div id="step-4" class="form-step hidden space-y-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Step 4: Review Applicant Information</h3>
+                            <div class="p-5 rounded-2xl bg-brand-50/60 border border-brand-200/80 space-y-3 text-xs">
+                                <div class="flex items-center justify-between border-b border-brand-200/60 pb-2">
+                                    <span class="font-bold text-brand-900 text-sm">Learner Application Summary</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-brand-700 text-white font-semibold text-[10px]">Ready for Record Creation</span>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-700">
+                                    <div>
+                                        <span class="text-slate-400 block text-[11px]">LRN:</span>
+                                        <span id="rev-lrn" class="font-bold font-mono text-slate-900">-</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-400 block text-[11px]">Full Name:</span>
+                                        <span id="rev-name" class="font-bold text-slate-900">-</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-400 block text-[11px]">Grade & Strand:</span>
+                                        <span id="rev-grade" class="font-bold text-slate-900">-</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-400 block text-[11px]">Barangay:</span>
+                                        <span id="rev-brgy" class="font-bold text-slate-900">-</span>
+                                    </div>
+                                </div>
+                                <div class="pt-2 text-slate-600 text-[11px]">
+                                    <i class="fa-solid fa-circle-check text-brand-700 mr-1"></i> By clicking submit, the student record will be added to the Naujan Municipal High School database and queued for sectioning.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Navigation Buttons -->
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-100 mt-6">
+                            <button type="button" id="prev-step-btn" onclick="prevStep()" class="hidden px-5 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Back
+                            </button>
+                            <div class="ml-auto flex items-center gap-3">
+                                <button type="button" onclick="switchView('dashboard')" class="px-4 py-2 rounded-xl text-slate-500 font-semibold text-xs hover:text-slate-800 transition-colors">Cancel</button>
+                                <button type="button" id="next-step-btn" onclick="nextStep()" class="px-6 py-2.5 rounded-xl bg-brand-700 text-white font-bold text-xs hover:bg-brand-800 transition-all shadow-md shadow-brand-700/20">
+                                    Next Step <i class="fa-solid fa-chevron-right ml-1"></i>
+                                </button>
+                                <button type="submit" id="submit-step-btn" class="hidden px-6 py-2.5 rounded-xl bg-brand-700 text-white font-bold text-xs hover:bg-brand-800 transition-all shadow-md shadow-brand-700/20">
+                                    Complete Enrollment <i class="fa-solid fa-check ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 3: STUDENT RECORDS MASTERLIST ================= -->
+            <section id="view-records" class="hidden space-y-6">
+                <!-- Search & Filters Bar -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900">Student Records Directory</h2>
+                            <p class="text-xs text-slate-500">Comprehensive masterlist with LIS synchronization and academic archiving</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="exportToCSV()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-csv text-emerald-600"></i> Export CSV
+                            </button>
+                            <button onclick="showToast('DepEd SF10 generation queued for selected cohort.')" class="px-3.5 py-2 rounded-xl bg-brand-700 text-white font-bold text-xs hover:bg-brand-800 transition-colors shadow-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-print"></i> Generate SF10
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Controls -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="records-search" oninput="filterRecords()" placeholder="Search LRN, Student Name..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <select id="records-grade-filter" onchange="filterRecords()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All Grade Levels (7 to 12)</option>
+                                <option value="Grade 7">Grade 7</option>
+                                <option value="Grade 8">Grade 8</option>
+                                <option value="Grade 9">Grade 9</option>
+                                <option value="Grade 10">Grade 10</option>
+                                <option value="Grade 11">Grade 11</option>
+                                <option value="Grade 12">Grade 12</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="records-strand-filter" onchange="filterRecords()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All Tracks & Strands</option>
+                                <option value="JHS Regular">JHS Regular Curriculum</option>
+                                <option value="STEM">SHS STEM</option>
+                                <option value="HUMSS">SHS HUMSS</option>
+                                <option value="ABM">SHS ABM</option>
+                                <option value="TVL">SHS TVL Tracks</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="records-status-filter" onchange="filterRecords()" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-700 focus:outline-none">
+                                <option value="ALL">All Enrollment Status</option>
+                                <option value="Officially Enrolled">Officially Enrolled</option>
+                                <option value="Pending Documents">Pending Documents</option>
+                                <option value="For Sectioning">For Sectioning</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Records Table -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">Learner Ref No. (LRN)</th>
+                                    <th class="py-3 px-4">Student Name</th>
+                                    <th class="py-3 px-4">Grade & Section</th>
+                                    <th class="py-3 px-4">Track / Strand</th>
+                                    <th class="py-3 px-4">Guardian Contact</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700" id="masterlist-tbody">
+                                <!-- Dynamically generated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination footer -->
+                    <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span id="record-count-text">Showing 1 to 6 of 6 entries</span>
+                        <div class="flex items-center gap-1">
+                            <button class="px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-40" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="px-2.5 py-1 rounded bg-brand-700 text-white font-bold">1</button>
+                            <button class="px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-50">2</button>
+                            <button class="px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Slide-over Drawer for Student Details / SF10 Card -->
+    <div id="student-drawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeStudentDrawer()"></div>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between">
+                <!-- Drawer Header -->
+                <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-brand-900 text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-id-card text-brand-100"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-sm">Learner Detailed Folder</h3>
+                            <p class="text-[11px] text-brand-200 font-mono">Naujan MHS DepEd SF10 Archive</p>
+                        </div>
+                    </div>
+                    <button onclick="closeStudentDrawer()" class="p-2 rounded-lg text-brand-200 hover:text-white hover:bg-white/10">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Drawer Content -->
+                <div class="p-6 overflow-y-auto space-y-6 text-xs" id="drawer-content">
+                    <!-- Injected dynamically by JS -->
+                </div>
+
+                <!-- Drawer Actions Footer -->
+                <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2">
+                    <button onclick="closeStudentDrawer()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100">Close</button>
+                    <button onclick="showToast('Printing official enrollment certificate...');" class="px-4 py-2 rounded-xl bg-brand-700 text-white font-bold hover:bg-brand-800 shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> Print Registration Form
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Action Alert Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-brand-500 text-base" id="toast-icon"></i>
+        <p class="text-xs font-medium" id="toast-msg">Operation completed successfully.</p>
+    </div>
+
+    <script>
+        // Sample Initial Student Records Dataset (Naujan Municipal High School context)
+        const initialStudents = [
+            {
+                lrn: "109842140021",
+                name: "Alvarez, Bea Nicole M.",
+                grade: "Grade 11",
+                strand: "STEM",
+                section: "11-Newton (STEM)",
+                brgy: "Barcenaga",
+                guardian: "Roberto Alvarez",
+                contact: "0918-442-1920",
+                status: "Pending Review",
+                ave: "92.40",
+                docs: ["PSA Birth Certificate", "SF9 Card", "Good Moral"],
+                date: "2026-09-12"
+            },
+            {
+                lrn: "109842140045",
+                name: "Mendoza, John Paul C.",
+                grade: "Grade 7",
+                strand: "JHS Regular",
+                section: "7-Mabini",
+                brgy: "Poblacion 1",
+                guardian: "Carmelita Mendoza",
+                contact: "0927-118-4902",
+                status: "Officially Enrolled",
+                ave: "88.75",
+                docs: ["PSA Birth Certificate", "SF9 Card"],
+                date: "2026-09-15"
+            },
+            {
+                lrn: "109842140089",
+                name: "Reyes, Samantha Joy D.",
+                grade: "Grade 12",
+                strand: "HUMSS",
+                section: "12-Rizal (HUMSS)",
+                brgy: "Inarawan",
+                guardian: "Danilo Reyes",
+                contact: "0945-883-2941",
+                status: "Officially Enrolled",
+                ave: "91.10",
+                docs: ["PSA Birth Certificate", "SF9 Card", "Good Moral"],
+                date: "2026-09-18"
+            },
+            {
+                lrn: "109842140102",
+                name: "Castillo, Mark Kevin L.",
+                grade: "Grade 11",
+                strand: "TVL",
+                section: "11-Edison (ICT)",
+                brgy: "Bancuro",
+                guardian: "Leticia Castillo",
+                contact: "0999-551-7821",
+                status: "Pending Documents",
+                ave: "84.30",
+                docs: ["SF9 Card"],
+                date: "2026-09-22"
+            },
+            {
+                lrn: "109842140134",
+                name: "Villanueva, Angelica P.",
+                grade: "Grade 8",
+                strand: "JHS Regular",
+                section: "8-Luna",
+                brgy: "Malinao",
+                guardian: "Paolo Villanueva",
+                contact: "0917-882-6610",
+                status: "Officially Enrolled",
+                ave: "89.20",
+                docs: ["PSA Birth Certificate", "SF9 Card", "Good Moral"],
+                date: "2026-09-25"
+            },
+            {
+                lrn: "109842140199",
+                name: "Tolentino, Kyle Joshua V.",
+                grade: "Grade 11",
+                strand: "ABM",
+                section: "11-Paccioli (ABM)",
+                brgy: "San Agustin",
+                guardian: "Vilma Tolentino",
+                contact: "0933-221-8742",
+                status: "For Sectioning",
+                ave: "87.65",
+                docs: ["PSA Birth Certificate", "SF9 Card"],
+                date: "2026-09-28"
+            }
+        ];
+
+        let studentsList = [...initialStudents];
+        let currentStep = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboardTable();
+            renderMasterlist(studentsList);
+            initCharts();
+            setupMobileMenu();
+            setupNotificationToggle();
+        });
+
+        // Switch application tab views
+        function switchView(viewName) {
+            const views = ['dashboard', 'enrollment', 'records'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                const nav = document.getElementById(`nav-${v}`);
+                if (v === viewName) {
+                    el.classList.remove('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-700 text-white shadow-sm shadow-brand-700/20";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (nav) {
+                        nav.className = "nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-brand-50 hover:text-brand-800";
+                    }
+                }
+            });
+
+            // Close mobile menu if open
+            closeMobileSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Toggle Strand selection when Grade 11 or 12 is chosen
+        function toggleStrandOption() {
+            const grade = document.getElementById('form-grade').value;
+            const strandWrapper = document.getElementById('strand-wrapper');
+            const strandSelect = document.getElementById('form-strand');
+
+            if (grade === 'Grade 11' || grade === 'Grade 12') {
+                strandWrapper.classList.remove('opacity-40', 'pointer-events-none');
+                strandSelect.required = true;
+                if (strandSelect.value === 'N/A') {
+                    strandSelect.value = 'STEM';
+                }
+            } else {
+                strandWrapper.classList.add('opacity-40', 'pointer-events-none');
+                strandSelect.required = false;
+                strandSelect.value = 'N/A';
+            }
+        }
+
+        function updateWizardUI() {
+            // Hide all steps
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step-${i}`).classList.add('hidden');
+                const ind = document.getElementById(`step-ind-${i}`);
+                const badge = ind.querySelector('span:first-child');
+                
+                if (i < currentStep) {
+                    badge.className = "w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center";
+                    badge.innerHTML = '<i class="fa-solid fa-check"></i>';
+                } else if (i === currentStep) {
+                    badge.className = "w-7 h-7 rounded-full bg-brand-700 text-white font-bold text-xs flex items-center justify-center shadow-sm";
+                    badge.innerHTML = i;
+                } else {
+                    badge.className = "w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center";
+                    badge.innerHTML = i;
+                }
+
+                if (i <= 3) {
+                    const bar = document.getElementById(`bar-${i}`);
+                    if (i < currentStep) {
+                        bar.className = "h-0.5 flex-1 mx-2 bg-emerald-600";
+                    } else {
+                        bar.className = "h-0.5 flex-1 mx-2 bg-slate-200";
+                    }
+                }
+            }
+
+            // Show active step
+            document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+
+            // Button controls
+            const prevBtn = document.getElementById('prev-step-btn');
+            const nextBtn = document.getElementById('next-step-btn');
+            const submitBtn = document.getElementById('submit-step-btn');
+
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (currentStep === 4) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+                populateReviewSummary();
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function nextStep() {
+            if (validateCurrentStep(currentStep)) {
+                if (currentStep < 4) {
+                    currentStep++;
+                    updateWizardUI();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateWizardUI();
+            }
+        }
+
+        function validateCurrentStep(step) {
+            if (step === 1) {
+                const lrn = document.getElementById('form-lrn').value.trim();
+                const lname = document.getElementById('form-lname').value.trim();
+                const fname = document.getElementById('form-fname').value.trim();
+                const dob = document.getElementById('form-dob').value;
+                const sex = document.getElementById('form-sex').value;
+                const brgy = document.getElementById('form-brgy').value;
+
+                if (!lrn || lrn.length !== 12 || isNaN(lrn)) {
+                    showToast('Please enter a valid 12-digit numeric DepEd LRN.');
+                    return false;
+                }
+                if (!lname || !fname || !dob || !sex || !brgy) {
+                    showToast('Please fill in all required basic learner identity fields.');
+                    return false;
+                }
+            } else if (step === 2) {
+                const grade = document.getElementById('form-grade').value;
+                const school = document.getElementById('form-last-school').value.trim();
+                const ave = document.getElementById('form-gen-ave').value;
+
+                if (!grade || !school || !ave) {
+                    showToast('Please specify the grade level, previous school, and general average.');
+                    return false;
+                }
+            } else if (step === 3) {
+                const guardian = document.getElementById('form-guardian').value.trim();
+                const contact = document.getElementById('form-contact').value.trim();
+
+                if (!guardian || !contact) {
+                    showToast('Please specify parent/guardian contact information.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function populateReviewSummary() {
+            document.getElementById('rev-lrn').textContent = document.getElementById('form-lrn').value;
+            const full = `${document.getElementById('form-lname').value}, ${document.getElementById('form-fname').value} ${document.getElementById('form-mname').value}`;
+            document.getElementById('rev-name').textContent = full;
+            
+            const grade = document.getElementById('form-grade').value;
+            const strand = document.getElementById('form-strand').value;
+            document.getElementById('rev-grade').textContent = (grade === 'Grade 11' || grade === 'Grade 12') ? `${grade} (${strand})` : grade;
+            document.getElementById('rev-brgy').textContent = document.getElementById('form-brgy').value;
+        }
+
+        // Handle Enrollment Submission
+        function handleEnrollmentSubmit(e) {
+            e.preventDefault();
+            const lrn = document.getElementById('form-lrn').value;
+            const lname = document.getElementById('form-lname').value;
+            const fname = document.getElementById('form-fname').value;
+            const grade = document.getElementById('form-grade').value;
+            const strandVal = document.getElementById('form-strand').value;
+            const brgy = document.getElementById('form-brgy').value;
+            const guardian = document.getElementById('form-guardian').value;
+            const contact = document.getElementById('form-contact').value;
+            const ave = document.getElementById('form-gen-ave').value;
+
+            const isSHS = (grade === 'Grade 11' || grade === 'Grade 12');
+            const cleanStrand = isSHS ? strandVal : 'JHS Regular';
+            const defaultSection = isSHS ? `${grade.replace('Grade ', '')}-Cohort A (${cleanStrand})` : `${grade.replace('Grade ', '')}-Sampaguita`;
+
+            const newRecord = {
+                lrn: lrn,
+                name: `${lname}, ${fname}`,
+                grade: grade,
+                strand: cleanStrand,
+                section: defaultSection,
+                brgy: brgy,
+                guardian: guardian,
+                contact: contact,
+                status: "Officially Enrolled",
+                ave: parseFloat(ave).toFixed(2),
+                docs: ["PSA Birth Certificate", "SF9 Card"],
+                date: "2026-09-30"
+            };
+
+            studentsList.unshift(newRecord);
+            renderDashboardTable();
+            renderMasterlist(studentsList);
+
+            showToast(`Enrollment successful for ${fname} ${lname}! LRN: ${lrn}`);
+
+            // Reset form
+            document.getElementById('enrollment-wizard-form').reset();
+            currentStep = 1;
+            updateWizardUI();
+
+            // Switch to Masterlist
+            setTimeout(() => {
+                switchView('records');
+            }, 800);
+        }
+
+        function renderDashboardTable() {
+            const tbody = document.getElementById('recent-enrollment-tbody');
+            tbody.innerHTML = '';
+
+            studentsList.slice(0, 5).forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-colors";
+                
+                let badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (s.status === 'Pending Documents') badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                if (s.status === 'For Sectioning') badgeClass = "bg-blue-50 text-blue-700 border-blue-200";
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-mono font-bold text-slate-800">${s.lrn}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-900">${s.name}</td>
+                    <td class="py-3 px-4">${s.grade} <span class="text-slate-400 font-normal">(${s.strand})</span></td>
+                    <td class="py-3 px-4 text-slate-500">${s.brgy}</td>
+                    <td class="py-3 px-4 text-slate-500">${s.date}</td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badgeClass}">
+                            ${s.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="openStudentDrawer('${s.lrn}')" class="p-1.5 text-brand-700 hover:text-brand-900 hover:bg-brand-50 rounded-lg transition-colors font-medium">
+                            <i class="fa-regular fa-eye"></i> View
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderMasterlist(list) {
+            const tbody = document.getElementById('masterlist-tbody');
+            tbody.innerHTML = '';
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-8 text-center text-slate-400 font-medium">
+                            <i class="fa-solid fa-folder-open text-2xl mb-1 block"></i>
+                            No student records matching current filters.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('record-count-text').textContent = 'Showing 0 entries';
+                return;
+            }
+
+            list.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-colors";
+
+                let badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (s.status === 'Pending Documents') badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                if (s.status === 'For Sectioning') badgeClass = "bg-blue-50 text-blue-700 border-blue-200";
+
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-mono font-bold text-brand-900">${s.lrn}</td>
+                    <td class="py-3.5 px-4 font-semibold text-slate-900">${s.name}</td>
+                    <td class="py-3.5 px-4">
+                        <span class="font-bold text-slate-800">${s.grade}</span>
+                        <span class="block text-[11px] text-slate-500">${s.section}</span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2 py-0.5 rounded-md bg-slate-100 font-semibold text-[11px] text-slate-700">${s.strand}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-500 font-mono text-[11px]">${s.contact}</td>
+                    <td class="py-3.5 px-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badgeClass}">
+                            ${s.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-right space-x-1">
+                        <button onclick="openStudentDrawer('${s.lrn}')" class="px-2.5 py-1 text-slate-700 bg-slate-100 hover:bg-brand-50 hover:text-brand-800 rounded-lg text-xs font-semibold transition-colors">
+                            Profile
+                        </button>
+                        <button onclick="approveStudent('${s.lrn}')" class="px-2.5 py-1 text-white bg-brand-700 hover:bg-brand-800 rounded-lg text-xs font-semibold transition-colors" title="Quick Verify">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('record-count-text').textContent = `Showing 1 to ${list.length} of ${list.length} entries`;
+        }
+
+        function filterRecords() {
+            const q = document.getElementById('records-search').value.toLowerCase().trim();
+            const gradeFilter = document.getElementById('records-grade-filter').value;
+            const strandFilter = document.getElementById('records-strand-filter').value;
+            const statusFilter = document.getElementById('records-status-filter').value;
+
+            const filtered = studentsList.filter(s => {
+                const matchQuery = s.lrn.includes(q) || s.name.toLowerCase().includes(q) || s.section.toLowerCase().includes(q);
+                const matchGrade = (gradeFilter === 'ALL') || s.grade === gradeFilter;
+                const matchStrand = (strandFilter === 'ALL') || s.strand.includes(strandFilter);
+                const matchStatus = (statusFilter === 'ALL') || s.status === statusFilter;
+                return matchQuery && matchGrade && matchStrand && matchStatus;
+            });
+
+            renderMasterlist(filtered);
+        }
+
+        function approveStudent(lrn) {
+            const student = studentsList.find(s => s.lrn === lrn);
+            if (student) {
+                student.status = "Officially Enrolled";
+                renderDashboardTable();
+                filterRecords();
+                showToast(`Student ${student.name} marked as Officially Enrolled!`);
+            }
+        }
+
+        function openStudentDrawer(lrn) {
+            const s = studentsList.find(item => item.lrn === lrn);
+            if (!s) return;
+
+            const container = document.getElementById('drawer-content');
+            container.innerHTML = `
+                <div class="text-center pb-4 border-b border-slate-100">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-100 border-2 border-brand-300 text-brand-800 font-extrabold text-xl flex items-center justify-center mx-auto mb-2 shadow-inner">
+                        ${s.name.split(' ')[0][0]}${s.name.split(',')[0][0]}
+                    </div>
+                    <h4 class="font-heading font-extrabold text-slate-900 text-base">${s.name}</h4>
+                    <p class="font-mono text-xs text-brand-700 font-bold mt-0.5">LRN: ${s.lrn}</p>
+                    <span class="inline-block mt-2 px-2.5 py-0.5 bg-brand-50 text-brand-800 border border-brand-200 rounded-full font-bold text-[10px]">
+                        ${s.status}
+                    </span>
+                </div>
+
+                <div class="space-y-3">
+                    <h5 class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">Academic Placement</h5>
+                    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Enrolled Grade:</span>
+                            <span class="font-bold text-slate-800">${s.grade}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Track / Strand:</span>
+                            <span class="font-bold text-slate-800">${s.strand}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Section:</span>
+                            <span class="font-bold text-brand-800">${s.section}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">General Average:</span>
+                            <span class="font-bold text-slate-800">${s.ave}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h5 class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">Demographic & Residence</h5>
+                    <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Barangay Residence:</span>
+                            <span class="font-semibold text-slate-800">${s.brgy}, Naujan</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Parent / Guardian:</span>
+                            <span class="font-semibold text-slate-800">${s.guardian}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Guardian Contact:</span>
+                            <span class="font-mono font-semibold text-slate-800">${s.contact}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Enrollment Date:</span>
+                            <span class="font-semibold text-slate-800">${s.date}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h5 class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">DepEd Credentials Verified</h5>
+                    <div class="space-y-1">
+                        ${s.docs.map(doc => `
+                            <div class="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-700">
+                                <i class="fa-solid fa-file-circle-check text-emerald-600"></i>
+                                <span>${doc}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('student-drawer').classList.remove('hidden');
+        }
+
+        function closeStudentDrawer() {
+            document.getElementById('student-drawer').classList.add('hidden');
+        }
+
+        // CSV Exporter
+        function exportToCSV() {
+            let csv = "LRN,Name,Grade,Strand,Section,Barangay,Contact,Status,GeneralAverage\n";
+            studentsList.forEach(s => {
+                csv += `"${s.lrn}","${s.name}","${s.grade}","${s.strand}","${s.section}","${s.brgy}","${s.contact}","${s.status}","${s.ave}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `NMHS_Enrollment_Masterlist_${new Date().toISOString().slice(0,10)}.csv`);
+            a.click();
+            showToast('Masterlist CSV exported successfully.');
+        }
+
+        function initCharts() {
+            // Chart 1: Enrollment Trend Velocity
+            const trendCtx = document.getElementById('enrollmentTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1 (Jun)', 'Week 2', 'Week 3', 'Week 4', 'Week 5 (Jul)', 'Week 6', 'Week 7', 'Week 8 (Aug)', 'Week 9 (Sep)'],
+                    datasets: [
+                        {
+                            label: 'Junior High (G7-10)',
+                            data: [180, 320, 580, 890, 1150, 1340, 1480, 1540, 1560],
+                            borderColor: '#15803d',
+                            backgroundColor: 'rgba(21, 128, 61, 0.08)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2.5
+                        },
+                        {
+                            label: 'Senior High (G11-12)',
+                            data: [90, 190, 310, 480, 640, 780, 850, 900, 920],
+                            borderColor: '#0d9488',
+                            backgroundColor: 'rgba(13, 148, 136, 0.04)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2.5,
+                            borderDash: [4, 4]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'Inter', size: 11, weight: '600' },
+                                boxWidth: 12
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: SHS Strand Doughnut
+            const strandCtx = document.getElementById('strandDoughnutChart').getContext('2d');
+            new Chart(strandCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['STEM', 'HUMSS', 'ABM', 'TVL / ICT'],
+                    datasets: [{
+                        data: [312, 258, 193, 157],
+                        backgroundColor: ['#15803d', '#14b8a6', '#f59e0b', '#6366f1'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Notification and mobile sidebar handlers
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                backdrop.classList.toggle('hidden');
+            });
+
+            backdrop.addEventListener('click', closeMobileSidebar);
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function setupNotificationToggle() {
+            const btn = document.getElementById('notif-btn');
+            const menu = document.getElementById('notif-menu');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Dynamic Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+    <script src="/assets/app.js"></script>
+</body>
+</html>

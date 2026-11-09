@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Naujan Municipal High School (SERMS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/glassmorphism.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',
+                            500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534',
+                            900: '#14532d', 950: '#052e16'
+                        },
+                        gold: { 50: '#fefce8', 100: '#fef9c3', 200: '#fef08a', 500: '#eab308', 600: '#ca8a04' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
+    <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-4">
+            <a href="/naujan_mhs_official_public_portal.html" class="flex min-w-0 items-center gap-3">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 text-gold-400 shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </span>
+                <span class="min-w-0">
+                    <span class="block truncate font-heading text-sm font-extrabold text-brand-950 sm:text-base">Naujan Municipal High School</span>
+                    <span class="block text-[11px] font-medium text-slate-500">Student Enrollment & Records Management System</span>
+                </span>
+            </a>
+            <div id="student-account-actions" class="flex shrink-0 items-center gap-2 sm:gap-3">
+                <div class="hidden text-right sm:block">
+                    <p id="student-account-name" class="max-w-48 truncate text-xs font-bold text-slate-800">Student</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-700">Student Account</p>
+                </div>
+                <span id="student-account-avatar" class="hidden h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-sm font-extrabold text-brand-900 sm:flex" aria-hidden="true">NM</span>
+                <button id="student-sign-out" type="button" class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-600 transition hover:bg-slate-50 hover:text-brand-800" aria-label="Sign out">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i><span class="hidden sm:inline">Sign out</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-7 sm:px-6 sm:py-9 lg:px-8">
+        <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 p-6 text-white shadow-xl sm:p-9">
+            <div class="pointer-events-none absolute -right-12 -top-20 h-64 w-64 rounded-full border-[32px] border-white/5"></div>
+            <div class="pointer-events-none absolute -bottom-24 right-1/4 h-52 w-52 rounded-full bg-emerald-400/10 blur-3xl"></div>
+            <div class="relative flex flex-col justify-between gap-6 md:flex-row md:items-end">
+                <div class="max-w-2xl space-y-3">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-emerald-100">
+                        <i class="fa-solid fa-user-graduate text-gold-300"></i> Student dashboard
+                    </span>
+                    <h1 class="font-heading text-2xl font-extrabold tracking-tight sm:text-3xl">Welcome, <span id="student-welcome-name">Student</span></h1>
+                    <p class="max-w-xl text-sm leading-relaxed text-brand-100">View the enrollment information linked to your account and keep your application tracking code somewhere safe.</p>
+                </div>
+                <button id="student-start-enrollment" type="button" class="hidden shrink-0 items-center justify-center gap-2 rounded-xl bg-gold-500 px-5 py-3 text-xs font-extrabold text-slate-950 shadow-lg shadow-black/10 transition hover:bg-gold-400">
+                    <i class="fa-solid fa-file-pen"></i><span>Start an application</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="student-enrollment-form-section" class="hidden overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-lg shadow-brand-900/5">
+            <div class="border-b border-brand-100 bg-gradient-to-r from-brand-50 to-white px-5 py-5 sm:px-7">
+                <span class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-brand-900">
+                    <i class="fa-solid fa-file-circle-plus"></i> Student enrollment
+                </span>
+                <h2 class="mt-3 font-heading text-xl font-extrabold text-slate-900">Submit your enrollment application</h2>
+                <p id="student-enrollment-school-year" class="mt-1 text-xs text-slate-600">This application will be linked to your signed-in student account and sent to the registrar for review.</p>
+            </div>
+            <div id="student-enrollment-closed-message" class="hidden m-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs leading-relaxed text-amber-900 sm:m-7">
+                Online enrollment is currently closed. You can still view your existing student dashboard information.
+            </div>
+            <form id="student-enrollment-form" class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-7">
+                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Student LRN
+                    <input id="student-enrollment-lrn" name="lrn" readonly class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 font-mono text-sm text-slate-500">
+                    <span class="mt-1 block text-[10px] font-normal text-slate-500">This is fixed to the LRN verified for your signed-in account.</span>
+                </label>
+                <label class="text-xs font-bold text-slate-700">First name
+                    <input name="firstName" maxlength="120" autocomplete="given-name" required class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Last name
+                    <input name="lastName" maxlength="120" autocomplete="family-name" required class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Middle name <span class="font-normal text-slate-400">(optional)</span>
+                    <input name="middleName" maxlength="120" autocomplete="additional-name" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Date of birth <span class="font-normal text-slate-400">(optional)</span>
+                    <input name="dateOfBirth" type="date" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Grade level
+                    <select name="grade" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                        <option value="">Select grade level</option>
+                        <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option>
+                        <option>Grade 11</option><option>Grade 12</option>
+                    </select>
+                </label>
+                <label class="text-xs font-bold text-slate-700">Sex <span class="font-normal text-slate-400">(optional)</span>
+                    <select name="sex" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                        <option value="">Select</option><option>Female</option><option>Male</option>
+                    </select>
+                </label>
+                <label class="text-xs font-bold text-slate-700">SHS strand <span class="font-normal text-slate-400">(Grade 11–12)</span>
+                    <select name="strand" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                        <option value="">Select if applicable</option><option value="STEM">STEM</option><option value="ABM">ABM</option>
+                        <option value="HUMSS">HUMSS</option><option value="TVL-AGRI">TVL: Agri-Fishery</option><option value="TVL-ICT">TVL: ICT</option>
+                    </select>
+                </label>
+                <label class="text-xs font-bold text-slate-700">Barangay <span class="font-normal text-slate-400">(optional)</span>
+                    <input name="barangay" maxlength="120" autocomplete="address-level3" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Last school attended <span class="font-normal text-slate-400">(optional)</span>
+                    <input name="lastSchool" maxlength="120" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Previous general average <span class="font-normal text-slate-400">(optional)</span>
+                    <input name="average" type="number" min="0" max="100" step="0.01" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700">Parent / guardian
+                    <input name="guardian" maxlength="120" required class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <label class="text-xs font-bold text-slate-700 sm:col-span-2">Contact number
+                    <input name="contact" type="tel" maxlength="120" autocomplete="tel" required class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm font-normal focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                </label>
+                <p id="student-enrollment-form-status" role="status" aria-live="polite" class="hidden rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-800 sm:col-span-2"></p>
+                <div class="flex flex-col justify-between gap-3 border-t border-slate-100 pt-4 sm:col-span-2 sm:flex-row sm:items-center">
+                    <p class="max-w-xl text-[10px] leading-relaxed text-slate-500">Please check your information before submitting. The registrar reviews enrollment applications; submission does not mean you are officially enrolled.</p>
+                    <button id="student-enrollment-submit" type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-800 px-5 py-3 text-xs font-extrabold text-white shadow transition hover:bg-brand-900 disabled:cursor-not-allowed disabled:opacity-50">
+                        <i class="fa-solid fa-paper-plane"></i> Submit to registrar
+                    </button>
+                </div>
+            </form>
+            <div id="student-enrollment-success" class="hidden p-6 sm:p-8" role="status" aria-live="polite">
+                <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                    <h3 class="font-heading text-base font-extrabold text-emerald-950"><i class="fa-solid fa-circle-check mr-2 text-emerald-700"></i>Application submitted</h3>
+                    <p class="mt-2 text-xs text-emerald-900">Your application is pending registrar review. Save your tracking code:</p>
+                    <p id="student-enrollment-success-code" class="mt-3 break-all rounded-xl bg-white p-3 font-mono text-sm font-extrabold text-brand-900"></p>
+                    <p class="mt-3 text-[11px] text-emerald-900">The new status and application details are now shown in My enrollment below.</p>
+                </div>
+            </div>
+        </section>
+
+        <section aria-label="Enrollment overview" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-slate-500">Application status</p>
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><i class="fa-solid fa-clipboard-check"></i></span>
+                </div>
+                <p id="student-status" class="mt-4 text-lg font-extrabold text-slate-900">Loading</p>
+                <p class="mt-1 text-[11px] text-slate-500">Latest status saved by the registrar</p>
+            </article>
+            <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-slate-500">Grade level</p>
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><i class="fa-solid fa-school"></i></span>
+                </div>
+                <p id="student-grade" class="mt-4 text-lg font-extrabold text-slate-900">—</p>
+                <p class="mt-1 text-[11px] text-slate-500">From your enrollment record</p>
+            </article>
+            <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-slate-500">Strand / program</p>
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-700"><i class="fa-solid fa-book-open"></i></span>
+                </div>
+                <p id="student-strand" class="mt-4 text-lg font-extrabold text-slate-900">—</p>
+                <p class="mt-1 text-[11px] text-slate-500">Shown when recorded by the school</p>
+            </article>
+            <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-slate-500">Section</p>
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-700"><i class="fa-solid fa-people-group"></i></span>
+                </div>
+                <p id="student-section" class="mt-4 text-lg font-extrabold text-slate-900">Not assigned</p>
+                <p class="mt-1 text-[11px] text-slate-500">Section assignments may not be available yet</p>
+            </article>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <article class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-7 lg:col-span-2">
+                <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-5 sm:flex-row sm:items-center">
+                    <div>
+                        <h2 class="font-heading text-lg font-extrabold text-slate-900">My enrollment</h2>
+                        <p class="mt-1 text-xs text-slate-500">Application details linked to your signed-in student account.</p>
+                    </div>
+                    <span id="student-record-badge" class="inline-flex w-fit items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-[10px] font-bold text-slate-600">
+                        <i class="fa-solid fa-circle-info"></i><span>Checking record</span>
+                    </span>
+                </div>
+                <div id="student-enrollment-panel" class="py-6">
+                    <p id="student-enrollment-message" class="text-sm leading-relaxed text-slate-600">Loading your enrollment record…</p>
+                    <dl id="student-enrollment-details" class="mt-5 hidden grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="rounded-2xl bg-slate-50 p-4">
+                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tracking code</dt>
+                            <dd id="student-tracking-code" class="mt-2 break-all font-mono text-sm font-extrabold text-brand-900">—</dd>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 p-4">
+                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Submitted</dt>
+                            <dd id="student-submitted-date" class="mt-2 text-sm font-bold text-slate-800">—</dd>
+                        </div>
+                    </dl>
+                </div>
+                <p class="border-t border-slate-100 pt-4 text-[11px] leading-relaxed text-slate-500">A status of Pending Review means the registrar has not completed its review. This dashboard does not verify PSA or DepEd LIS records.</p>
+            </article>
+
+            <aside class="space-y-4">
+                <article class="rounded-3xl border border-brand-200 bg-brand-50 p-5 sm:p-6">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-800 shadow-sm"><i class="fa-solid fa-circle-question"></i></div>
+                    <h2 class="mt-4 font-heading text-base font-extrabold text-brand-950">Need help?</h2>
+                    <p class="mt-2 text-xs leading-relaxed text-brand-900/80">If your application is missing or you need help with account access, contact the school registrar.</p>
+                    <a href="/naujan_mhs_account_recovery_portal.html" class="mt-4 inline-flex items-center gap-2 text-xs font-extrabold text-brand-900 hover:underline">
+                        Account recovery <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </article>
+                <a href="/naujan_mhs_official_public_portal.html" class="flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-5 text-xs font-bold text-slate-700 shadow-sm transition hover:border-brand-200 hover:text-brand-800">
+                    <span><i class="fa-solid fa-arrow-left mr-2 text-brand-700"></i>Return to school portal</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i>
+                </a>
+            </aside>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <article class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+                    <div>
+                        <h2 class="font-heading text-base font-extrabold text-slate-900">Attendance</h2>
+                        <p class="mt-1 text-[11px] text-slate-500">Recent class records, when available</p>
+                    </div>
+                    <span id="student-attendance-count" class="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold text-brand-800">Loading</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[420px] text-left text-xs">
+                        <thead class="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500">
+                            <tr><th class="px-5 py-3 font-bold sm:px-6">Date</th><th class="px-5 py-3 font-bold">Section</th><th class="px-5 py-3 font-bold">Status</th></tr>
+                        </thead>
+                        <tbody id="student-attendance-body" class="divide-y divide-slate-100">
+                            <tr><td colspan="3" class="px-5 py-6 text-center text-slate-500 sm:px-6">Loading attendance…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="border-t border-slate-100 px-5 py-3 text-[10px] text-slate-500 sm:px-6">Attendance shown here is limited to records saved in SERMS.</p>
+            </article>
+
+            <article class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+                <div class="border-b border-slate-100 px-5 py-4 sm:px-6">
+                    <h2 class="font-heading text-base font-extrabold text-slate-900">Reviewed grades</h2>
+                    <p class="mt-1 text-[11px] text-slate-500">Assessment scores from grade submissions approved by the school</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[460px] text-left text-xs">
+                        <thead class="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500">
+                            <tr><th class="px-5 py-3 font-bold sm:px-6">Learning area</th><th class="px-5 py-3 font-bold">Term</th><th class="px-5 py-3 font-bold">Recorded scores</th></tr>
+                        </thead>
+                        <tbody id="student-grades-body" class="divide-y divide-slate-100">
+                            <tr><td colspan="3" class="px-5 py-6 text-center text-slate-500 sm:px-6">Loading reviewed grades…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="border-t border-slate-100 px-5 py-3 text-[10px] text-slate-500 sm:px-6">Only approved submissions appear. These component scores are not a report card or final grade.</p>
+            </article>
+        </section>
+    </main>
+
+    <footer class="mt-auto border-t border-slate-200 bg-white px-4 py-5 text-center text-[10px] text-slate-500">
+        Naujan Municipal High School · Student Enrollment & Records Management System
+    </footer>
+    <div id="toast" class="pointer-events-none fixed bottom-6 right-6 z-50 flex max-w-sm translate-y-24 items-center gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-white opacity-0 shadow-2xl transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-gold-400" id="toast-icon"></i>
+        <p id="toast-msg" class="text-xs font-medium"></p>
+    </div>
+    <script src="/assets/app.js"></script>
+</body>
+</html>
