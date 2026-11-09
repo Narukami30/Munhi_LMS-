@@ -1,0 +1,95 @@
+:root {
+    --serms-glass-surface: rgba(255, 255, 255, 0.76);
+    --serms-glass-surface-strong: rgba(255, 255, 255, 0.88);
+    --serms-glass-border: rgba(255, 255, 255, 0.78);
+    --serms-glass-shadow: 0 12px 36px rgba(15, 23, 42, 0.07);
+}
+
+html {
+    background: #f8fafc;
+}
+
+body {
+    background-color: #f8fafc;
+    background-image:
+        radial-gradient(ellipse at 8% 4%, rgba(34, 197, 94, 0.075), transparent 36rem),
+        radial-gradient(ellipse at 94% 26%, rgba(234, 179, 8, 0.055), transparent 32rem);
+    background-attachment: fixed;
+}
+
+body :is(header.sticky, header[class*="sticky"]) {
+    background-color: rgba(255, 255, 255, 0.78);
+    border-color: rgba(226, 232, 240, 0.72);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    backdrop-filter: blur(18px) saturate(145%);
+}
+
+body :is(div, section, article)[class~="bg-white"][class~="rounded-2xl"][class*="border-slate-200"],
+body :is(div, section, article)[class~="bg-white"][class~="rounded-3xl"][class*="border-slate-200"] {
+    background-color: var(--serms-glass-surface);
+    border-color: var(--serms-glass-border);
+    box-shadow: var(--serms-glass-shadow);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+}
+
+body div.fixed > div[class~="bg-white"][class*="rounded-"] {
+    background-color: var(--serms-glass-surface-strong);
+    border-color: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 24px 70px rgba(2, 6, 23, 0.2);
+    -webkit-backdrop-filter: blur(22px) saturate(145%);
+    backdrop-filter: blur(22px) saturate(145%);
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+    body:has(#mobile-toggle) header.sticky > div:first-child nav {
+        display: none !important;
+    }
+
+    body:has(#mobile-toggle) header.sticky #mobile-toggle {
+        display: inline-flex !important;
+    }
+
+    body:has(#mobile-toggle) header.sticky a.group > div:last-child > div:first-child > span:nth-of-type(2) {
+        display: none !important;
+    }
+
+    body:has(#mobile-toggle) header.sticky #mobile-nav.hidden {
+        display: none !important;
+    }
+
+    body:has(#mobile-toggle) header.sticky #mobile-nav:not(.hidden) {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        z-index: 40;
+        display: block !important;
+        border-color: rgba(226, 232, 240, 0.72);
+        background-color: rgba(255, 255, 255, 0.92);
+        -webkit-backdrop-filter: blur(18px) saturate(145%);
+        backdrop-filter: blur(18px) saturate(145%);
+    }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    body :is(header.sticky, header[class*="sticky"]) {
+        background-color: rgba(255, 255, 255, 0.96);
+    }
+
+    body :is(div, section, article)[class~="bg-white"][class~="rounded-2xl"][class*="border-slate-200"],
+    body :is(div, section, article)[class~="bg-white"][class~="rounded-3xl"][class*="border-slate-200"],
+    body div.fixed > div[class~="bg-white"][class*="rounded-"] {
+        background-color: #fff;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    body :is(header.sticky, header[class*="sticky"]) {
+        background-color: rgba(255, 255, 255, 0.96);
+    }
+
+    body :is(div, section, article)[class~="bg-white"][class*="border-slate-200"] {
+        background-color: rgba(255, 255, 255, 0.96);
+    }
+}
