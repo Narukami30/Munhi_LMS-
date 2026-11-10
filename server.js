@@ -1,4 +1,13 @@
-require('dotenv').config();
+const fs = require('node:fs');
+const dotenv = require('dotenv');
+
+const configuredEnvFile = process.env.SERMS_ENV_FILE;
+const renderEnvFile = '/etc/secrets/.env';
+const envFile = configuredEnvFile || (fs.existsSync(renderEnvFile) ? renderEnvFile : null);
+if (envFile && !fs.existsSync(envFile)) {
+  throw new Error(`SERMS_ENV_FILE points to a file that does not exist: ${envFile}`);
+}
+dotenv.config(envFile ? { path: envFile } : undefined);
 
 const crypto = require('node:crypto');
 const path = require('node:path');
@@ -12,6 +21,9 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const mongoUri = process.env.MONGODB_URI || (process.env.NODE_ENV === 'production' ? '' : 'mongodb://127.0.0.1:27017/naujan_mhs_serms');
+if (!mongoUri) {
+  throw new Error('MONGODB_URI is required in production. Set it in Render Environment, or upload a secret file and set SERMS_ENV_FILE to its /etc/secrets/<filename> path.');
+}
 const trustProxyHops = process.env.TRUST_PROXY_HOPS;
 const roles = ['student', 'teacher', 'registrar', 'principal'];
 
@@ -1418,7 +1430,6 @@ app.use((error, req, res, next) => {
 });
 
 async function start() {
-  if (!mongoUri) throw new Error('MONGODB_URI is required in production. Set it to your MongoDB connection string.');
   if (!process.env.MONGODB_URI && process.env.NODE_ENV !== 'production') {
     console.log('MONGODB_URI is not set; using local MongoDB at mongodb://127.0.0.1:27017/naujan_mhs_serms');
   }
