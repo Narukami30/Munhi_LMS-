@@ -70,16 +70,34 @@
         }
         @media print {
             body * {
-                visibility: hidden;
+                visibility: hidden !important;
             }
             #printable-report-card, #printable-report-card * {
-                visibility: visible;
+                visibility: visible !important;
+            }
+            #portfolio-drawer,
+            #portfolio-drawer > div,
+            #portfolio-drawer > div > div {
+                position: static !important;
+                display: block !important;
+                width: auto !important;
+                height: auto !important;
+                max-width: none !important;
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                background: #fff !important;
+                box-shadow: none !important;
             }
             #printable-report-card {
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 100%;
+                height: auto !important;
+                overflow: visible !important;
+                padding: 1rem;
+                background: #fff;
             }
         }
     </style>
@@ -95,7 +113,8 @@
                 </button>
                 <div class="flex items-center gap-3">
                     <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-900 via-brand-800 to-brand-700 p-0.5 shadow-md shadow-brand-800/20 flex items-center justify-center text-white">
-                        <i class="fa-solid fa-chalkboard-user text-xl"></i>
+                        <i data-school-logo-fallback class="fa-solid fa-chalkboard-user text-xl"></i>
+                        <img data-school-logo alt="School logo" class="absolute inset-0 hidden h-full w-full rounded-2xl object-contain bg-white p-1">
                         <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-gold-500 border-2 border-white rounded-full"></span>
                     </div>
                     <div>
@@ -237,7 +256,7 @@
                         <span>DepEd Order No. 8, s. 2015</span>
                     </div>
                     <p class="text-[11px] text-brand-100/90 leading-relaxed">
-                        Science Component Weights: Written Work (40%), Performance Tasks (40%), Term Exam (20%). Lowest Passing Transmuted Grade is 75.
+                        Teachers can customize Written Works, Performance Tasks, and Term Exam weights for each subject, class, and term. Weights must total 100%.
                     </p>
                 </div>
             </div>
@@ -437,7 +456,7 @@
                     </div>
 
                     <!-- Filter / Term Switchers & Weights -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-3 border-t border-slate-100 text-xs">
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1">Class Section:</label>
                             <select id="teacher-section-input" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium focus:ring-2 focus:ring-brand-700 focus:outline-none">
@@ -456,14 +475,47 @@
                                 <option value="3">Term 3</option>
                             </select>
                         </div>
-                        <!-- Subject Weights Banner -->
-                        <div class="bg-brand-50 p-2.5 rounded-xl border border-brand-200 flex flex-col justify-center">
-                            <span class="text-[10px] font-extrabold uppercase text-brand-900 tracking-wider">DepEd Weights (Science):</span>
-                            <div class="flex justify-between font-bold text-brand-800 text-[11px] mt-0.5">
-                                <span>WW: 40%</span>
-                                <span>PT: 40%</span>
-                                <span>QA: 20%</span>
+                        <div class="sm:col-span-2 lg:col-span-3 bg-brand-50 p-3 rounded-xl border border-brand-200">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                                <div>
+                                    <span class="text-[10px] font-extrabold uppercase text-brand-900 tracking-wider">Customize grade component weights</span>
+                                    <p class="text-[10px] text-brand-800">Set the percentage contribution for this subject, section, and term. The total must equal 100%.</p>
+                                </div>
+                                <span id="teacher-weight-total" class="font-bold text-[11px] text-brand-800">Total: 100%</span>
                             </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <label class="flex items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-emerald-900">
+                                    <span class="font-bold">Written Works</span>
+                                    <span class="flex items-center gap-1"><input id="teacher-weight-ww" type="number" min="0" max="100" step="1" value="40" class="w-16 rounded-lg border border-slate-200 px-2 py-1 text-right font-bold text-slate-800 focus:ring-2 focus:ring-brand-700 focus:outline-none"><span>%</span></span>
+                                </label>
+                                <label class="flex items-center justify-between gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-blue-900">
+                                    <span class="font-bold">Performance Tasks</span>
+                                    <span class="flex items-center gap-1"><input id="teacher-weight-pt" type="number" min="0" max="100" step="1" value="40" class="w-16 rounded-lg border border-slate-200 px-2 py-1 text-right font-bold text-slate-800 focus:ring-2 focus:ring-brand-700 focus:outline-none"><span>%</span></span>
+                                </label>
+                                <label class="flex items-center justify-between gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 text-amber-900">
+                                    <span class="font-bold">Term Exam</span>
+                                    <span class="flex items-center gap-1"><input id="teacher-weight-qa" type="number" min="0" max="100" step="1" value="20" class="w-16 rounded-lg border border-slate-200 px-2 py-1 text-right font-bold text-slate-800 focus:ring-2 focus:ring-brand-700 focus:outline-none"><span>%</span></span>
+                                </label>
+                            </div>
+                            <details class="mt-3 rounded-xl border border-brand-200 bg-white p-3">
+                                <summary class="cursor-pointer text-[11px] font-bold text-brand-900">Customize assessment names and maximum scores</summary>
+                                <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                                    <label class="text-[10px] font-semibold text-slate-600">WW 1 name<input id="teacher-assessment-name-ww1" type="text" maxlength="40" value="WW1" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">WW 1 maximum<input id="teacher-assessment-max-ww1" type="number" min="0.01" max="10000" step="0.01" value="25" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">WW 2 name<input id="teacher-assessment-name-ww2" type="text" maxlength="40" value="WW2" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">WW 2 maximum<input id="teacher-assessment-max-ww2" type="number" min="0.01" max="10000" step="0.01" value="25" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">WW 3 name<input id="teacher-assessment-name-ww3" type="text" maxlength="40" value="WW3" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">WW 3 maximum<input id="teacher-assessment-max-ww3" type="number" min="0.01" max="10000" step="0.01" value="50" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">PT 1 name<input id="teacher-assessment-name-pt1" type="text" maxlength="40" value="PT1" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">PT 1 maximum<input id="teacher-assessment-max-pt1" type="number" min="0.01" max="10000" step="0.01" value="30" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">PT 2 name<input id="teacher-assessment-name-pt2" type="text" maxlength="40" value="PT2" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">PT 2 maximum<input id="teacher-assessment-max-pt2" type="number" min="0.01" max="10000" step="0.01" value="30" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">PT 3 name<input id="teacher-assessment-name-pt3" type="text" maxlength="40" value="PT3" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">PT 3 maximum<input id="teacher-assessment-max-pt3" type="number" min="0.01" max="10000" step="0.01" value="40" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">Term exam name<input id="teacher-assessment-name-exam" type="text" maxlength="40" value="Exam" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                    <label class="text-[10px] font-semibold text-slate-600">Term exam maximum<input id="teacher-assessment-max-exam" type="number" min="0.01" max="10000" step="0.01" value="50" class="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-800"></label>
+                                </div>
+                            </details>
                         </div>
                     </div>
                 </div>
@@ -477,9 +529,9 @@
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <th class="py-2.5 px-3 text-left w-12 border-r border-slate-200">No.</th>
                                     <th class="py-2.5 px-3 text-left w-56 border-r border-slate-200">Learner Name (LRN)</th>
-                                    <th colspan="4" class="py-2 px-2 bg-emerald-100/70 text-emerald-900 border-r border-slate-200">Written Works (40%)</th>
-                                    <th colspan="4" class="py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-slate-200">Performance Tasks (40%)</th>
-                                    <th colspan="2" class="py-2 px-2 bg-amber-100/70 text-amber-900 border-r border-slate-200">Term Exam (20%)</th>
+                                    <th id="ecr-header-ww" colspan="4" class="py-2 px-2 bg-emerald-100/70 text-emerald-900 border-r border-slate-200">Written Works (40%)</th>
+                                    <th id="ecr-header-pt" colspan="4" class="py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-slate-200">Performance Tasks (40%)</th>
+                                    <th id="ecr-header-qa" colspan="2" class="py-2 px-2 bg-amber-100/70 text-amber-900 border-r border-slate-200">Term Exam (20%)</th>
                                     <th class="py-2 px-2 bg-slate-200 border-r border-slate-200">Initial</th>
                                     <th class="py-2 px-3 bg-brand-700 text-white font-extrabold">Term Grade</th>
                                     <th class="py-2 px-2 text-right pr-4">Remark</th>
@@ -488,18 +540,18 @@
                                 <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 text-[11px]">
                                     <th class="py-1 px-2 border-r border-slate-200">#</th>
                                     <th class="py-1 px-3 text-left border-r border-slate-200 font-normal">Highest Possible Score (HPS):</th>
-                                    <th class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW1 (25)</th>
-                                    <th class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW2 (25)</th>
-                                    <th class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW3 (50)</th>
-                                    <th class="py-1 px-1 bg-emerald-100/80 font-bold text-emerald-900 border-r border-slate-200">WS (40%)</th>
+                                    <th id="ecr-hps-ww1" class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW1 (25)</th>
+                                    <th id="ecr-hps-ww2" class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW2 (25)</th>
+                                    <th id="ecr-hps-ww3" class="py-1 px-1 bg-emerald-50 text-emerald-900 font-mono">WW3 (50)</th>
+                                    <th id="ecr-subheader-ww" class="py-1 px-1 bg-emerald-100/80 font-bold text-emerald-900 border-r border-slate-200">WS (40%)</th>
 
-                                    <th class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT1 (30)</th>
-                                    <th class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT2 (30)</th>
-                                    <th class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT3 (40)</th>
-                                    <th class="py-1 px-1 bg-blue-100/80 font-bold text-blue-900 border-r border-slate-200">WS (40%)</th>
+                                    <th id="ecr-hps-pt1" class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT1 (30)</th>
+                                    <th id="ecr-hps-pt2" class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT2 (30)</th>
+                                    <th id="ecr-hps-pt3" class="py-1 px-1 bg-blue-50 text-blue-900 font-mono">PT3 (40)</th>
+                                    <th id="ecr-subheader-pt" class="py-1 px-1 bg-blue-100/80 font-bold text-blue-900 border-r border-slate-200">WS (40%)</th>
 
-                                    <th class="py-1 px-1 bg-amber-50 text-amber-900 font-mono">Exam (50)</th>
-                                    <th class="py-1 px-1 bg-amber-100/80 font-bold text-amber-900 border-r border-slate-200">WS (20%)</th>
+                                    <th id="ecr-hps-exam" class="py-1 px-1 bg-amber-50 text-amber-900 font-mono">Exam (50)</th>
+                                    <th id="ecr-subheader-qa" class="py-1 px-1 bg-amber-100/80 font-bold text-amber-900 border-r border-slate-200">WS (20%)</th>
 
                                     <th class="py-1 px-1 font-mono bg-slate-100 border-r border-slate-200">100%</th>
                                     <th class="py-1 px-2 font-bold bg-brand-800 text-white">Transmuted</th>
@@ -515,7 +567,7 @@
                     <div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-500">
                         <div class="flex items-center gap-2">
                             <i class="fa-solid fa-circle-info text-brand-700"></i>
-                            <span>All cell values automatically trigger DepEd Table 1 transmutation formula on change.</span>
+                            <span>Weights are teacher-configurable and must total 100%. Grades are transmuted using DepEd Table 1.</span>
                         </div>
                         <div class="font-mono text-[11px] font-semibold">
                             Auto-Calculation Engine: <span class="text-emerald-700">ACTIVE</span>
@@ -705,7 +757,7 @@
                         </div>
                         <div>
                             <h3 class="font-heading font-bold text-sm">Learner Record Preview</h3>
-                            <p class="text-[11px] text-brand-200">SERMS teacher-submitted grade data only</p>
+                            <p class="text-[11px] text-brand-200">Approved grades available to your teacher account</p>
                         </div>
                     </div>
                     <button onclick="closePortfolioDrawer()" class="p-2 rounded-lg text-brand-200 hover:text-white hover:bg-white/10">
@@ -721,8 +773,8 @@
                 <!-- Drawer Actions Footer -->
                 <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2">
                     <button onclick="closePortfolioDrawer()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-100 text-xs">Close</button>
-                    <button type="button" disabled title="Official SF9 output is unavailable because complete approved subject records are not stored in SERMS." class="px-4 py-2 rounded-xl bg-slate-200 text-slate-500 font-bold cursor-not-allowed shadow-sm flex items-center gap-1.5 text-xs">
-                        <i class="fa-solid fa-ban"></i> Official SF9 unavailable
+                    <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-brand-700 text-white font-bold hover:bg-brand-800 shadow-sm flex items-center gap-1.5 text-xs">
+                        <i class="fa-solid fa-print"></i> Print / Save PDF
                     </button>
                 </div>
             </div>
@@ -737,9 +789,23 @@
 
     <script>
         const advisoryStudents = [];
+        const defaultGradeWeights = { ww: 40, pt: 40, qa: 20 };
+        const defaultAssessments = {
+            ww1: { name: 'WW1', max: 25 },
+            ww2: { name: 'WW2', max: 25 },
+            ww3: { name: 'WW3', max: 50 },
+            pt1: { name: 'PT1', max: 30 },
+            pt2: { name: 'PT2', max: 30 },
+            pt3: { name: 'PT3', max: 40 },
+            exam: { name: 'Exam', max: 50 }
+        };
+        const assessmentFields = Object.keys(defaultAssessments);
+        let gradeWeights = { ...defaultGradeWeights };
+        let gradingAssessments = Object.fromEntries(assessmentFields.map(field => [field, { ...defaultAssessments[field] }]));
         let teacherChart = null;
         let teacherAnecdotalRecords = [];
         let teacherSubmission = null;
+        let teacherGradeSubmissions = [];
         let teacherLocked = false;
 
         function escapeHtml(value) {
@@ -760,12 +826,140 @@
         }
 
         function getTeacherGrade(student) {
-            const fields = ['ww1', 'ww2', 'ww3', 'pt1', 'pt2', 'pt3', 'exam'];
-            if (!fields.every(field => Number.isFinite(student[field]))) return null;
-            const initial = ((student.ww1 + student.ww2 + student.ww3) / 100) * 40
-                + ((student.pt1 + student.pt2 + student.pt3) / 100) * 40
-                + (student.exam / 50) * 20;
+            if (!isGradeWeightsValid(gradeWeights) || !isAssessmentsValid(gradingAssessments)
+                || !assessmentFields.every(field => Number.isFinite(student[field]))) return null;
+            if (assessmentFields.some(field => student[field] < 0 || student[field] > gradingAssessments[field].max)) return null;
+            const wwFields = assessmentFields.filter(field => field.startsWith('ww'));
+            const ptFields = assessmentFields.filter(field => field.startsWith('pt'));
+            const wwScore = wwFields.reduce((total, field) => total + student[field], 0);
+            const wwMaximum = wwFields.reduce((total, field) => total + gradingAssessments[field].max, 0);
+            const ptScore = ptFields.reduce((total, field) => total + student[field], 0);
+            const ptMaximum = ptFields.reduce((total, field) => total + gradingAssessments[field].max, 0);
+            const initial = (wwScore / wwMaximum) * gradeWeights.ww
+                + (ptScore / ptMaximum) * gradeWeights.pt
+                + (student.exam / gradingAssessments.exam.max) * gradeWeights.qa;
             return { initial, grade: transmuteGrade(initial) };
+        }
+
+        function isGradeWeightsValid(weights) {
+            return ['ww', 'pt', 'qa'].every(key => Number.isInteger(weights[key]) && weights[key] >= 0 && weights[key] <= 100)
+                && weights.ww + weights.pt + weights.qa === 100;
+        }
+
+        function isAssessmentsValid(assessments) {
+            return assessments && assessmentFields.every(field =>
+                typeof assessments[field]?.name === 'string'
+                && assessments[field].name.trim().length > 0
+                && assessments[field].name.trim().length <= 40
+                && Number.isFinite(assessments[field].max)
+                && assessments[field].max > 0
+                && assessments[field].max <= 10000
+            );
+        }
+
+        function readGradeWeights() {
+            const values = ['ww', 'pt', 'qa'].map(key => {
+                const input = document.getElementById(`teacher-weight-${key}`);
+                return input?.value.trim() ? Number(input.value) : NaN;
+            });
+            return { ww: values[0], pt: values[1], qa: values[2] };
+        }
+
+        function readGradingAssessments() {
+            return Object.fromEntries(assessmentFields.map(field => [
+                field,
+                {
+                    name: document.getElementById(`teacher-assessment-name-${field}`).value.trim(),
+                    max: Number(document.getElementById(`teacher-assessment-max-${field}`).value)
+                }
+            ]));
+        }
+
+        function updateGradeWeightSummary() {
+            const inputs = [
+                ...['ww', 'pt', 'qa'].map(key => document.getElementById(`teacher-weight-${key}`)),
+                ...assessmentFields.flatMap(field => [
+                    document.getElementById(`teacher-assessment-name-${field}`),
+                    document.getElementById(`teacher-assessment-max-${field}`)
+                ])
+            ];
+            const total = document.getElementById('teacher-weight-total');
+            const weights = gradeWeights;
+            const weightsValid = isGradeWeightsValid(weights);
+            const assessmentsValid = isAssessmentsValid(gradingAssessments);
+            const scoresWithinMaximums = advisoryStudents.every(student =>
+                assessmentFields.every(field => student[field] === undefined || student[field] <= gradingAssessments[field].max)
+            );
+            const valid = weightsValid && assessmentsValid && scoresWithinMaximums;
+            const totalValue = weights.ww + weights.pt + weights.qa;
+            const displayWeight = key => Number.isInteger(weights[key]) ? `${weights[key]}%` : '—';
+            total.textContent = !weightsValid
+                ? `Total: ${Number.isFinite(totalValue) ? totalValue : '—'}% (must be 100%)`
+                : !assessmentsValid
+                    ? 'Enter valid assessment names and maximums.'
+                    : !scoresWithinMaximums
+                        ? 'Some saved scores exceed their configured maximum.'
+                        : `Total: ${totalValue}%`;
+            total.className = `font-bold text-[11px] ${valid ? 'text-brand-800' : 'text-rose-700'}`;
+            document.getElementById('ecr-header-ww').textContent = `Written Works (${displayWeight('ww')})`;
+            document.getElementById('ecr-header-pt').textContent = `Performance Tasks (${displayWeight('pt')})`;
+            document.getElementById('ecr-header-qa').textContent = `Term Exam (${displayWeight('qa')})`;
+            document.getElementById('ecr-subheader-ww').textContent = `WS (${displayWeight('ww')})`;
+            document.getElementById('ecr-subheader-pt').textContent = `WS (${displayWeight('pt')})`;
+            document.getElementById('ecr-subheader-qa').textContent = `WS (${displayWeight('qa')})`;
+            assessmentFields.forEach(field => {
+                const assessment = gradingAssessments[field];
+                const maximum = Number.isFinite(assessment.max) ? assessment.max : '—';
+                document.getElementById(`ecr-hps-${field}`).textContent = `${assessment.name || field} (${maximum})`;
+                document.querySelectorAll(`#ecr-table-body input[data-assessment="${field}"]`)
+                    .forEach(input => { input.max = Number.isFinite(assessment.max) ? String(assessment.max) : '0'; });
+            });
+            inputs.forEach(input => { input.disabled = teacherLocked; });
+            document.querySelectorAll('#view-ecr button[onclick="saveEcrDraft()"], #view-ecr button[onclick="submitToRegistrar()"]')
+                .forEach(button => { button.disabled = teacherLocked || !advisoryStudents.length || !valid; });
+        }
+
+        function applyGradeWeights(weights, updateInputs = true) {
+            const candidate = weights && typeof weights === 'object'
+                ? { ww: Number(weights.ww), pt: Number(weights.pt), qa: Number(weights.qa) }
+                : { ...defaultGradeWeights };
+            gradeWeights = isGradeWeightsValid(candidate) ? candidate : { ...defaultGradeWeights };
+            if (updateInputs) {
+                ['ww', 'pt', 'qa'].forEach(key => {
+                    document.getElementById(`teacher-weight-${key}`).value = String(gradeWeights[key]);
+                });
+            }
+            updateGradeWeightSummary();
+        }
+
+        function applyGradingAssessments(assessments, updateInputs = true) {
+            const candidate = assessments && typeof assessments === 'object'
+                ? Object.fromEntries(assessmentFields.map(field => {
+                    const assessment = assessments[field] || {};
+                    return [field, {
+                        name: typeof assessment.name === 'string' ? assessment.name.trim() : '',
+                        max: Number(assessment.max)
+                    }];
+                }))
+                : Object.fromEntries(assessmentFields.map(field => [field, { ...defaultAssessments[field] }]));
+            gradingAssessments = isAssessmentsValid(candidate)
+                ? candidate
+                : Object.fromEntries(assessmentFields.map(field => [field, { ...defaultAssessments[field] }]));
+            if (updateInputs) {
+                assessmentFields.forEach(field => {
+                    document.getElementById(`teacher-assessment-name-${field}`).value = gradingAssessments[field].name;
+                    document.getElementById(`teacher-assessment-max-${field}`).value = String(gradingAssessments[field].max);
+                });
+            }
+            updateGradeWeightSummary();
+        }
+
+        function handleGradingConfigChange() {
+            gradeWeights = readGradeWeights();
+            gradingAssessments = readGradingAssessments();
+            updateGradeWeightSummary();
+            renderEcrTable();
+            updateTeacherOverview();
         }
 
         // DepEd Official Transmutation Table snippet (DepEd Order No. 8, s. 2015)
@@ -809,6 +1003,13 @@
             document.getElementById('teacher-current-date').textContent = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
             document.getElementById('teacher-attendance-date').textContent = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
             document.getElementById('anecdotal-date').value = localDateString(today);
+            ['ww', 'pt', 'qa'].forEach(key => document.getElementById(`teacher-weight-${key}`).addEventListener('input', handleGradingConfigChange));
+            assessmentFields.forEach(field => {
+                document.getElementById(`teacher-assessment-name-${field}`).addEventListener('input', handleGradingConfigChange);
+                document.getElementById(`teacher-assessment-max-${field}`).addEventListener('input', handleGradingConfigChange);
+            });
+            applyGradeWeights(defaultGradeWeights);
+            applyGradingAssessments(defaultAssessments);
             renderEcrTable();
             renderAdvisoryTable(advisoryStudents);
             renderAttendanceRoster();
@@ -818,7 +1019,7 @@
             setupNotificationToggle();
         });
 
-        window.setTeacherRecords = function ({ rosters = [], submission, attendance, anecdotal }) {
+        window.setTeacherRecords = function ({ rosters = [], submission, gradeSubmissions = [], attendance, anecdotal }) {
             const sectionSelect = document.getElementById('teacher-section-input');
             const previousSection = sectionSelect.value;
             sectionSelect.replaceChildren();
@@ -853,7 +1054,10 @@
             advisoryStudents.splice(0, advisoryStudents.length, ...roster.values());
             teacherAnecdotalRecords = anecdotal || [];
             teacherSubmission = submission || null;
+            teacherGradeSubmissions = gradeSubmissions;
             teacherLocked = teacherSubmission?.status === 'Approved & Locked';
+            applyGradeWeights(teacherSubmission?.weights || defaultGradeWeights);
+            applyGradingAssessments(teacherSubmission?.assessments || defaultAssessments);
             document.getElementById('teacher-section-label').textContent = section || 'No assigned class section';
             document.getElementById('teacher-attendance-section').textContent = section || 'Not assigned';
             const accountName = window.SERMS_ACCOUNT?.name || 'Teacher';
@@ -862,9 +1066,9 @@
             const badge = document.getElementById('ecr-status-badge');
             badge.textContent = `Status: ${status}`;
             badge.className = `px-2 py-0.5 rounded text-[10px] font-bold border ${status === 'Approved & Locked' ? 'bg-slate-100 text-slate-700 border-slate-200' : status === 'Submitted' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-amber-100 text-amber-800 border-amber-200'}`;
-            document.querySelectorAll('#view-ecr button[onclick="saveEcrDraft()"], #view-ecr button[onclick="submitToRegistrar()"]').forEach(element => { element.disabled = teacherLocked || !advisoryStudents.length; });
             document.querySelectorAll('#view-attendance button[onclick="saveDailyAttendance()"], #view-attendance button[onclick="markAllPresent()"]').forEach(element => { element.disabled = !advisoryStudents.length; });
             renderEcrTable();
+            updateGradeWeightSummary();
             renderAdvisoryTable(advisoryStudents);
             renderAttendanceRoster();
             renderAnecdotalRecords();
@@ -910,13 +1114,18 @@
 
             advisoryStudents.forEach((s, idx) => {
                 const result = getTeacherGrade(s);
-                const wwWeighted = result ? (((s.ww1 + s.ww2 + s.ww3) / 100) * 40).toFixed(2) : '—';
-                const ptWeighted = result ? (((s.pt1 + s.pt2 + s.pt3) / 100) * 40).toFixed(2) : '—';
-                const qaWeighted = result ? ((s.exam / 50) * 20).toFixed(2) : '—';
+                const wwScore = ['ww1', 'ww2', 'ww3'].reduce((sum, field) => sum + (s[field] || 0), 0);
+                const wwMaximum = ['ww1', 'ww2', 'ww3'].reduce((sum, field) => sum + gradingAssessments[field].max, 0);
+                const ptScore = ['pt1', 'pt2', 'pt3'].reduce((sum, field) => sum + (s[field] || 0), 0);
+                const ptMaximum = ['pt1', 'pt2', 'pt3'].reduce((sum, field) => sum + gradingAssessments[field].max, 0);
+                const wwWeighted = result ? ((wwScore / wwMaximum) * gradeWeights.ww).toFixed(2) : '—';
+                const ptWeighted = result ? ((ptScore / ptMaximum) * gradeWeights.pt).toFixed(2) : '—';
+                const qaWeighted = result ? ((s.exam / gradingAssessments.exam.max) * gradeWeights.qa).toFixed(2) : '—';
                 const initialScore = result ? result.initial.toFixed(2) : '—';
                 const transmuted = result ? result.grade : '—';
                 const isPassed = result && transmuted >= 75;
                 const scoreValue = field => s[field] ?? '';
+                const scoreInput = field => `<input data-assessment="${field}" type="number" min="0" max="${gradingAssessments[field].max}" step="0.01" value="${scoreValue(field)}" ${teacherLocked || !isAssessmentsValid(gradingAssessments) ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, '${field}', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">`;
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 text-slate-800 transition-colors";
@@ -928,31 +1137,31 @@
                     </td>
                     <!-- WW Inputs -->
                     <td class="py-1 px-1 bg-emerald-50/40 font-mono">
-                        <input type="number" min="0" max="25" value="${scoreValue('ww1')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'ww1', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('ww1')}
                     </td>
                     <td class="py-1 px-1 bg-emerald-50/40 font-mono">
-                        <input type="number" min="0" max="25" value="${scoreValue('ww2')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'ww2', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('ww2')}
                     </td>
                     <td class="py-1 px-1 bg-emerald-50/40 font-mono">
-                        <input type="number" min="0" max="50" value="${scoreValue('ww3')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'ww3', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('ww3')}
                     </td>
                     <td class="py-1 px-1 bg-emerald-100/50 font-bold font-mono text-emerald-900 border-r border-slate-200">${wwWeighted}%</td>
 
                     <!-- PT Inputs -->
                     <td class="py-1 px-1 bg-blue-50/40 font-mono">
-                        <input type="number" min="0" max="30" value="${scoreValue('pt1')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'pt1', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('pt1')}
                     </td>
                     <td class="py-1 px-1 bg-blue-50/40 font-mono">
-                        <input type="number" min="0" max="30" value="${scoreValue('pt2')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'pt2', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('pt2')}
                     </td>
                     <td class="py-1 px-1 bg-blue-50/40 font-mono">
-                        <input type="number" min="0" max="40" value="${scoreValue('pt3')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'pt3', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('pt3')}
                     </td>
                     <td class="py-1 px-1 bg-blue-100/50 font-bold font-mono text-blue-900 border-r border-slate-200">${ptWeighted}%</td>
 
                     <!-- Exam Input -->
                     <td class="py-1 px-1 bg-amber-50/40 font-mono">
-                        <input type="number" min="0" max="50" value="${scoreValue('exam')}" ${teacherLocked ? 'disabled' : ''} onchange="updateEcrScore(${s.id}, 'exam', this.value)" class="w-12 text-center p-1 rounded border border-slate-200 bg-white focus:ring-1 focus:ring-brand-700">
+                        ${scoreInput('exam')}
                     </td>
                     <td class="py-1 px-1 bg-amber-100/50 font-bold font-mono text-amber-900 border-r border-slate-200">${qaWeighted}%</td>
 
@@ -975,10 +1184,10 @@
         function updateEcrScore(studentId, field, newVal) {
             const student = advisoryStudents.find(s => s.id === studentId);
             if (student) {
-                const limits = { ww1: 25, ww2: 25, ww3: 50, pt1: 30, pt2: 30, pt3: 40, exam: 50 };
+                const limits = Object.fromEntries(assessmentFields.map(key => [key, gradingAssessments[key].max]));
                 const score = Number(newVal);
-                if (!Number.isFinite(score) || score < 0 || score > limits[field]) {
-                    showToast(`Enter a score from 0 to ${limits[field]}.`);
+                if (!Object.hasOwn(limits, field) || !Number.isFinite(limits[field]) || !Number.isFinite(score) || score < 0 || score > limits[field]) {
+                    showToast(`Enter a score from 0 to ${limits[field] ?? 'the configured maximum'}.`);
                     renderEcrTable();
                     return;
                 }
@@ -1042,7 +1251,7 @@
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'px-2.5 py-1 text-slate-700 bg-slate-100 hover:bg-brand-50 hover:text-brand-800 rounded-lg text-xs font-semibold transition-colors';
-                button.textContent = 'View record';
+                button.textContent = 'Form 138 preview';
                 button.addEventListener('click', () => viewStudentPortfolio(s.lrn));
                 actionCell.appendChild(button);
                 tr.appendChild(actionCell);
@@ -1133,122 +1342,140 @@
             showToast('Attendance was not saved. Retry after checking your connection.');
         }
 
-        // Student Portfolio / Form 138 (SF9) Modal Generator
+        function portfolioText(tag, text, className = '') {
+            const element = document.createElement(tag);
+            element.textContent = text;
+            element.className = className;
+            return element;
+        }
+
+        function portfolioStudentPicker(container, selectedLrn = '') {
+            const label = portfolioText('label', 'Select learner', 'block text-xs font-bold text-slate-700 print:hidden');
+            const select = document.createElement('select');
+            select.className = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs print:hidden';
+            select.add(new Option('-- Choose a learner --', ''));
+            advisoryStudents.forEach(student => select.add(new Option(`${student.name} (${student.lrn})`, student.lrn)));
+            select.value = selectedLrn;
+            select.addEventListener('change', () => {
+                if (select.value) viewStudentPortfolio(select.value);
+            });
+            label.appendChild(select);
+            container.appendChild(label);
+        }
+
+        function calculateApprovedPortfolioGrade(submission, scoreRecord) {
+            const weights = submission.weights || defaultGradeWeights;
+            const assessments = Object.fromEntries(assessmentFields.map(field => [
+                field,
+                { ...defaultAssessments[field], ...(submission.assessments?.[field] || {}) }
+            ]));
+            const scores = Object.fromEntries(assessmentFields.map(field => [field, Number(scoreRecord[field])]));
+            if (!isGradeWeightsValid(weights) || !isAssessmentsValid(assessments)
+                || !assessmentFields.every(field => Number.isFinite(scores[field])
+                    && scores[field] >= 0 && scores[field] <= assessments[field].max)) return null;
+            const wwFields = assessmentFields.filter(field => field.startsWith('ww'));
+            const ptFields = assessmentFields.filter(field => field.startsWith('pt'));
+            const sum = fields => fields.reduce((total, field) => total + scores[field], 0);
+            const maximum = fields => fields.reduce((total, field) => total + assessments[field].max, 0);
+            const initial = sum(wwFields) / maximum(wwFields) * weights.ww
+                + sum(ptFields) / maximum(ptFields) * weights.pt
+                + scores.exam / assessments.exam.max * weights.qa;
+            return transmuteGrade(initial);
+        }
+
         function viewStudentPortfolio(lrn) {
-            const s = advisoryStudents.find(i => i.lrn === lrn);
+            const student = advisoryStudents.find(item => item.lrn === lrn);
             const container = document.getElementById('printable-report-card');
             container.replaceChildren();
-            if (!s) {
-                showToast('No learner record was found in your saved class records.');
+            if (!student) {
+                showToast('No learner record was found in your assigned roster.');
                 return;
             }
-            const result = getTeacherGrade(s);
-            const title = document.createElement('h4');
-            title.className = 'font-heading text-lg font-bold text-slate-900';
-            title.textContent = 'SERMS Grade Record Preview';
-            const identity = document.createElement('p');
-            identity.className = 'text-sm text-slate-700';
-            identity.textContent = `${s.name} • LRN ${s.lrn}`;
-            const subject = document.createElement('p');
-            subject.className = 'text-sm text-slate-700';
-            subject.textContent = `Learning area: ${document.getElementById('teacher-learning-area').value || teacherSubmission?.grade || 'Not specified'}`;
-            const term = document.createElement('p');
-            term.className = 'text-sm text-slate-700';
-            term.textContent = `Term: ${teacherSubmission?.quarter || document.getElementById('teacher-quarter').value}`;
-            const grade = document.createElement('p');
-            grade.className = 'rounded-xl border border-brand-200 bg-brand-50 p-3 text-sm font-bold text-brand-900';
-            grade.textContent = result ? `Saved subject grade: ${result.grade}` : 'No complete saved subject grade is available.';
-            const disclaimer = document.createElement('p');
-            disclaimer.className = 'rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900';
-            disclaimer.textContent = 'This is an internal preview, not an official SF9 report card. SERMS does not store the complete approved multi-subject and promotion records required to produce an official report card.';
-            container.append(title, identity, subject, term, grade, disclaimer);
-            document.getElementById('portfolio-drawer').classList.remove('hidden');
-            return;
+            portfolioStudentPicker(container, student.lrn);
+            const report = document.createElement('div');
+            report.className = 'mt-5';
+            report.append(
+                portfolioText('p', 'NAUJAN MUNICIPAL HIGH SCHOOL', 'text-center text-lg font-extrabold tracking-wide'),
+                portfolioText('h4', 'LEARNER PROGRESS REPORT', 'mt-1 text-center text-base font-bold'),
+                portfolioText('p', 'SERMS teacher view · approved grade records only', 'mt-1 text-center text-xs text-slate-600')
+            );
+            const identity = document.createElement('div');
+            identity.className = 'mt-5 grid grid-cols-1 gap-2 border-y border-slate-300 py-3 text-xs sm:grid-cols-2';
+            identity.append(
+                portfolioText('p', `Learner: ${student.name}`, 'font-semibold'),
+                portfolioText('p', `LRN: ${student.lrn}`, 'font-semibold'),
+                portfolioText('p', `Grade level: ${student.grade || '—'}`),
+                portfolioText('p', `Section: ${document.getElementById('teacher-section-input').value || '—'}`),
+                portfolioText('p', `Strand: ${student.strand || '—'}`)
+            );
+            report.appendChild(identity);
 
-            // Science Grade for this student
-            const wwTotal = s.ww1 + s.ww2 + s.ww3;
-            const ptTotal = s.pt1 + s.pt2 + s.pt3;
-            const initialScore = ((wwTotal / 100) * 40) + ((ptTotal / 100) * 40) + ((s.exam / 50) * 20);
-            const scienceGrade = transmuteGrade(initialScore);
-
-            const genAve = ((s.filipino + s.english + s.math + scienceGrade + s.ap + s.esp + s.mapeh + s.tle) / 8).toFixed(1);
-
-            container.innerHTML = `
-                <!-- DepEd Official Heading -->
-                <div class="text-center pb-4 border-b-2 border-brand-900">
-                    <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Republic of the Philippines • Department of Education</p>
-                    <h3 class="font-heading font-extrabold text-brand-900 text-lg">NAUJAN MUNICIPAL HIGH SCHOOL</h3>
-                    <p class="text-xs text-slate-600">Division of Oriental Mindoro • District of Naujan West</p>
-                    <p class="text-xs font-bold text-slate-800 mt-2 uppercase tracking-wider bg-brand-50 py-1 rounded-lg border border-brand-200">
-                        LEARNER'S PROGRESS REPORT CARD (SF 9 - JHS)
-                    </p>
-                </div>
-
-                <!-- Learner Bio -->
-                <div class="grid grid-cols-2 gap-2 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <div><span class="text-slate-400">Name:</span> <strong class="text-slate-900">${s.name}</strong></div>
-                    <div><span class="text-slate-400">LRN:</span> <strong class="font-mono text-slate-900">${s.lrn}</strong></div>
-                    <div><span class="text-slate-400">Grade & Section:</span> <strong>Grade 10 - Jose Rizal</strong></div>
-                    <div><span class="text-slate-400">School Year:</span> <strong>2026–2027</strong></div>
-                    <div><span class="text-slate-400">Class Adviser:</span> <strong id="report-card-adviser-name">Mrs. Maria Santos, LPT</strong></div>
-                    <div><span class="text-slate-400">Curriculum:</span> <strong>K to 12 Basic Education</strong></div>
-                </div>
-
-                <!-- Academic Rating Table -->
-                <div class="space-y-2">
-                    <h4 class="font-bold uppercase tracking-wider text-slate-700 text-xs">REPORT ON LEARNING PROGRESS AND ACHIEVEMENT</h4>
-                    <table class="w-full text-left border border-slate-200">
-                        <thead class="bg-slate-100 font-bold text-[11px] text-slate-700">
-                            <tr>
-                                <th class="p-2 border-b border-r border-slate-200">Learning Areas</th>
-                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q1</th>
-                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q2</th>
-                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q3</th>
-                                <th class="p-2 border-b border-r border-slate-200 text-center w-12">Q4</th>
-                                <th class="p-2 border-b border-slate-200 text-center w-16">Final</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 font-mono text-[11px]">
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Filipino</td><td class="p-2 text-center border-r border-slate-200">${s.filipino}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">English</td><td class="p-2 text-center border-r border-slate-200">${s.english}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Mathematics</td><td class="p-2 text-center border-r border-slate-200">${s.math}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr class="bg-brand-50/60 font-semibold"><td class="p-2 font-sans text-brand-900 border-r border-slate-200">Science (Your Subject)</td><td class="p-2 text-center border-r border-slate-200 text-brand-800 font-bold">${scienceGrade}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Araling Panlipunan (AP)</td><td class="p-2 text-center border-r border-slate-200">${s.ap}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Edukasyon sa Pagpapakatao (EsP)</td><td class="p-2 text-center border-r border-slate-200">${s.esp}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">MAPEH</td><td class="p-2 text-center border-r border-slate-200">${s.mapeh}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr><td class="p-2 font-sans font-medium border-r border-slate-200">Technology & Livelihood Educ (TLE)</td><td class="p-2 text-center border-r border-slate-200">${s.tle}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold">-</td></tr>
-                            <tr class="bg-slate-100 font-bold"><td class="p-2 font-sans text-slate-900 border-r border-slate-200">General Average</td><td class="p-2 text-center border-r border-slate-200 text-brand-900 font-extrabold">${genAve}</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center border-r border-slate-200">-</td><td class="p-2 text-center font-bold text-brand-900">-</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Signatures -->
-                <div class="pt-8 grid grid-cols-2 gap-8 text-center text-xs">
-                    <div>
-                        <div id="report-card-adviser-signature" class="border-b border-slate-800 pb-1 font-bold text-slate-900">MRS. MARIA SANTOS, LPT</div>
-                        <p class="text-slate-500 text-[10px] mt-0.5">Class Adviser</p>
-                    </div>
-                    <div>
-                        <div class="border-b border-slate-800 pb-1 font-bold text-slate-900">DR. EDUARDO DELA CRUZ</div>
-                        <p class="text-slate-500 text-[10px] mt-0.5">Secondary School Principal IV</p>
-                    </div>
-                </div>
-            `;
-
-            const adviserName = window.SERMS_ACCOUNT?.name;
-            if (adviserName) {
-                document.getElementById('report-card-adviser-name').textContent = adviserName;
-                document.getElementById('report-card-adviser-signature').textContent = adviserName.toLocaleUpperCase();
+            const areas = new Map();
+            const approvedRecords = teacherGradeSubmissions.filter(submission =>
+                submission.status === 'Approved & Locked'
+                && (submission.students || []).some(entry => entry.lrn === student.lrn)
+            );
+            approvedRecords.forEach(submission => {
+                const term = Number(submission.quarter);
+                if (!Number.isInteger(term) || term < 1 || term > 3) return;
+                const key = String(submission.grade || 'Learning area').trim().toLocaleLowerCase();
+                if (!areas.has(key)) areas.set(key, { name: submission.grade || 'Learning area', terms: new Map() });
+                const area = areas.get(key);
+                if (!area.terms.has(term)) {
+                    const scoreRecord = submission.students.find(entry => entry.lrn === student.lrn);
+                    area.terms.set(term, calculateApprovedPortfolioGrade(submission, scoreRecord));
+                }
+            });
+            const table = document.createElement('table');
+            table.className = 'mt-5 w-full border-collapse text-left text-xs';
+            const head = document.createElement('thead');
+            head.className = 'bg-slate-100';
+            const heading = document.createElement('tr');
+            ['Learning area', 'Term 1', 'Term 2', 'Term 3'].forEach(label => {
+                const cell = portfolioText('th', label, 'border border-slate-300 px-3 py-2 font-bold');
+                cell.scope = 'col';
+                heading.appendChild(cell);
+            });
+            head.appendChild(heading);
+            const body = document.createElement('tbody');
+            [...areas.values()].sort((first, second) => first.name.localeCompare(second.name)).forEach(area => {
+                const row = document.createElement('tr');
+                row.appendChild(portfolioText('th', area.name, 'border border-slate-300 px-3 py-2 font-semibold'));
+                for (let term = 1; term <= 3; term += 1) {
+                    const grade = area.terms.get(term);
+                    row.appendChild(portfolioText('td', grade === undefined ? '—' : grade === null ? 'Incomplete' : String(grade),
+                        'border border-slate-300 px-3 py-2 text-center'));
+                }
+                body.appendChild(row);
+            });
+            if (!areas.size) {
+                const row = document.createElement('tr');
+                const empty = portfolioText('td', 'No approved grade submissions are available for this learner.', 'border border-slate-300 px-3 py-4 text-center text-slate-500');
+                empty.colSpan = 4;
+                row.appendChild(empty);
+                body.appendChild(row);
             }
+            table.append(head, body);
+            report.appendChild(table);
+            report.appendChild(portfolioText(
+                'p',
+                'Unofficial preview only — not a certified DepEd SF9/Form 138. Only approved grades submitted by this teacher account are included. Missing terms have no approved record; incomplete means the approved record lacks valid scores. School year, attendance, final averages, and other teachers’ subjects are not included.',
+                'mt-5 rounded-xl border border-amber-300 bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-950'
+            ));
+            container.appendChild(report);
             document.getElementById('portfolio-drawer').classList.remove('hidden');
         }
 
         function openForm138Preview() {
             if (!advisoryStudents.length) {
-                showToast('No saved learner records are available for a preview.');
+                showToast('No learners are available in your assigned roster.');
                 return;
             }
-            viewStudentPortfolio(advisoryStudents[0].lrn);
+            const container = document.getElementById('printable-report-card');
+            container.replaceChildren();
+            portfolioStudentPicker(container);
+            container.appendChild(portfolioText('p', 'Choose a learner to view their approved grade records.', 'mt-4 text-sm text-slate-600'));
+            document.getElementById('portfolio-drawer').classList.remove('hidden');
         }
 
         function closePortfolioDrawer() {

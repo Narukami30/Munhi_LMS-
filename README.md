@@ -18,6 +18,10 @@ Node.js and Express application for the NMHS SERMS pages, backed by MongoDB. The
 
 The seeded accounts are created or updated by role and identifier. Keep `.env` private. Do not use development credentials or the development session secret in production.
 
+## API rate limits
+
+The API has a per-IP limit of 600 requests per 15 minutes (the health check is excluded). Sensitive and public-write endpoints have stricter per-IP limits: 10 login attempts per 15 minutes, 5 student registrations per hour, 20 enrollment submissions per hour, 60 tracking lookups per 15 minutes, 5 recovery starts per hour, 10 recovery-code verifications per 15 minutes, 5 password resets per 15 minutes, and 5 helpdesk submissions per hour. Limited requests return HTTP 429 with a JSON error and standard rate-limit headers. Counters use the in-memory store and are separate per Node process; they reset when a process restarts and are not shared across multiple server instances.
+
 ## Deploy to Render
 
 1. Push the project to a private GitHub repository. Confirm `.env` is not committed; `.gitignore` excludes it and other `.env.*` files while allowing `.env.example`.
@@ -33,15 +37,16 @@ Do not commit production `.env` files or secret files. Render's `SESSION_SECRET`
 
 - Role-specific sign-in and protected student, teacher, registrar, and principal dashboards.
 - Student self-registration using a 12-digit LRN, verified-format email address, and strong password; student accounts remain inactive until a registrar approves them. Registrars can approve or reject requests with a review note. Approved students can use account recovery through their registered email.
-- Student dashboard with the signed-in learner's linked enrollment status, grade/program, section when assigned, submission date, tracking code, saved attendance, and approved grade-submission assessment scores. Students without an existing enrollment record can submit a separate application directly from the dashboard while enrollment is open; the signed-in account's LRN is read-only and enforced by the API. The form is hidden when an application already exists, preventing duplicate submissions.
+- Student dashboard with the signed-in learner's linked enrollment status, grade/program, section when assigned, submission date, tracking code, saved attendance, and approved grade-submission assessment scores. Students can generate and print an unofficial three-term progress-report preview from their approved scores; it is not a certified DepEd SF9/Form 138. Students without an existing enrollment record can submit a separate application directly from the dashboard while enrollment is open; the signed-in account's LRN is read-only and enforced by the API. The form is hidden when an application already exists, preventing duplicate submissions.
 - Teacher, registrar, and principal profile settings for updating the account name and email or changing a password after confirming the current password.
 - Online enrollment submission, review status, and public tracking by a high-entropy tracking code (not by LRN); the principal can manage the public portal's school year, enrollment availability, homepage copy, announcements, contact details, school-reported statistics, and logo.
 - Registrar live enrollment and document-request summaries, database-backed enrollment review and document processing, and CSV exports for enrollment and document-request records.
 - Principal-managed teacher class rosters containing officially enrolled learners; teacher views and record submissions are restricted to those assignments.
-- Teacher attendance, grade drafts/submissions by teacher-entered subject or learning area across three terms, anecdotal records, and attendance CSV exports.
-- Principal live enrollment, faculty, staff-account, and grade-submission summaries; teacher/registrar account provisioning and activation/deactivation; faculty records; grade review; and an audit log.
+- Teacher attendance, grade drafts/submissions by teacher-entered subject or learning area across three terms, configurable assessment names and maximum scores plus Written Works/Performance Tasks/Term Exam weights (whole-number percentages totaling 100%, saved with each subject/section/term record), per-learner previews of that teacher's approved grades, anecdotal records, and attendance CSV exports.
+- Principal live enrollment, faculty, staff-account, and grade-submission summaries; teacher/registrar account provisioning and activation/deactivation; faculty personnel record creation, editing, activation/deactivation, and deletion; grade review; and an audit log.
 - Principal CSV downloads for enrollment applications, saved attendance, grade submissions, and audit events. These exports reflect stored SERMS data and are not certified DepEd forms.
 - Password recovery with expiring, single-use verification codes and helpdesk tickets.
+- Shared interface states across the public portal and dashboards: table loading skeletons; empty-state explanations and next steps; offline messaging with same-tab, in-memory GET fallback; slow-request progress counts while keeping loaded content available; typo suggestions for supported searches; role-aware permission and session-expiry guidance; inline form validation; and success announcements. Session-expiry drafts are stored in the current tab for up to 30 minutes, exclude passwords and file inputs, and are restored after dashboard API hydration.
 
 The account recovery portal returns an OTP in API responses only when `NODE_ENV` is not `production`. Configure `SMTP_HOST` and `MAIL_FROM` to deliver production recovery emails; recovery codes are sent only to the active account's registered email address. SMS delivery is not configured and is disabled in the portal. Recovery helpdesk tickets are saved in SERMS and can be reviewed and updated in the registrar dashboard. Password resets require at least 8 characters with upper- and lowercase letters, a number, and a symbol.
 

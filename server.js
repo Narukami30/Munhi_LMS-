@@ -65,6 +65,16 @@ const enrollmentSchema = new mongoose.Schema({
   submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' }
 }, schemaOptions);
 
+const defaultGradeAssessments = {
+  ww1: { name: 'WW1', max: 25 },
+  ww2: { name: 'WW2', max: 25 },
+  ww3: { name: 'WW3', max: 50 },
+  pt1: { name: 'PT1', max: 30 },
+  pt2: { name: 'PT2', max: 30 },
+  pt3: { name: 'PT3', max: 40 },
+  exam: { name: 'Exam', max: 50 }
+};
+
 const documentRequestSchema = new mongoose.Schema({
   tracking: { type: String, required: true, unique: true },
   lrn: { type: String, required: true, trim: true },
@@ -90,6 +100,11 @@ const gradeSchema = new mongoose.Schema({
   grade: String,
   section: String,
   students: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  weights: { type: mongoose.Schema.Types.Mixed, default: () => ({ ww: 40, pt: 40, qa: 20 }) },
+  assessments: {
+    type: mongoose.Schema.Types.Mixed,
+    default: () => Object.fromEntries(Object.entries(defaultGradeAssessments).map(([field, assessment]) => [field, { ...assessment }]))
+  },
   status: { type: String, enum: ['Draft', 'Submitted', 'Approved & Locked', 'Returned for Revision'], default: 'Draft' },
   reviewNote: String,
   reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
@@ -198,15 +213,27 @@ const PublicPortalContent = mongoose.model('PublicPortalContent', publicPortalCo
 
 app.disable('x-powered-by');
 app.use(helmet({ contentSecurityPolicy: false }));
+
+const createRateLimiter = (windowMs, limit, skip) => rateLimit({
+  windowMs,
+  limit,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  skip,
+  handler: (req, res) => res.status(429).json({ error: 'Too many requests. Please wait before trying again.' })
+});
+const apiLimiter = createRateLimiter(15 * 60 * 1000, 600, req => req.path === '/health');
+const loginLimiter = createRateLimiter(15 * 60 * 1000, 10);
+const studentRegistrationLimiter = createRateLimiter(60 * 60 * 1000, 5);
+const enrollmentSubmissionLimiter = createRateLimiter(60 * 60 * 1000, 20);
+const trackingLimiter = createRateLimiter(15 * 60 * 1000, 60);
+const recoveryStartLimiter = createRateLimiter(60 * 60 * 1000, 5);
+const recoveryVerifyLimiter = createRateLimiter(15 * 60 * 1000, 10);
+const recoveryResetLimiter = createRateLimiter(15 * 60 * 1000, 5);
+const helpdeskSubmissionLimiter = createRateLimiter(60 * 60 * 1000, 5);
+app.use('/api', apiLimiter);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
-
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false });
-const studentRegistrationLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false });
-const publicSubmissionLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false });
-const trackingLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 60, standardHeaders: 'draft-7', legacyHeaders: false });
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/recovery', authLimiter);
 
 const sessionSecret = crypto.createHmac('sha256', process.env.SESSION_SECRET || 'local-development-secret-change-before-deploying')
   .update(crypto.randomBytes(32))
@@ -225,6 +252,13 @@ function httpError(status, message) {
   const error = new Error(message);
   error.status = status;
   return error;
+}
+
+function getImageType(image) {
+  if (image.length >= 8 && image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'png';
+  if (image.length >= 3 && image[0] === 0xff && image[1] === 0xd8 && image[2] === 0xff) return 'jpeg';
+  if (image.length >= 12 && image.toString('ascii', 0, 4) === 'RIFF' && image.toString('ascii', 8, 12) === 'WEBP') return 'webp';
+  return null;
 }
 
 function requireAuth(...allowedRoles) {
@@ -400,17 +434,14 @@ app.put('/api/principal/public-content', requireAuth('principal'), async (req, r
     if (typeof req.body.logoData !== 'string') throw httpError(400, 'Upload a PNG, JPEG, or WebP logo image.');
     let logoData = req.body.logoData;
     if (logoData) {
-      const match = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(logoData);
+      const match = /^data:image\/[a-z0-9.+-]+;base64,([A-Za-z0-9+/]+={0,2})$/i.exec(logoData);
       if (!match) throw httpError(400, 'Logo must be a PNG, JPEG, or WebP image.');
-      const image = Buffer.from(match[2], 'base64');
+      const image = Buffer.from(match[1], 'base64');
       if (!image.length || image.length > 750 * 1024) throw httpError(400, 'Logo image must be no larger than 750 KB.');
-      const signatures = {
-        png: image.length >= 8 && image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
-        jpeg: image.length >= 3 && image[0] === 0xff && image[1] === 0xd8 && image[2] === 0xff,
-        webp: image.length >= 12 && image.toString('ascii', 0, 4) === 'RIFF' && image.toString('ascii', 8, 12) === 'WEBP'
-      };
-      if (!signatures[match[1]]) throw httpError(400, 'The uploaded file is not a valid image of the selected type.');
-      logoData = `data:image/${match[1]};base64,${image.toString('base64')}`;
+      if (image.toString('base64') !== match[1]) throw httpError(400, 'Logo image data is malformed. Choose the file again and retry.');
+      const imageType = getImageType(image);
+      if (!imageType) throw httpError(400, 'The selected file contents are not a supported PNG, JPEG, or WebP image.');
+      logoData = `data:image/${imageType};base64,${image.toString('base64')}`;
     }
     const update = {
       schoolYear: req.body.schoolYear.trim(),
@@ -452,19 +483,24 @@ app.get('/api/student/dashboard', requireAuth('student'), async (req, res, next)
     }).select('lrn trackingCode status grade strand section createdAt').lean();
     let grades = [];
     let attendance = [];
-    if (enrollment?.status === 'Officially Enrolled') {
-      const [gradeRecords, attendanceRecords] = await Promise.all([
+    let assignedSections = [];
+    if (enrollment) {
+      const [gradeRecords, rosterAssignments, attendanceRecords] = await Promise.all([
         GradeSubmission.find({ status: 'Approved & Locked', 'students.lrn': enrollment.lrn })
-          .select('grade quarter section students reviewedAt')
+          .select('grade quarter section students reviewedAt weights assessments')
           .sort({ quarter: -1, reviewedAt: -1 })
           .limit(40)
           .lean(),
-        Attendance.find({ 'entries.lrn': enrollment.lrn })
-          .select('date section entries')
-          .sort({ date: -1 })
-          .limit(90)
-          .lean()
+        TeacherRoster.find({ learnerLrns: enrollment.lrn }).select('section').sort({ section: 1 }).lean(),
+        enrollment.status === 'Officially Enrolled'
+          ? Attendance.find({ 'entries.lrn': enrollment.lrn })
+            .select('date section entries')
+            .sort({ date: -1 })
+            .limit(90)
+            .lean()
+          : Promise.resolve([])
       ]);
+      assignedSections = [...new Set(rosterAssignments.map(roster => roster.section).filter(Boolean))];
       const scoreFields = ['ww1', 'ww2', 'ww3', 'pt1', 'pt2', 'pt3', 'exam'];
       grades = gradeRecords.map(record => {
         const student = record.students.find(entry => entry.lrn === enrollment.lrn);
@@ -479,6 +515,8 @@ app.get('/api/student/dashboard', requireAuth('student'), async (req, res, next)
           quarter: record.quarter,
           section: record.section,
           scores,
+          weights: record.weights || { ww: 40, pt: 40, qa: 20 },
+          assessments: record.assessments || defaultGradeAssessments,
           reviewedAt: record.reviewedAt
         };
       }).filter(record => Object.keys(record.scores).length > 0);
@@ -488,6 +526,7 @@ app.get('/api/student/dashboard', requireAuth('student'), async (req, res, next)
         status: record.entries.find(entry => entry.lrn === enrollment.lrn)?.status
       })).filter(record => ['Present', 'Late', 'Absent', 'Excused'].includes(record.status));
     }
+    const section = assignedSections.length ? assignedSections.join(', ') : enrollment?.section || '';
     res.json({
       account: { name: account.name, identifier: account.identifier },
       enrollment: enrollment ? {
@@ -495,7 +534,7 @@ app.get('/api/student/dashboard', requireAuth('student'), async (req, res, next)
         status: enrollment.status,
         grade: enrollment.grade,
         strand: enrollment.strand,
-        section: enrollment.section,
+        section,
         submittedAt: enrollment.createdAt
       } : null,
       grades,
@@ -504,7 +543,7 @@ app.get('/api/student/dashboard', requireAuth('student'), async (req, res, next)
   } catch (error) { next(error); }
 });
 
-app.post('/api/auth/login', async (req, res, next) => {
+app.post('/api/auth/login', loginLimiter, async (req, res, next) => {
   try {
     requireFields(req.body, ['identifier', 'password', 'role']);
     if (!roles.includes(req.body.role)) throw httpError(400, 'Select a valid account type.');
@@ -624,7 +663,7 @@ app.post('/api/auth/logout', (req, res, next) => {
   });
 });
 
-app.post('/api/enrollments', publicSubmissionLimiter, async (req, res, next) => {
+app.post('/api/enrollments', enrollmentSubmissionLimiter, async (req, res, next) => {
   try {
     requireFields(req.body, ['lrn', 'lastName', 'firstName', 'grade']);
     if (!(await getPublicPortalContent()).enrollmentOpen) throw httpError(403, 'Online enrollment applications are currently closed.');
@@ -911,7 +950,26 @@ app.post('/api/teacher/grades', requireAuth('teacher'), async (req, res, next) =
     if (!Array.isArray(req.body.students) || req.body.students.length === 0 || req.body.students.length > 1000) throw httpError(400, 'Grade entries must include between 1 and 1,000 learners.');
     const quarter = Number(req.body.quarter);
     if (!Number.isInteger(quarter) || quarter < 1 || quarter > 3) throw httpError(400, 'Term must be an integer from 1 to 3.');
-    const scoreLimits = { ww1: 25, ww2: 25, ww3: 50, pt1: 30, pt2: 30, pt3: 40, exam: 50 };
+    const weights = req.body.weights === undefined ? { ww: 40, pt: 40, qa: 20 } : req.body.weights;
+    if (!weights || typeof weights !== 'object' || Array.isArray(weights)
+      || !['ww', 'pt', 'qa'].every(key => Number.isInteger(weights[key]) && weights[key] >= 0 && weights[key] <= 100)
+      || weights.ww + weights.pt + weights.qa !== 100) {
+      throw httpError(400, 'Written Works, Performance Tasks, and Term Exam weights must be whole percentages totaling 100%.');
+    }
+    const assessmentSettings = req.body.assessments === undefined ? defaultGradeAssessments : req.body.assessments;
+    if (!assessmentSettings || typeof assessmentSettings !== 'object' || Array.isArray(assessmentSettings)) {
+      throw httpError(400, 'Provide valid names and maximum scores for each assessment.');
+    }
+    const assessments = Object.fromEntries(Object.keys(defaultGradeAssessments).map(field => {
+      const setting = assessmentSettings[field];
+      const maximum = Number(setting?.max);
+      if (typeof setting?.name !== 'string' || !setting.name.trim() || setting.name.trim().length > 40
+        || !Number.isFinite(maximum) || maximum <= 0 || maximum > 10000) {
+        throw httpError(400, `${field} requires a name of 1–40 characters and a maximum score greater than 0 and no greater than 10,000.`);
+      }
+      return [field, { name: setting.name.trim(), max: maximum }];
+    }));
+    const scoreLimits = Object.fromEntries(Object.entries(assessments).map(([field, setting]) => [field, setting.max]));
     for (const student of req.body.students) {
       if (!student || typeof student.lrn !== 'string' || !student.lrn.trim() || typeof student.name !== 'string' || !student.name.trim()) {
         throw httpError(400, 'Each grade entry requires a learner name and LRN.');
@@ -934,7 +992,7 @@ app.post('/api/teacher/grades', requireAuth('teacher'), async (req, res, next) =
     const current = await GradeSubmission.findOne(key).select('status');
     if (current?.status === 'Approved & Locked') throw httpError(409, 'This grade submission is signed and locked and cannot be changed.');
     const status = req.body.status === 'Submitted' || current?.status === 'Submitted' ? 'Submitted' : 'Draft';
-    const update = { ...key, students, status };
+    const update = { ...key, students, weights, assessments, status };
     const grade = current
       ? await GradeSubmission.findOneAndUpdate({ ...key, status: { $ne: 'Approved & Locked' } }, update, { new: true, runValidators: true })
       : await GradeSubmission.create(update);
@@ -1224,9 +1282,62 @@ app.post('/api/principal/accounts', requireAuth('principal'), async (req, res, n
 app.post('/api/principal/faculty', requireAuth('principal'), async (req, res, next) => {
   try {
     requireFields(req.body, ['name']);
-    const faculty = await Faculty.create({ name: req.body.name.trim(), rank: req.body.rank || '', department: req.body.department || '', load: req.body.load || '' });
+    const fields = ['name', 'rank', 'department', 'load'];
+    const limits = { name: 120, rank: 120, department: 120, load: 240 };
+    for (const field of fields) {
+      if (req.body[field] !== undefined && typeof req.body[field] !== 'string') throw httpError(400, `${field} must be text.`);
+      if (typeof req.body[field] === 'string' && req.body[field].trim().length > limits[field]) {
+        throw httpError(400, `${field} must be ${limits[field]} characters or fewer.`);
+      }
+    }
+    if (req.body.active !== undefined && typeof req.body.active !== 'boolean') throw httpError(400, 'active must be true or false.');
+    const faculty = await Faculty.create({
+      name: req.body.name.trim(),
+      rank: (req.body.rank || '').trim(),
+      department: (req.body.department || '').trim(),
+      load: (req.body.load || '').trim(),
+      ...(req.body.active === undefined ? {} : { active: req.body.active })
+    });
     await audit(req, 'faculty.created', String(faculty._id), { name: faculty.name });
     res.status(201).json({ faculty });
+  } catch (error) { next(error); }
+});
+
+app.patch('/api/principal/faculty/:id', requireAuth('principal'), async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) throw httpError(400, 'Invalid faculty record identifier.');
+    const fields = ['name', 'rank', 'department', 'load'];
+    const limits = { name: 120, rank: 120, department: 120, load: 240 };
+    if (!fields.some(field => req.body[field] !== undefined) && req.body.active === undefined) {
+      throw httpError(400, 'Provide at least one faculty field to update.');
+    }
+    const update = {};
+    for (const field of fields) {
+      if (req.body[field] === undefined) continue;
+      if (typeof req.body[field] !== 'string') throw httpError(400, `${field} must be text.`);
+      const value = req.body[field].trim();
+      if (value.length > limits[field]) throw httpError(400, `${field} must be ${limits[field]} characters or fewer.`);
+      if (field === 'name' && !value) throw httpError(400, 'name is required.');
+      update[field] = value;
+    }
+    if (req.body.active !== undefined) {
+      if (typeof req.body.active !== 'boolean') throw httpError(400, 'active must be true or false.');
+      update.active = req.body.active;
+    }
+    const faculty = await Faculty.findByIdAndUpdate(req.params.id, { $set: update }, { new: true, runValidators: true });
+    if (!faculty) throw httpError(404, 'Faculty record not found.');
+    await audit(req, 'faculty.updated', String(faculty._id), { name: faculty.name, fields: Object.keys(update) });
+    res.json({ faculty });
+  } catch (error) { next(error); }
+});
+
+app.delete('/api/principal/faculty/:id', requireAuth('principal'), async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) throw httpError(400, 'Invalid faculty record identifier.');
+    const faculty = await Faculty.findByIdAndDelete(req.params.id);
+    if (!faculty) throw httpError(404, 'Faculty record not found.');
+    await audit(req, 'faculty.deleted', String(faculty._id), { name: faculty.name });
+    res.status(204).end();
   } catch (error) { next(error); }
 });
 
@@ -1247,7 +1358,7 @@ app.get('/api/principal/audit', requireAuth('principal'), async (req, res) => {
   res.json({ events: await AuditEvent.find().populate('actor', 'name identifier role').sort({ createdAt: -1 }).limit(500).lean() });
 });
 
-app.post('/api/auth/recovery/start', async (req, res, next) => {
+app.post('/api/auth/recovery/start', recoveryStartLimiter, async (req, res, next) => {
   try {
     requireFields(req.body, ['identifier', 'role']);
     if (!roles.includes(req.body.role)) throw httpError(400, 'Select a valid account type.');
@@ -1304,7 +1415,7 @@ app.post('/api/auth/recovery/start', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.post('/api/auth/recovery/verify', async (req, res, next) => {
+app.post('/api/auth/recovery/verify', recoveryVerifyLimiter, async (req, res, next) => {
   try {
     requireFields(req.body, ['challengeId', 'code']);
     if (!mongoose.isValidObjectId(req.body.challengeId) || !/^\d{6}$/.test(req.body.code)) {
@@ -1329,7 +1440,7 @@ app.post('/api/auth/recovery/verify', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.post('/api/auth/recovery/reset', async (req, res, next) => {
+app.post('/api/auth/recovery/reset', recoveryResetLimiter, async (req, res, next) => {
   try {
     requireFields(req.body, ['challengeId', 'resetToken', 'password']);
     if (!mongoose.isValidObjectId(req.body.challengeId) || !/^[a-f\d]{64}$/i.test(req.body.resetToken)) {
@@ -1351,7 +1462,7 @@ app.post('/api/auth/recovery/reset', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.post('/api/helpdesk', publicSubmissionLimiter, async (req, res, next) => {
+app.post('/api/helpdesk', helpdeskSubmissionLimiter, async (req, res, next) => {
   try {
     requireFields(req.body, ['name', 'reason']);
     const ticket = await HelpdeskTicket.create({
@@ -1412,9 +1523,9 @@ app.get('/:page', (req, res, next) => {
   const requiredRole = protectedPages.get(req.params.page);
   if (requiredRole) {
     const account = req.session.account;
-    if (!account) return res.redirect(`/?signin=${encodeURIComponent(Array.isArray(requiredRole) ? requiredRole[0] : requiredRole)}`);
+    if (!account) return res.redirect(`/?signin=${encodeURIComponent(Array.isArray(requiredRole) ? requiredRole[0] : requiredRole)}&reason=session`);
     const allowed = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    if (!allowed.includes(account.role)) return res.redirect(`/${pageForRole[account.role] || pageForRole.student}`);
+    if (!allowed.includes(account.role)) return res.redirect(`/${pageForRole[account.role] || pageForRole.student}?access=denied`);
   }
   res.sendFile(path.join(__dirname, req.params.page));
 });
