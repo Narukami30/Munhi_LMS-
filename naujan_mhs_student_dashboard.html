@@ -10,6 +10,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/glassmorphism.css">
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #student-report-printable,
+            #student-report-printable * {
+                visibility: visible !important;
+            }
+            #student-report-printable {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                padding: 1rem;
+                color: #0f172a;
+                background: #fff;
+            }
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -35,8 +54,9 @@
     <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-4">
             <a href="/naujan_mhs_official_public_portal.html" class="flex min-w-0 items-center gap-3">
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 text-gold-400 shadow-md">
-                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                <span class="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-tr from-brand-950 via-brand-900 to-brand-700 text-gold-400 shadow-md">
+                    <i data-school-logo-fallback class="fa-solid fa-graduation-cap text-xl"></i>
+                    <img data-school-logo alt="School logo" class="absolute inset-0 hidden h-full w-full object-contain bg-white p-1">
                 </span>
                 <span class="min-w-0">
                     <span class="block truncate font-heading text-sm font-extrabold text-brand-950 sm:text-base">Naujan Municipal High School</span>
@@ -255,8 +275,15 @@
 
             <article class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
                 <div class="border-b border-slate-100 px-5 py-4 sm:px-6">
-                    <h2 class="font-heading text-base font-extrabold text-slate-900">Reviewed grades</h2>
-                    <p class="mt-1 text-[11px] text-slate-500">Assessment scores from grade submissions approved by the school</p>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h2 class="font-heading text-base font-extrabold text-slate-900">Reviewed grades</h2>
+                            <p class="mt-1 text-[11px] text-slate-500">Assessment scores from grade submissions approved by the school</p>
+                        </div>
+                        <button id="student-generate-report" type="button" disabled class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-800 px-3 py-2 text-[11px] font-bold text-white shadow-sm transition hover:bg-brand-900 disabled:cursor-not-allowed disabled:opacity-50">
+                            <i class="fa-solid fa-file-lines"></i> Generate Form 138 Preview
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full min-w-[460px] text-left text-xs">
@@ -270,6 +297,20 @@
                 </div>
                 <p class="border-t border-slate-100 px-5 py-3 text-[10px] text-slate-500 sm:px-6">Only approved submissions appear. These component scores are not a report card or final grade.</p>
             </article>
+        </section>
+
+        <section id="student-report-section" class="hidden overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 print:hidden sm:px-6">
+                <div>
+                    <h2 class="font-heading text-base font-extrabold text-slate-900">Learner progress report</h2>
+                    <p class="text-[11px] text-slate-500">Preview generated from the student's approved SERMS grade submissions.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="student-print-report" type="button" class="rounded-xl bg-brand-800 px-3 py-2 text-[11px] font-bold text-white hover:bg-brand-900"><i class="fa-solid fa-print mr-1"></i> Print / Save PDF</button>
+                    <button id="student-close-report" type="button" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50">Close</button>
+                </div>
+            </div>
+            <div id="student-report-printable" class="p-5 sm:p-8"></div>
         </section>
     </main>
 

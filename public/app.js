@@ -5,21 +5,483 @@
     const path = window.location.pathname;
     window.SERMS_PUBLIC_CONTENT = { loaded: false, schoolYear: '', enrollmentOpen: false };
 
-    async function api(url, options) {
-        const response = await fetch(`/api${url}`, {
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', ...(options && options.headers) },
-            ...options
+    const apiCache = new Map();
+    const draftStorageKey = `serms-draft:${path}`;
+    let activeApiRequests = 0;
+    let completedApiRequests = 0;
+    let slowRequestTimer = null;
+    let stateBanner;
+    let stateMessage;
+    let stateAction;
+    let restoredDraft;
+    let draftCleanupTimer;
+    let draftRestoreAnnounced = false;
+    let lastOfflineReadUrl = '';
+
+    function ensureStateBanner() {
+        if (stateBanner || !document.body) return;
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes serms-shimmer { 100% { transform: translateX(100%); } }
+            .serms-skeleton { position: relative; overflow: hidden; background: #e2e8f0; border-radius: .5rem; }
+            .serms-skeleton::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent); animation: serms-shimmer 1.4s infinite; }
+            .serms-field-error { color: #b91c1c; font-size: .75rem; margin-top: .35rem; }
+            [aria-invalid="true"] { border-color: #dc2626 !important; }
+        `;
+        document.head.appendChild(style);
+        stateBanner = document.createElement('section');
+        stateBanner.id = 'serms-state-banner';
+        stateBanner.className = 'fixed inset-x-0 top-0 z-[100] hidden px-4 py-3 shadow-lg';
+        stateBanner.setAttribute('role', 'status');
+        stateBanner.setAttribute('aria-live', 'polite');
+        stateBanner.innerHTML = '<div class="mx-auto flex max-w-7xl items-center justify-between gap-4"><div class="min-w-0"><strong id="serms-state-title" class="block text-sm"></strong><p id="serms-state-message" class="mt-0.5 text-xs"></p></div><button id="serms-state-action" type="button" class="shrink-0 rounded-lg border border-current px-3 py-1.5 text-xs font-bold"></button></div>';
+        document.body.prepend(stateBanner);
+        stateMessage = stateBanner.querySelector('#serms-state-message');
+        stateAction = stateBanner.querySelector('#serms-state-action');
+    }
+
+    function showState(kind, title, message, actionLabel, action) {
+        ensureStateBanner();
+        if (!stateBanner) return;
+        const colors = {
+            offline: 'bg-amber-50 text-amber-950 border-b border-amber-300',
+            slow: 'bg-blue-50 text-blue-950 border-b border-blue-300',
+            error: 'bg-rose-50 text-rose-950 border-b border-rose-300',
+            permission: 'bg-amber-50 text-amber-950 border-b border-amber-300',
+            session: 'bg-orange-50 text-orange-950 border-b border-orange-300',
+            success: 'bg-emerald-50 text-emerald-950 border-b border-emerald-300'
+        };
+        stateBanner.className = `fixed inset-x-0 top-0 z-[100] px-4 py-3 shadow-lg ${colors[kind] || colors.error}`;
+        stateBanner.dataset.state = kind;
+        stateBanner.querySelector('#serms-state-title').textContent = title;
+        stateMessage.textContent = message;
+        stateAction.textContent = actionLabel || 'Dismiss';
+        stateAction.classList.toggle('hidden', !actionLabel);
+        stateAction.onclick = action || (() => stateBanner.classList.add('hidden'));
+    }
+
+    function hideState(kinds) {
+        if (!stateBanner) return;
+        if (!kinds || kinds.includes(stateBanner.dataset.state)) stateBanner.classList.add('hidden');
+    }
+
+    function collectDraft() {
+        const controls = [...document.querySelectorAll('input, select, textarea')]
+            .filter(control => control.type !== 'password' && control.type !== 'file' && control.type !== 'hidden' && (control.id || control.name));
+        const values = controls.map(control => ({
+            id: control.id || '',
+            name: control.name || '',
+            type: control.type,
+            optionValue: control.value,
+            value: control.type === 'checkbox' || control.type === 'radio' ? control.checked : control.value
+        }));
+        try {
+            sessionStorage.setItem(draftStorageKey, JSON.stringify({ savedAt: Date.now(), values }));
+            restoredDraft = null;
+            return true;
+        } catch (error) {
+            console.error('Could not preserve this page draft:', error);
+            return false;
+        }
+    }
+
+    function restoreDraft() {
+        if (!restoredDraft) {
+            try {
+                restoredDraft = JSON.parse(sessionStorage.getItem(draftStorageKey) || 'null');
+            } catch (error) {
+                console.error('Could not read the saved page draft:', error);
+                return;
+            }
+        }
+        const draft = restoredDraft;
+        if (!draft || !Array.isArray(draft.values) || !Number.isFinite(draft.savedAt) || Date.now() - draft.savedAt > 30 * 60 * 1000) {
+            sessionStorage.removeItem(draftStorageKey);
+            restoredDraft = null;
+            return;
+        }
+        let restored = 0;
+        draft.values.forEach(saved => {
+            const control = saved.id ? document.getElementById(saved.id)
+                : [...document.querySelectorAll('[name]')].find(element => element.name === saved.name
+                    && element.type === saved.type
+                    && (!['checkbox', 'radio'].includes(saved.type) || element.value === saved.optionValue));
+            if (!control || control.dataset.sermsDraftRestored || control.type === 'password' || control.type === 'file' || control.type === 'hidden') return;
+            if (control.type === 'checkbox' || control.type === 'radio') control.checked = saved.value;
+            else control.value = saved.value;
+            control.dataset.sermsDraftRestored = 'true';
+            control.dispatchEvent(new Event('input', { bubbles: true }));
+            control.dispatchEvent(new Event('change', { bubbles: true }));
+            restored += 1;
         });
-        if (response.status === 204) return null;
-        const body = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(body.error || 'The request could not be completed.');
-        return body;
+        if (restored && !draftRestoreAnnounced) {
+            showState('success', 'Saved work restored', `${restored} field${restored === 1 ? '' : 's'} restored from this browser tab. Passwords were not saved; review the restored information before submitting.`);
+            draftRestoreAnnounced = true;
+        }
+        if (restored) {
+            window.clearTimeout(draftCleanupTimer);
+            draftCleanupTimer = window.setTimeout(() => {
+                sessionStorage.removeItem(draftStorageKey);
+                restoredDraft = null;
+            }, 30 * 1000);
+        }
+    }
+
+    function restoreDraftWhenIdle(startedAt = Date.now()) {
+        if (activeApiRequests === 0 || Date.now() - startedAt >= 30 * 1000) {
+            window.setTimeout(() => {
+                if (activeApiRequests === 0 || Date.now() - startedAt >= 30 * 1000) restoreDraft();
+                else restoreDraftWhenIdle(startedAt);
+            }, activeApiRequests === 0 ? 150 : 500);
+            return;
+        }
+        window.setTimeout(() => restoreDraftWhenIdle(startedAt), 250);
+    }
+
+    function saveDraftAndReload() {
+        collectDraft();
+        window.location.reload();
+    }
+
+    function preserveDraftOnSessionExpiry() {
+        const saved = collectDraft();
+        const role = window.SERMS_ACCOUNT?.role || document.documentElement.dataset.accountRole || 'student';
+        showState(
+            'session',
+            'Your session expired',
+            saved
+                ? 'Your open work was saved in this browser tab (passwords were excluded). Sign in again, then return to this page to restore it.'
+                : 'We could not save this page’s work in this browser tab. Copy any unsaved text before signing in again.',
+            'Sign in again',
+            () => { window.location.assign(`${publicPortal}?signin=${encodeURIComponent(role)}`); }
+        );
+    }
+
+    function showApiError(error) {
+        if (error.status === 401 && window.SERMS_ACCOUNT && error.url !== '/auth/login') {
+            preserveDraftOnSessionExpiry();
+            return;
+        }
+        if (error.status === 403) {
+            const destination = window.SERMS_ACCOUNT ? dashboardFor(window.SERMS_ACCOUNT.role) : publicPortal;
+            const requiredRole = error.url?.includes('/principal/') ? 'principal'
+                : error.url?.includes('/registrar/') ? 'registrar'
+                    : error.url?.includes('/teacher/') ? 'teacher'
+                        : 'an authorized school staff';
+            showState('permission', 'Access not allowed', `This action needs ${requiredRole} permission. Your account does not have that role, so no change was made. Return to your dashboard or ask the principal to grant the access you need.`, 'Return to dashboard', () => { window.location.assign(destination); });
+            return;
+        }
+        if (error.status === 429) {
+            showState('error', 'Please wait before retrying', error.message, 'Dismiss');
+            return;
+        }
+        if (error.status >= 500) {
+            showState('error', 'SERMS could not complete that request', 'This appears to be a server-side problem; your browser did not cause it. Your current screen is kept. Try again shortly, or contact the school administrator if it continues.', 'Retry', saveDraftAndReload);
+        } else if (error.status >= 400) {
+            showState('error', 'Please check the highlighted information', error.message, 'Dismiss');
+        }
+    }
+
+    function retryOfflineRead() {
+        if (!navigator.onLine) {
+            showState('offline', 'You are still offline', 'Previously loaded information remains on screen. New searches and saves will work again when the connection returns.', 'Dismiss');
+            return;
+        }
+        if (!lastOfflineReadUrl) {
+            showState('offline', 'SERMS is still unreachable', 'Your current screen and unsent form entries are unchanged. Check the connection and try the action again.', 'Dismiss');
+            return;
+        }
+        api(lastOfflineReadUrl).catch(error => console.error('Retrying the last read failed:', error));
+    }
+
+    function setOfflineState() {
+        showState('offline', 'You are offline or SERMS cannot be reached', 'Previously loaded information stays on this screen. You can review it, but changes and new searches cannot be saved until the connection returns.', 'Retry connection', retryOfflineRead);
+    }
+
+    function updateSlowState() {
+        if (!activeApiRequests) return;
+        showState('slow', 'SERMS is responding slowly', `${completedApiRequests} API request${completedApiRequests === 1 ? '' : 's'} completed; ${activeApiRequests} still in progress. Keep viewing the information already on screen while the request finishes.`, 'Keep using loaded data', () => hideState(['slow']));
+    }
+
+    async function api(url, options) {
+        const method = options?.method || 'GET';
+        const cacheKey = url;
+        activeApiRequests += 1;
+        if (!slowRequestTimer) {
+            completedApiRequests = 0;
+            slowRequestTimer = window.setTimeout(updateSlowState, 4000);
+        }
+        try {
+            const response = await fetch(`/api${url}`, {
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', ...(options && options.headers) },
+                ...options
+            });
+            if (response.status === 204) {
+                if (method !== 'GET') {
+                    showState('success', 'Request completed', 'SERMS confirmed the request. Your current information remains available on this screen; continue with the next step when ready.', 'Dismiss');
+                }
+                return null;
+            }
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const error = new Error(body.error || 'The request could not be completed.');
+                error.status = response.status;
+                error.url = url;
+                showApiError(error);
+                throw error;
+            }
+            if (method !== 'GET') {
+                showState('success', 'Request completed', 'SERMS confirmed the request. Your current information remains available on this screen; continue with the next step when ready.', 'Dismiss');
+            }
+            if (method === 'GET' && url !== '/auth/me' && url !== '/auth/profile') apiCache.set(cacheKey, body);
+            if (method === 'GET' && lastOfflineReadUrl === url) lastOfflineReadUrl = '';
+            if (navigator.onLine) hideState(['offline']);
+            return body;
+        } catch (error) {
+            if (error.status) throw error;
+            const cached = method === 'GET' ? apiCache.get(cacheKey) : null;
+            if (method === 'GET') lastOfflineReadUrl = url;
+            setOfflineState();
+            if (cached) return cached;
+            const unavailable = new Error('The server could not be reached. Check your internet connection and retry; your unsent changes remain on this screen.');
+            unavailable.networkError = true;
+            throw unavailable;
+        } finally {
+            activeApiRequests = Math.max(0, activeApiRequests - 1);
+            completedApiRequests += 1;
+            if (!activeApiRequests) {
+                window.clearTimeout(slowRequestTimer);
+                slowRequestTimer = null;
+                if (stateBanner?.classList.contains('serms-state-slow')) hideState(['slow']);
+            }
+        }
     }
 
     function notify(message) {
+        const liveRegion = document.getElementById('serms-live-announcement');
+        if (liveRegion) liveRegion.textContent = message;
         if (typeof window.showToast === 'function') window.showToast(message);
         else window.alert(message);
+    }
+
+    function showInlineFieldError(control, message) {
+        const container = control.closest('label') || control.parentElement;
+        if (!container) return;
+        let error = container.querySelector(':scope > [data-serms-field-error]');
+        if (!error) {
+            error = document.createElement('p');
+            error.dataset.sermsFieldError = 'true';
+            error.className = 'serms-field-error';
+            error.setAttribute('role', 'alert');
+            container.appendChild(error);
+        }
+        error.textContent = message;
+        control.setAttribute('aria-invalid', 'true');
+    }
+
+    function clearInlineFieldError(control) {
+        control.removeAttribute('aria-invalid');
+        const container = control.closest('label') || control.parentElement;
+        container?.querySelector(':scope > [data-serms-field-error]')?.remove();
+    }
+
+    function showFormValidationError(event, error) {
+        const form = event?.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        const message = error.message || 'Check this field and try again.';
+        const fieldTerms = [
+            ['email', ['email']],
+            ['lrn', ['lrn', 'learner reference']],
+            ['password', ['password', 'verification code']],
+            ['confirm', ['confirm', 'match']],
+            ['name', ['name']],
+            ['grade', ['grade level', 'grade']],
+            ['section', ['section']],
+            ['date', ['date']],
+            ['contact', ['contact', 'phone']],
+            ['reason', ['reason', 'message']],
+            ['identifier', ['username', 'identifier', 'tracking code']]
+        ];
+        const lower = message.toLowerCase();
+        let candidate;
+        for (const [term, clues] of fieldTerms) {
+            if (!clues.some(clue => lower.includes(clue))) continue;
+            candidate = [...form.elements].find(control =>
+                `${control.id} ${control.name} ${control.labels?.[0]?.textContent || ''}`.toLowerCase().includes(term)
+            );
+            if (candidate) break;
+        }
+        candidate ||= form.querySelector(':invalid') || form.querySelector('input:not([type="hidden"]), select, textarea');
+        if (candidate) showInlineFieldError(candidate, message);
+    }
+
+    function addLoadingSkeletons() {
+        document.querySelectorAll('tbody').forEach(body => {
+            const cell = body.querySelector('tr td');
+            if (!cell || !/^loading\b/i.test(cell.textContent.trim())) return;
+            const columns = Math.min(Math.max(Number(cell.colSpan) || 4, 3), 7);
+            const fragment = document.createDocumentFragment();
+            for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
+                const row = document.createElement('tr');
+                row.setAttribute('aria-hidden', 'true');
+                for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+                    const td = document.createElement('td');
+                    td.className = 'px-4 py-3';
+                    const block = document.createElement('div');
+                    block.className = `serms-skeleton h-3 ${columnIndex === 0 ? 'w-3/4' : 'w-1/2'}`;
+                    td.appendChild(block);
+                    row.appendChild(td);
+                }
+                fragment.appendChild(row);
+            }
+            body.replaceChildren(fragment);
+        });
+        document.querySelectorAll('body *').forEach(element => {
+            if (element.children.length || !/^Loading\b/i.test(element.textContent.trim())) return;
+            element.setAttribute('aria-label', 'Loading information');
+            element.textContent = '';
+            const block = document.createElement('span');
+            block.className = 'serms-skeleton inline-block h-4 w-24 align-middle';
+            block.setAttribute('aria-hidden', 'true');
+            element.appendChild(block);
+        });
+    }
+
+    function addEmptyStateGuidance(root = document) {
+        root.querySelectorAll('tbody tr td[colspan]').forEach(cell => {
+            const text = cell.textContent.trim();
+            if (!/^No\b/i.test(text) || cell.querySelector('[data-serms-empty-guidance]')) return;
+            const guidance = document.createElement('span');
+            guidance.dataset.sermsEmptyGuidance = 'true';
+            guidance.className = 'mt-1 block text-[11px] font-normal text-slate-500';
+            guidance.textContent = /match|result/i.test(text)
+                ? 'Next: check spelling, use a shorter search, or clear a filter.'
+                : 'Next: add a record or adjust the current search and filters.';
+            cell.appendChild(guidance);
+        });
+    }
+
+    function levenshtein(first, second) {
+        const row = Array.from({ length: second.length + 1 }, (_, index) => index);
+        for (let i = 1; i <= first.length; i += 1) {
+            let diagonal = row[0];
+            row[0] = i;
+            for (let j = 1; j <= second.length; j += 1) {
+                const previous = row[j];
+                row[j] = Math.min(row[j] + 1, row[j - 1] + 1, diagonal + (first[i - 1] === second[j - 1] ? 0 : 1));
+                diagonal = previous;
+            }
+        }
+        return row[second.length];
+    }
+
+    function getSearchCandidates(inputId) {
+        const sources = {
+            'advisory-search': typeof advisoryStudents === 'undefined' ? [] : advisoryStudents.map(item => `${item.name} ${item.lrn}`),
+            'records-search': typeof studentsList === 'undefined' ? [] : studentsList.map(item => `${item.name} ${item.lrn} ${item.section}`),
+            'vault-search': typeof vaultRecords === 'undefined' ? [] : vaultRecords.map(item => `${item.name} ${item.lrn} ${item.grade} ${item.strand}`),
+            'doc-search': typeof docRequests === 'undefined' ? [] : docRequests.map(item => `${item.name} ${item.lrn} ${item.tracking}`),
+            'approval-search': typeof approvalRecords === 'undefined' ? [] : approvalRecords.map(item => `${item.section} ${item.adviser}`),
+            'staff-account-search': staffAccounts.map(item => `${item.name} ${item.identifier} ${item.role}`),
+            'roster-learner-search': principalRosterLearners.map(item => `${item.name} ${item.lrn} ${item.grade}`)
+        };
+        return sources[inputId] || [];
+    }
+
+    function showSearchHelp(input) {
+        const tableIds = {
+            'advisory-search': 'advisory-table-body',
+            'records-search': 'masterlist-tbody',
+            'vault-search': 'vault-table-body',
+            'doc-search': 'doc-requests-tbody',
+            'approval-search': 'approvals-table-body',
+            'staff-account-search': 'staff-account-table-body',
+            'roster-learner-search': 'roster-learners-list'
+        };
+        const table = document.getElementById(tableIds[input.id]);
+        const empty = table && (table.tagName === 'TBODY'
+            ? table.rows.length === 0 || (table.rows.length === 1 && /no .*?(match|record|learner|request|account|submission)/i.test(table.textContent))
+            : /no .*?(match|record|learner)/i.test(table.textContent));
+        const helpId = `${input.id}-search-help`;
+        document.getElementById(helpId)?.remove();
+        if (!input.value.trim() || !empty) return;
+
+        const query = input.value.trim().toLowerCase();
+        const candidates = getSearchCandidates(input.id);
+        const best = candidates.map(candidate => {
+            const words = String(candidate).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+            const distance = Math.min(...words.map(word => levenshtein(query, word)));
+            return { candidate: String(candidate), distance };
+        }).sort((a, b) => a.distance - b.distance)[0];
+        const suggested = best && best.distance > 0 && best.distance <= Math.max(1, Math.floor(query.length / 4))
+            ? best.candidate.split(/\s+/).slice(0, 2).join(' ')
+            : '';
+        const help = document.createElement('p');
+        help.id = helpId;
+        help.className = 'col-span-full mt-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-950';
+        help.setAttribute('role', 'status');
+        const text = document.createElement('span');
+        text.textContent = suggested
+            ? `No results for “${input.value}”. Did you mean “${suggested}”? You can also search by part of a name or ID. `
+            : `No results for “${input.value}”. Check the spelling, try part of a name or ID, or clear filters. `;
+        help.appendChild(text);
+        if (suggested) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'font-bold underline';
+            button.textContent = `Search “${suggested}”`;
+            button.addEventListener('click', () => {
+                input.value = suggested;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            help.appendChild(button);
+        }
+        const anchor = input.closest('.relative') || input.parentElement;
+        anchor?.insertAdjacentElement('afterend', help);
+    }
+
+    function initializeInterfaceStates() {
+        ensureStateBanner();
+        const liveRegion = document.createElement('div');
+        liveRegion.id = 'serms-live-announcement';
+        liveRegion.className = 'sr-only';
+        liveRegion.setAttribute('aria-live', 'polite');
+        document.body.appendChild(liveRegion);
+        addLoadingSkeletons();
+        addEmptyStateGuidance();
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) addEmptyStateGuidance(node);
+            }));
+        });
+        document.querySelectorAll('tbody').forEach(body => observer.observe(body, { childList: true, subtree: true }));
+        document.addEventListener('invalid', event => showInlineFieldError(event.target, event.target.validationMessage), true);
+        document.addEventListener('input', event => {
+            if (event.target.matches('input, select, textarea')) clearInlineFieldError(event.target);
+        });
+        ['advisory-search', 'records-search', 'vault-search', 'doc-search', 'approval-search', 'staff-account-search', 'roster-learner-search'].forEach(id => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.spellcheck = true;
+            let timer;
+            input.addEventListener('input', () => {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(() => showSearchHelp(input), 80);
+            });
+        });
+        document.addEventListener('submit', event => {
+            if (!event.target.checkValidity()) showFormValidationError(event, new Error('Review the highlighted fields and correct them before continuing.'));
+        }, true);
+        window.addEventListener('offline', setOfflineState);
+        window.addEventListener('online', () => {
+            showState('success', 'Connection restored', 'SERMS is reachable again. You can retry any change that did not finish.', 'Dismiss');
+            if (lastOfflineReadUrl) retryOfflineRead();
+        });
+        if (!navigator.onLine) setOfflineState();
+        const protectedPage = ['student_dashboard.html', 'teacher_portal_dashboard.html', 'registrar_dashboard.html', 'principal_super_admin_dashboard.html', 'enrollment_records_management_system.html']
+            .some(page => path.endsWith(page));
+        if (!protectedPage && !new URLSearchParams(window.location.search).has('signin')) restoreDraft();
     }
 
     function value(id) {
@@ -40,6 +502,29 @@
             '"': '&quot;',
             "'": '&#39;'
         })[character]);
+    }
+
+    function applySchoolLogo(logoData) {
+        document.querySelectorAll('[data-school-logo]').forEach(image => {
+            const fallback = image.parentElement?.querySelector('[data-school-logo-fallback]');
+            if (logoData) {
+                image.onerror = () => {
+                    image.classList.add('hidden');
+                    fallback?.classList.remove('hidden');
+                };
+                image.onload = () => {
+                    image.classList.remove('hidden');
+                    fallback?.classList.add('hidden');
+                };
+                image.src = logoData;
+            } else {
+                image.onerror = null;
+                image.onload = null;
+                image.removeAttribute('src');
+                image.classList.add('hidden');
+                fallback?.classList.remove('hidden');
+            }
+        });
     }
 
     let staffAccounts = [];
@@ -338,12 +823,13 @@
         if (typeof facultyRoster === 'undefined') return;
         facultyRoster.splice(0, facultyRoster.length, ...faculty.map(member => ({
             id: member._id,
-            name: escapeHtml(member.name),
-            rank: escapeHtml(member.rank || ''),
-            dept: escapeHtml(member.department || ''),
-            load: escapeHtml(member.load || ''),
+            name: member.name,
+            rank: member.rank || '',
+            dept: member.department || '',
+            load: member.load || '',
             ipcrf: 'Not yet rated',
-            status: member.active ? 'Active Duty' : 'Inactive'
+            active: member.active !== false,
+            status: member.active !== false ? 'Active Duty' : 'Inactive'
         })));
         if (typeof window.renderFacultyTable === 'function') window.renderFacultyTable(facultyRoster);
     }
@@ -464,6 +950,7 @@
         window.setTeacherRecords({
             rosters,
             submission,
+            gradeSubmissions: submissions,
             attendance: {
                 ...(savedToday || { section }),
                 entries: students.map(student => ({ lrn: student.lrn, name: student.name, status: student.attendance }))
@@ -585,6 +1072,7 @@
                 return original.apply(this, args);
             } catch (error) {
                 console.error(`${name} failed:`, error);
+                showFormValidationError(args[0], error);
                 notify(error.message);
                 return undefined;
             }
@@ -613,12 +1101,13 @@
         if (!pathname.endsWith('.html') || pathname === publicPortal || pathname.endsWith('account_recovery_portal.html')) return;
         api('/auth/me').then(({ account }) => {
             if (!account) {
-                window.location.replace(`${publicPortal}?signin=${encodeURIComponent(role)}`);
+                collectDraft();
+                window.location.replace(`${publicPortal}?signin=${encodeURIComponent(Array.isArray(role) ? role[0] : role)}&reason=session`);
                 return;
             }
             const allowed = Array.isArray(role) ? role : [role];
             if (!allowed.includes(account.role)) {
-                window.location.replace(dashboardFor(account.role));
+                window.location.replace(`${dashboardFor(account.role)}?access=denied`);
                 return;
             }
             window.SERMS_ACCOUNT = account;
@@ -626,7 +1115,11 @@
             updateProfileHeader(account);
             attachLogoutButton();
             if (account.role !== 'student') attachProfileSettings();
+            api('/public/content')
+                .then(({ content }) => applySchoolLogo(content.logoData || ''))
+                .catch(error => console.error('Could not load the school logo:', error));
             hydratePage(pathname);
+            restoreDraftWhenIdle();
         }).catch(error => {
             console.error('Unable to verify the current session:', error);
             notify(`Unable to connect to SERMS: ${error.message}`);
@@ -922,6 +1415,7 @@
             api('/student/dashboard').then(async ({ account, enrollment, grades, attendance }) => {
                 if (!account?.identifier) throw new Error('Your student LRN could not be loaded. Contact the registrar for assistance.');
                 studentIdentifier = account.identifier;
+                const approvedGrades = grades;
                 document.getElementById('student-enrollment-lrn').value = studentIdentifier;
                 hasEnrollment = Boolean(enrollment);
                 const status = document.getElementById('student-status');
@@ -931,6 +1425,126 @@
                 const attendanceBody = document.getElementById('student-attendance-body');
                 const attendanceCount = document.getElementById('student-attendance-count');
                 const gradesBody = document.getElementById('student-grades-body');
+                const reportSection = document.getElementById('student-report-section');
+                const reportContent = document.getElementById('student-report-printable');
+                const generateReportButton = document.getElementById('student-generate-report');
+                generateReportButton.disabled = approvedGrades.length === 0;
+                generateReportButton.addEventListener('click', () => {
+                    if (!approvedGrades.length) {
+                        notify('No approved grade records are available to generate a report.');
+                        return;
+                    }
+                    const scoreFields = ['ww1', 'ww2', 'ww3', 'pt1', 'pt2', 'pt3', 'exam'];
+                    const defaultAssessments = {
+                        ww1: { name: 'Written Work 1', max: 20 },
+                        ww2: { name: 'Written Work 2', max: 20 },
+                        ww3: { name: 'Written Work 3', max: 20 },
+                        pt1: { name: 'Performance Task 1', max: 20 },
+                        pt2: { name: 'Performance Task 2', max: 20 },
+                        pt3: { name: 'Performance Task 3', max: 20 },
+                        exam: { name: 'Term Exam', max: 50 }
+                    };
+                    const transmute = initial => {
+                        const boundaries = [
+                            [100, 100], [98.4, 99], [96.8, 98], [95.2, 97], [93.6, 96],
+                            [92, 95], [90.4, 94], [88.8, 93], [87.2, 92], [85.6, 91],
+                            [84, 90], [82.4, 89], [80.8, 88], [79.2, 87], [77.6, 86],
+                            [76, 85], [74.4, 84], [72.8, 83], [71.2, 82], [69.6, 81],
+                            [68, 80], [66.4, 79], [64.8, 78], [63.2, 77], [61.6, 76],
+                            [60, 75], [56, 74], [52, 73], [48, 72], [44, 71], [40, 70]
+                        ];
+                        return boundaries.find(([minimum]) => initial >= minimum)?.[1] ?? 68;
+                    };
+                    const resultFor = record => {
+                        const assessments = { ...defaultAssessments, ...(record.assessments || {}) };
+                        const weights = record.weights || { ww: 40, pt: 40, qa: 20 };
+                        if (!['ww', 'pt', 'qa'].every(key => Number.isFinite(Number(weights[key])) && Number(weights[key]) >= 0)
+                            || Number(weights.ww) + Number(weights.pt) + Number(weights.qa) !== 100) return null;
+                        if (!scoreFields.every(field => Number.isFinite(Number(record.scores?.[field]))
+                            && Number(record.scores[field]) >= 0
+                            && Number.isFinite(Number(assessments[field]?.max))
+                            && Number(assessments[field].max) > 0
+                            && Number(record.scores[field]) <= Number(assessments[field].max))) return null;
+                        const totalFor = fields => fields.reduce((sum, field) => sum + Number(record.scores[field]), 0);
+                        const maxFor = fields => fields.reduce((sum, field) => sum + Number(assessments[field].max), 0);
+                        const initial = totalFor(['ww1', 'ww2', 'ww3']) / maxFor(['ww1', 'ww2', 'ww3']) * Number(weights.ww)
+                            + totalFor(['pt1', 'pt2', 'pt3']) / maxFor(['pt1', 'pt2', 'pt3']) * Number(weights.pt)
+                            + Number(record.scores.exam) / Number(assessments.exam.max) * Number(weights.qa);
+                        return transmute(initial);
+                    };
+                    const learningAreas = new Map();
+                    approvedGrades.forEach(record => {
+                        const areaName = String(record.learningArea || 'Learning area').trim();
+                        const key = areaName.toLocaleLowerCase();
+                        if (!learningAreas.has(key)) learningAreas.set(key, { name: areaName, terms: new Map() });
+                        const area = learningAreas.get(key);
+                        const term = Number(record.quarter);
+                        if (Number.isInteger(term) && term >= 1 && term <= 3 && !area.terms.has(term)) {
+                            area.terms.set(term, resultFor(record));
+                        }
+                    });
+                    const element = (tag, text, className) => {
+                        const node = document.createElement(tag);
+                        node.textContent = text;
+                        if (className) node.className = className;
+                        return node;
+                    };
+                    const report = document.createElement('div');
+                    report.className = 'mx-auto max-w-4xl text-slate-900';
+                    report.append(
+                        element('p', 'NAUJAN MUNICIPAL HIGH SCHOOL', 'text-center text-lg font-extrabold tracking-wide'),
+                        element('h2', 'LEARNER PROGRESS REPORT', 'mt-1 text-center text-base font-bold'),
+                        element('p', 'SERMS-generated Form 138 / SF9-style preview', 'mt-1 text-center text-xs text-slate-600')
+                    );
+                    const learnerDetails = document.createElement('div');
+                    learnerDetails.className = 'mt-6 grid grid-cols-1 gap-2 border-y border-slate-300 py-3 text-xs sm:grid-cols-2';
+                    learnerDetails.append(
+                        element('p', `Learner: ${account.name || '—'}`, 'font-semibold'),
+                        element('p', `LRN: ${account.identifier}`, 'font-semibold'),
+                        element('p', `Grade level: ${enrollment?.grade || '—'}`),
+                        element('p', `Section: ${enrollment?.section || 'Not assigned'}`),
+                        element('p', `Strand: ${enrollment?.strand || '—'}`),
+                        element('p', 'School year: Not included in approved grade records')
+                    );
+                    report.appendChild(learnerDetails);
+                    const tableWrap = document.createElement('div');
+                    tableWrap.className = 'mt-5 overflow-x-auto';
+                    const table = document.createElement('table');
+                    table.className = 'w-full border-collapse text-left text-xs';
+                    const head = document.createElement('thead');
+                    head.className = 'bg-slate-100';
+                    const headingRow = document.createElement('tr');
+                    ['Learning area', 'Term 1', 'Term 2', 'Term 3'].forEach(label => {
+                        const cell = element('th', label, 'border border-slate-300 px-3 py-2 font-bold');
+                        cell.scope = 'col';
+                        headingRow.appendChild(cell);
+                    });
+                    head.appendChild(headingRow);
+                    const body = document.createElement('tbody');
+                    [...learningAreas.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach(area => {
+                        const row = document.createElement('tr');
+                        row.appendChild(element('th', area.name, 'border border-slate-300 px-3 py-2 font-semibold'));
+                        for (let term = 1; term <= 3; term += 1) {
+                            const grade = area.terms.get(term);
+                            row.appendChild(element('td', grade === undefined ? '—' : grade === null ? 'Incomplete' : String(grade),
+                                'border border-slate-300 px-3 py-2 text-center'));
+                        }
+                        body.appendChild(row);
+                    });
+                    table.append(head, body);
+                    tableWrap.appendChild(table);
+                    report.appendChild(tableWrap);
+                    report.appendChild(element(
+                        'p',
+                        'Unofficial preview only — this is not a certified DepEd SF9/Form 138. It includes approved SERMS records for Terms 1–3 only; a dash means no approved record is available for that term. Attendance and school-year details are not included because they are not part of the grade records.',
+                        'mt-5 rounded-xl border border-amber-300 bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-950'
+                    ));
+                    reportContent.replaceChildren(report);
+                    reportSection.classList.remove('hidden');
+                    reportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+                document.getElementById('student-print-report').addEventListener('click', () => window.print());
+                document.getElementById('student-close-report').addEventListener('click', () => reportSection.classList.add('hidden'));
                 const addTableMessage = (body, text) => {
                     const row = document.createElement('tr');
                     const cell = document.createElement('td');
@@ -994,7 +1608,6 @@
                         : 'Attendance appears after the registrar marks your application officially enrolled.');
                 }
                 if (grades.length) {
-                    const scoreLabels = { ww1: 'WW1', ww2: 'WW2', ww3: 'WW3', pt1: 'PT1', pt2: 'PT2', pt3: 'PT3', exam: 'Exam' };
                     grades.forEach(record => {
                         const row = document.createElement('tr');
                         row.className = 'text-slate-700';
@@ -1007,7 +1620,10 @@
                         const scores = document.createElement('td');
                         scores.className = 'px-5 py-3 font-mono text-[10px] leading-relaxed';
                         scores.textContent = Object.entries(record.scores)
-                            .map(([field, score]) => `${scoreLabels[field] || field}: ${score}`)
+                            .map(([field, score]) => {
+                                const assessment = record.assessments?.[field];
+                                return `${assessment?.name || field}: ${score}${assessment?.max ? `/${assessment.max}` : ''}`;
+                            })
                             .join(' · ');
                         row.append(area, term, scores);
                         gradesBody.appendChild(row);
@@ -1192,15 +1808,7 @@
             }
         });
         const updateLogo = logoData => {
-            document.querySelectorAll('[data-school-logo]').forEach(image => {
-                if (logoData) {
-                    image.src = logoData;
-                    image.classList.remove('hidden');
-                } else {
-                    image.removeAttribute('src');
-                    image.classList.add('hidden');
-                }
-            });
+            applySchoolLogo(logoData);
             document.querySelectorAll('[data-school-logo-fallback]').forEach(icon => {
                 icon.classList.toggle('hidden', Boolean(logoData));
             });
@@ -1408,6 +2016,11 @@
         }, function () { return false; });
 
         const params = new URLSearchParams(window.location.search);
+        if (params.get('reason') === 'session') {
+            showState('session', 'Please sign in again', 'Your previous session ended. Any saved draft remains in this browser tab and can be restored after you return to its page.', 'Dismiss');
+        } else if (params.get('access') === 'denied') {
+            showState('permission', 'This area is restricted', 'Your account was redirected to its permitted dashboard. If you need access, contact the principal.', 'Dismiss');
+        }
         if (params.has('signin') && typeof window.openLoginModal === 'function') window.openLoginModal(params.get('signin'));
     }
 
@@ -1584,11 +2197,34 @@
             if (!students.length) throw new Error('A class roster is required before saving grades.');
             const section = value('teacher-section-input');
             if (!section) throw new Error('Enter the class section before saving grades.');
+            const weightInputs = ['ww', 'pt', 'qa'].map(key => value(`teacher-weight-${key}`));
+            const weights = { ww: Number(weightInputs[0]), pt: Number(weightInputs[1]), qa: Number(weightInputs[2]) };
+            if (weightInputs.some(weight => !weight)) {
+                throw new Error('Enter all three grade component weights.');
+            }
+            if (!Object.values(weights).every(weight => Number.isInteger(weight) && weight >= 0 && weight <= 100)
+                || weights.ww + weights.pt + weights.qa !== 100) {
+                throw new Error('Grade component weights must be whole percentages totaling 100%.');
+            }
+            const assessmentFields = ['ww1', 'ww2', 'ww3', 'pt1', 'pt2', 'pt3', 'exam'];
+            const assessments = Object.fromEntries(assessmentFields.map(field => [
+                field,
+                {
+                    name: value(`teacher-assessment-name-${field}`),
+                    max: Number(value(`teacher-assessment-max-${field}`))
+                }
+            ]));
+            if (assessmentFields.some(field => !assessments[field].name || assessments[field].name.length > 40
+                || !Number.isFinite(assessments[field].max) || assessments[field].max <= 0 || assessments[field].max > 10000)) {
+                throw new Error('Each assessment needs a name of 1–40 characters and a maximum score greater than 0 and no greater than 10,000.');
+            }
             return {
                 status,
                 quarter: Number(value('teacher-quarter')) || 1,
                 grade: value('teacher-learning-area'),
                 section,
+                weights,
+                assessments,
                 students
             };
         };
@@ -1669,13 +2305,25 @@
         const logoPreview = document.getElementById('portal-logo-preview');
         const logoPlaceholder = document.getElementById('portal-logo-placeholder');
         const logoFile = document.getElementById('portal-logo-file');
+        let logoSelectionVersion = 0;
+        let logoLoadPromise = Promise.resolve();
         const setLogoPreview = logoData => {
             savedLogoData = logoData;
             if (logoData) {
+                logoPreview.onerror = () => {
+                    logoPreview.classList.add('hidden');
+                    logoPlaceholder.classList.remove('hidden');
+                    contentStatus.textContent = 'The saved logo cannot be displayed. Upload a valid image or remove the logo before saving.';
+                    contentStatus.classList.add('text-rose-700');
+                };
+                logoPreview.onload = () => {
+                    logoPreview.classList.remove('hidden');
+                    logoPlaceholder.classList.add('hidden');
+                };
                 logoPreview.src = logoData;
-                logoPreview.classList.remove('hidden');
-                logoPlaceholder.classList.add('hidden');
             } else {
+                logoPreview.onerror = null;
+                logoPreview.onload = null;
                 logoPreview.removeAttribute('src');
                 logoPreview.classList.add('hidden');
                 logoPlaceholder.classList.remove('hidden');
@@ -1726,24 +2374,55 @@
             reader.addEventListener('error', () => reject(new Error('The selected logo file could not be read.')));
             reader.readAsDataURL(file);
         });
+        const normalizeImageData = data => {
+            const encoded = data.slice(data.indexOf(',') + 1);
+            const bytes = Uint8Array.from(atob(encoded), character => character.charCodeAt(0));
+            const isPng = bytes.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte);
+            const isJpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+            const isWebp = bytes.length >= 12
+                && String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF'
+                && String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP';
+            const type = isPng ? 'png' : isJpeg ? 'jpeg' : isWebp ? 'webp' : '';
+            if (!type) throw new Error('The selected file contents are not a supported PNG, JPEG, or WebP image.');
+            return `data:image/${type};base64,${encoded}`;
+        };
+        const validateImageData = data => new Promise((resolve, reject) => {
+            const image = new Image();
+            image.addEventListener('load', () => {
+                if (image.naturalWidth && image.naturalHeight) resolve();
+                else reject(new Error('The selected logo file is not a valid image.'));
+            }, { once: true });
+            image.addEventListener('error', () => reject(new Error('The selected logo file is not a valid PNG, JPEG, or WebP image.')), { once: true });
+            image.src = data;
+        });
         if (contentForm) {
             loadPublicContentEditor();
             logoFile.addEventListener('change', async () => {
                 const file = logoFile.files?.[0];
                 if (!file) return;
-                if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 750 * 1024) {
+                const selectionVersion = ++logoSelectionVersion;
+                if (file.size > 750 * 1024) {
                     logoFile.value = '';
                     notify('Choose a PNG, JPEG, or WebP logo no larger than 750 KB.');
                     return;
                 }
-                try {
-                    setLogoPreview(await readImageData(file));
-                } catch (error) {
-                    console.error('Could not preview school logo:', error);
-                    notify(error.message);
-                }
+                logoLoadPromise = (async () => {
+                    try {
+                        const imageData = normalizeImageData(await readImageData(file));
+                        await validateImageData(imageData);
+                        if (selectionVersion === logoSelectionVersion) setLogoPreview(imageData);
+                    } catch (error) {
+                        console.error('Could not preview school logo:', error);
+                        if (selectionVersion === logoSelectionVersion) logoFile.value = '';
+                        notify(error.message);
+                        throw error;
+                    }
+                })();
+                logoLoadPromise.catch(() => {});
             });
             document.getElementById('portal-logo-remove').addEventListener('click', () => {
+                logoSelectionVersion++;
+                logoLoadPromise = Promise.resolve();
                 logoFile.value = '';
                 setLogoPreview('');
             });
@@ -1753,6 +2432,7 @@
                 contentStatus.classList.remove('text-rose-700', 'text-emerald-700');
                 contentStatus.textContent = 'Saving public portal settings…';
                 try {
+                    await logoLoadPromise;
                     const announcements = Array.from({ length: 3 }, (_, index) => ({
                         category: value(`portal-announcement-${index}-category`),
                         date: value(`portal-announcement-${index}-date`),
@@ -1782,6 +2462,7 @@
                     });
                     window.SERMS_PUBLIC_CONTENT = { ...content, loaded: true };
                     setLogoPreview(content.logoData || '');
+                    applySchoolLogo(content.logoData || '');
                     logoFile.value = '';
                     contentStatus.textContent = 'Public portal content saved. Updates are live on the public portal.';
                     contentStatus.classList.add('text-emerald-700');
@@ -1834,28 +2515,51 @@
             return result;
         });
         wrap('handleFacultySubmit', async function () {
+            const id = value('fac-id');
             const payload = {
                 name: value('fac-name'),
                 rank: value('fac-rank'),
                 department: value('fac-dept'),
-                load: value('fac-load')
+                load: value('fac-load'),
+                active: checked('fac-active')
             };
-            const result = await api('/principal/faculty', {
-                method: 'POST',
+            const result = await api(id ? `/principal/faculty/${encodeURIComponent(id)}` : '/principal/faculty', {
+                method: id ? 'PATCH' : 'POST',
                 body: JSON.stringify(payload)
             });
-            for (const [id, field] of [['fac-name', 'name'], ['fac-rank', 'rank'], ['fac-dept', 'department'], ['fac-load', 'load']]) {
-                const input = document.getElementById(id);
-                if (input) input.value = escapeHtml(payload[field]);
-            }
-            return result;
+            return { ...result, wasUpdate: Boolean(id) };
         }, async function (original, args, result) {
             original.apply(this, args);
-            await loadPrincipalFaculty();
-            await loadPrincipalOverview();
-            await loadPrincipalAudit();
+            notify(`Faculty record ${result.wasUpdate ? 'updated' : 'created'} for ${result.faculty.name}.`);
+            try {
+                await Promise.all([loadPrincipalFaculty(), loadPrincipalOverview(), loadPrincipalAudit()]);
+            } catch (error) {
+                console.error('Faculty record was saved but the oversight view could not be refreshed:', error);
+                notify(`Faculty record was saved, but the view could not be refreshed: ${error.message}`);
+            }
             return result;
         });
+        window.deleteFacultyRecord = async function (id) {
+            const member = (typeof facultyRoster !== 'undefined' ? facultyRoster : []).find(record => String(record.id) === String(id));
+            if (!member) {
+                notify('That faculty record is no longer available. Refresh the roster and try again.');
+                return;
+            }
+            if (!window.confirm(`Permanently delete ${member.name}'s personnel record? This cannot be undone.`)) return;
+            try {
+                await api(`/principal/faculty/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                notify(`Faculty record deleted for ${member.name}.`);
+                try {
+                    await Promise.all([loadPrincipalFaculty(), loadPrincipalOverview(), loadPrincipalAudit()]);
+                } catch (error) {
+                    console.error('Faculty record was deleted but the oversight view could not be refreshed:', error);
+                    notify(`Faculty record was deleted, but the view could not be refreshed: ${error.message}`);
+                }
+            } catch (error) {
+                console.error('Could not delete faculty record:', error);
+                notify(`Could not delete faculty record: ${error.message}`);
+            }
+        };
         wrap('handleBroadcastSubmit', async function () {
             return api('/principal/broadcasts', {
                 method: 'POST',
@@ -2023,6 +2727,7 @@
             : path.endsWith('principal_super_admin_dashboard.html') ? 'principal'
                 : path.endsWith('enrollment_records_management_system.html') ? ['registrar', 'principal']
                     : null;
+    initializeInterfaceStates();
     if (guardRoles) onDashboard(path, guardRoles);
 
     window.SERMS_API = api;
